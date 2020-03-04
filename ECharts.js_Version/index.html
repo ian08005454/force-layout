@@ -1,0 +1,148 @@
+<!-- version 1.0 -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="./source/images/academia_sinica_icon.ico" type="image/x-icon" />
+    <title>Force Layout</title>
+
+    <!-- CSS -->
+    <!-- <link rel="stylesheet" href="./css/reset.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
+    <link rel="stylesheet" href="./css/index.css">
+
+
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="sidebar">
+            <div class="sidebar_level">
+                <p class="current_relation">呈現 / 總關係線段 : </p>
+                <p class="current_node">呈現 / 總節點數 : </p>
+            </div>
+            <div class="slider">
+                
+                <!-- <div class="slider_item">
+                    <label class="slider_describe" for="relation_strength">關係強度 : </label>
+                    <input type="text" value="" id="relation_strength">
+                    <div class="slider_slider" id="relation_strength"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="word_strength">詞頻強度 : </label>
+                    <input type="text" value="" id="word_strength">
+                    <div class="slider_slider" id="word_strength"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="group_label_distance">群間距離 : </label>
+                    <input type="text" value="" id="group_label_distance">
+                    <div class="slider_slider" id="group_label_distance"></div>
+                </div> -->
+                <div class="slider_item">
+                    <label class="slider_describe" for="relation_distance">關係線段距離長度 : </label>
+                    <input type="text" value="" id="relation_distance">
+                    <div class="slider_slider" id="relation_distance"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="relation_link_width">關係線段粗細 : </label>
+                    <input type="text" value="" id="relation_link_width">
+                    <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
+                    <div class="slider_slider" id="relation_link_width"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="main_screen_room">整體圖形縮放 : </label>
+                    <input type="text" value="" id="main_screen_room">
+                    <div class="slider_slider" id="main_screen_room"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="relation_font_size">關係線段字體大小 : </label>
+                    <input type="text" value="" id="relation_font_size">
+                    <div class="slider_slider" id="relation_font_size"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="subject_font_size">節點字體大小 : </label>
+                    <input type="text" value="" id="subject_font_size">
+                    <div class="slider_slider" id="subject_font_size"></div>
+                </div>
+                <div class="slider_item">
+                    <label class="slider_describe" for="node_size">圓圈大小 : </label>
+                    <input type="text" value="" id="node_size">
+                    <div class="slider_slider" id="node_size"></div>
+                </div>
+                <div class="slider_item word_strength">
+                    <label class="slider_describe" for="word_strength">詞頻強度 ≥ </label>
+                    <input type="text" value="" id="word_strength">
+                    <div class="slider_slider" id="word_strength"></div>
+                </div>
+                <div class="slider_item common_show_value">
+                    <label class="slider_describe" for="common_show_value">共現次數 ≥ </label>
+                    <input type="text" value="" id="common_show_value" name="cs_value" width="100px">
+                    <div class="slider_slider" id="common_show_value"></div>
+                </div>
+                <div class="slider_item max_level">
+                    <label class="slider_describe" for="max_level">最大階層數 : </label>
+                    <input type="text" value="" id="max_level">
+                    <div class="slider_slider" id="max_level"></div>
+                </div>
+            </div>
+            <div class="keyword_search" id ="ksearch">
+                <label>"/"=OR,空格=AND</label>
+                <!-- <button id="addmore_btn" type="submit">+</button> -->
+                <input type="text" placeholder="搜尋節點" id="keyword_search_field">
+                <button id="keyword_search_button" type="submit">搜尋</button>
+                <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
+                <button id="keyword_search_button2" type="submit">搜尋</button> -->
+                <div class="keyword">
+                </div>
+            </div>
+            <!-- <div id="choose_color"></div> -->
+        </div>
+        <div id="main" style="width: 1480px;height:800px;"></div>
+    </div>
+    <!-- CDN JS library  -->
+
+    <!-- avoid echarts.js library console.warn, use the download file and common out console.warn @lib/echarts 4.2.0-rc.2.js line 72314 which is warning about Legend data should be same with series name or data name-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.0-rc.2/echarts.js"></script> -->
+    <script src="./lib/echarts 4.2.0-rc.2.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+
+    <!-- resource -->
+    <!-- english data -->
+    <!-- <script src="./source/paragraph.js"></script> -->
+    <!-- <script src="./source/paragraph copy.js"></script> -->
+    <!-- <script src="./source/book.js"></script> -->
+    <!-- <script src="./source/multi-paragraph.js"></script> -->
+    <!-- <script src="./source/p_test.js"></script> -->
+    <!-- <script src="./source/p_test1.js"></script> -->
+    <script src="./source/book 2.js"></script>
+
+
+    <!-- chinese data -->
+    <!-- <script src="./source/Hung Li.js"></script>  -->
+    <!-- <script src="./source/test.js"></script> -->
+    <!-- <script src="./source/2d_combine_synonyms_with_custom_relations_none_direction.js"></script> -->
+
+    <!-- js file -->
+    <script src="./js/node_css.js"></script>
+    <script src="./js/new_data_format.js"></script>
+    <script src="./js/API.js"></script>
+    <script src="./js/Main_setting.js"></script>
+    <!-- <script src="./js/new_Event.js"></script> -->
+    <!-- <script src="./js/new_Event copy.js"></script> -->
+    <!-- //new_Event copy2 修復搜尋錯亂 -->
+    <!-- <script src="./js/new_Event copy2.js"></script> -->
+    <!-- <script src="./js/new_Event copy3.js"></script> -->
+    <!-- <script src="./js/new_Event copy mouse.js"></script> -->
+    <!-- <script src="./js/new_Event copy mouse_temp_ok.js"></script> -->
+    <script src="./js/new_Event copy mouse_temp_ver2.js"></script>
+    <!-- <script src="./js/add_color.js"></script> -->
+    <!-- <script src="./js/test.js"></script> -->
+</body>
+
+</html>
