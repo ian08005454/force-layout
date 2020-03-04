@@ -39,11 +39,11 @@ keyword.length == 0 ? $(".max_level").hide() : $(".max_level").show();
 function keyword_search(e) {
     // get the search name
     var keyword_search_name = $('#keyword_search_field').val();
+    keyword_search_name = keyword_search_name.trim();
     var keyword_search_name_s = [];
-
-    if (keyword_search_name.includes(" ")) {//搜尋兩個 AND
+    if (keyword_search_name.includes("&")) {//搜尋兩個 AND
         //keyword
-        keyword_search_name_s = keyword_search_name.split(" ");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
+        keyword_search_name_s = keyword_search_name.split("&");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
         db_firstkey_search.push(keyword_search_name_s[0]);
         db_firstkey_search = Array.from(new Set(db_firstkey_search));
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
@@ -53,398 +53,34 @@ function keyword_search(e) {
     } else if (keyword_search_name.includes("/")) {//搜尋兩個 OR
         keyword_search_name_s = keyword_search_name.split("/");//keyword_search_name_s=[]
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
-            if (data.all_nodes.includes(keyword_search_name_s[0], keyword_search_name_s[1])) {
-                keyword_search_verify_pass_or(keyword_search_name_s);
-                // keyword_search_verify_pass_or(keyword_search_name_s[1]);
-            } else {
-                keyword_search_verify_fail();
-            }
-        };
+            for(var i=0,keywordLen = keyword_search_name_s.length; i < keywordLen; i++){
+                keyword_search_verify_pass(keyword_search_name_s[i]);
+        }
+        }
     } else {//搜尋一個
         keyword_search_name_s.push(keyword_search_name);
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
-            data.all_nodes.includes(keyword_search_name_s[0]) ? keyword_search_verify_pass(keyword_search_name_s[0]) : keyword_search_verify_fail();
+            keyword_search_verify_pass(keyword_search_name_s[0]);
         };
     }
-    /////搜尋兩個 OR
-    function keyword_search_verify_pass_or(kwd_search_name) {
-        $(".max_level").show();
-        $(".common_show_value").hide();
-        $(".word_strength").hide();
-
-        // avoid same keyword search twice
-        if (keyword_or.includes(kwd_search_name)) {
-            alert(`Error, same keyword can not search more than twice`);
-            $('#keyword_search_field').val('');
-            return;
-        }
-        keyword.push(kwd_search_name[0]);
-        keyword.push(kwd_search_name[1]);
-        $('#keyword_search_field').val(''); // clear the keyword search field
-        data_filter();
-        event_setOption_function();
-        sidebar_level_render();
-        keyword_item_append();
-        keyword_item_delete_or();
-    }
-    function keyword_item_delete_or(){
-        // avoid to bind the click(delete) event twice, have to unbind the first click event first.
-        $('.keyword_delete').off('click').click(e => {
-            //////////////
-            console.log("keyword"+keyword);
-            console.log(keyword.indexOf(e.currentTarget.dataset.name));//找不到
-            console.log(e.currentTarget.dataset.name);
-            
-            keyword.splice(keyword.indexOf(e.currentTarget.dataset.name)-1, 2);
-            // db_firstkey_search.splice(db_firstkey_search.indexOf(e.currentTarget.dataset.name), 2);
-            $(`div[data-item="${e.currentTarget.dataset.name}"]`).remove();
-            console.log("keyword"+keyword);
-            keyword_search_reset();//有問題
-            event_setOption_function();
-            sidebar_level_render();
-            if (keyword.length == 0) {
-                $(".max_level").hide();
-                if (onlyLOD == 1) {
-                    $(".common_show_value").hide();
-                    $(".word_strength").hide();
-                } else {
-                    $(".common_show_value").show();
-                    $(".word_strength").show();
-                }
-            }
-        });
-    }
-
-
-
-    /////搜尋兩個OR
-
-
     ////搜尋兩個AND start------------------------------------------------
-
-    function search_more_and() {//搜尋兩個 and
-        //確保所蒐尋的兩個name都有在同一組裡面
-        // console.log(db_firstkey_search);
-        collect_and = [];
-        option.series[0].categories = data.category.filter(category => {
-            if (db_firstkey_search.includes(category.target) || db_firstkey_search.includes(category.source)) {
-                collect_more.push(category.target, category.source);
-                return category;
-            }
-        });
-
-        let minus1 = $(collect_more).not(db_firstkey_search).toArray();
-        for (let i = 1; i < 8; i++) {//4是自訂的數量
-            option.series[0].categories = data.category.filter(category => {
-                if (minus1.includes(category.target) || minus1.includes(category.source)) {
-                    collect_and.push(category.target, category.source);
-                    // console.log(collect_and);//這個!!
-                    return category;
-                }
-            });
-            collect_and = Array.from(new Set(collect_and));
-            minus1 = $(collect_and).not(db_firstkey_search).toArray();
-        };
-        if (collect_and.includes(keyword_search_name_s[1])) {
-            //確定都有的話回傳true
-            console.log("collect_and*/-");
-            console.log(collect_and);
-            return true;
-        }
-        else {//否則回傳false
-            return false;
-        }
-    }
-
-    function search_more_pass() {//搜尋兩個 AND
-        $(".max_level").hide();
-        $(".common_show_value").hide();
-        $(".word_strength").hide();
-
-        if (db_firstkey_search.includes(keyword_search_name)) {//重複搜尋的判斷
-            alert(`Error, same keyword can not search more than twice`);
-            return;
-        }
-        // db_firstkey_search.push(keyword_search_name);
-        $('#keyword_search_field').val('');
-        search_double();
-        event_setOption_function();
-        sidebar_level_render();
-        keyword_item_append();
-        keyword_item_delete_AND();
-    }
-    function search_double() {//找到and的第二個人並顯示在畫面上 
-        //從單一點開始找
-        union_collect = [];
-        and_collcet = [];
-        let main_arr = [];
-        var srh_name;//只存要先搜尋的name 兩個其中一個
-        var temp_save_obj = [];//裝跑回圈所占存的node
-        var temp_name = [];//i = 0 錢俊
-        ///
-        var repeat;
-        var temp_array1 = [];
-        var temp_array2 = [];
-        var count = 1;
-        var outcome = 0;
-        // filter_i(keyword_search_name_s);
-        selet_easy_name(keyword_search_name_s);
-        find_main_arr(main_arr, union_collect, srh_name[0]);
-
-        option.series[0].links = save_obj.filter(category => {
-            collect_more.push(category.source, category.target);
-
-            union_collect_category_AND.push(category.source, category.target);
-
-            return category;
-        })
-        collect_more = Array.from(new Set(collect_more));
-        union_collect_category_AND = Array.from(new Set(union_collect_category_AND));
-        collect_more.push(srh_name);
-
-        option.series[0].nodes = data.nodes.filter(node => {
-            console.log(keyword_search_name_s);//這個內的要變成紅色的字
-            // console.log(collect_more);
-            // console.log(union_collect_category_AND);
-            keyword_search_name_s.includes(node.name) ? node.itemStyle.normal.color = 'red' : node.itemStyle.normal.color = user_colors[node.gp];//原color[node.gp]
-            return collect_more.includes(node.name) && union_collect_category_AND.includes(node.name);
-        })
-        option.series[0].categories = option.series[0].links;
-        /////////////////////////////////////////////////////////////////////
-
-        function filter_i(ANDarrayelmt) {//將輸入的node的下一層顯示出來
-            let temp1 = [],//存輸入的第一個name
-                temp2 = [],//存輸入的第二個name
-                arr1 = [],//存與temp1相連的node
-                arr2 = [],
-                arr3 = [];//裝arr1 arr2合併的值
-            console.log("fsdfdfsfdsfgb");
-            temp1.push(ANDarrayelmt[0]);
-            temp2.push(ANDarrayelmt[1]);
-
-            option.series[0].categories = data.category.filter(category => {
-                //將name1的下一層找出來
-                if (ANDarrayelmt[0].includes(category.target) || ANDarrayelmt[0].includes(category.source)) {
-                    arr1.push(category.target, category.source);
-                }
-            });
-
-            arr1 = Array.from(new Set(arr1));//將重複的刪掉
-            console.log(arr1);
-            console.log(ANDarrayelmt[1]);
-            // console.log(arr1.includes(ANDarrayelmt[1]));
-            // console.log(arr1.includes(ANDarrayelmt[0]));
-
-            if (arr1.includes(ANDarrayelmt[1])) {//判斷如果name1的下一層包含name2的話
-                console.log("work");
-                //將需要的link抓出來
-                option.series[0].categories = data.category.filter(category => {
-                    if (ANDarrayelmt[0].includes(category.target) && ANDarrayelmt[1].includes(category.source)) {
-                        return category;//顯示結果
-                    } else if (ANDarrayelmt[0].includes(category.source) && ANDarrayelmt[1].includes(category.target)) {
-                        return category;
-                    }
-                })
-                console.log(option.series[0].categories);//ex 錢臻 方受疇 的link 
-                count++;
-
-                console.log(count);
-            } else {//判斷如果name1的下一層不包含的話
-                // console.log("workwork");
-                // count++;
-                console.log(count);
-                while (outcome == 0) {
-                    console.log("xzxxz");//work
-                    if (count % 2 == 0) {//偶數
-                        console.log("nmnbbmb");
-
-                        option.series.categories = data.category.filter(category => {
-                            if (ANDarrayelmt[1].includes(category.target) || ANDarrayelmt[1].includes(category.source)) {
-                                arr2.push(category.target, category.source);
-                            }
-                        })
-                        arr2 = Array.from(new set(arr2));
-                        arr3 = arr1.concat(arr2);
-                        repeat = arr3.filter((element, index, arr) => {//將重複的node提出
-                            // console.log(ele,index,arr);
-                            return arr.indexOf(element) !== index;
-                        })
-                        outcome = 1;
-                        if (repeat) {
-                            console.log(repeat);
-                            console.log("repeat");
-                            outcome = 1;
-                            // break;
-                        } else {
-                            console.log("hahaa");
-                            break;
-                        }
-
-                    } else {//奇數
-                        console.log("nmnbbmb1321");
-
-                        break;
-                    }
-
-                }
-            }
-
-
-
-
-
-
-
-
-            // temp2.push(ANDarrayelmt[1]);
-            // option.series[0].categories = data.category.filter(category => {
-            //     if (ANDarrayelmt[1].includes(category.target) || ANDarrayelmt[1].includes(category.source)) {
-            //         arr2.push(category.target, category.source);
-            //     }
-            // });
-            // arr1 = Array.from(new Set(arr1));
-            // arr2 = Array.from(new Set(arr2));
-            // console.log(arr1);//node1和自己的下一層
-            // console.log(arr2);//node2和自己的下一層
-
-            // let arr3 = arr1.concat(arr2);
-            // repeat = arr3.filter((element, index, arr) => {//將重複的node提出
-            //     // console.log(ele,index,arr);
-            //     return arr.indexOf(element) !== index;
-            // })
-            // console.log(repeat);
-            // if (repeat.length !== 0) {///有的話結束跳出
-            //     console.log("repeat is exit");
-            // } else {//如果沒有重複的話 要繼續重複執行
-            //     console.log("repeat is not exit");
-
-            // }
-        }
-
-        function selet_easy_name(nameArrayElmt) {//之前的
-            //選擇從比較簡單的name開始計算
-            let temp1 = [], temp2 = [], u1 = [], u2 = [];
-
-            temp1.push(nameArrayElmt[0]);
-            option.series[0].categories = data.category.filter(category => {
-                if (nameArrayElmt[0].includes(category.target) || nameArrayElmt[0].includes(category.source)) {
-                    u1.push(category.target, category.source);
-                }
-            });
-            temp2.push(nameArrayElmt[1]);
-            option.series[0].categories = data.category.filter(category => {
-                if (nameArrayElmt[1].includes(category.target) || nameArrayElmt[1].includes(category.source)) {
-                    u2.push(category.target, category.source);
-                }
-            });
-            u1 = Array.from(new Set(u1));
-            u2 = Array.from(new Set(u2));
-            // console.log(u1);
-            // console.log(u2);
-            if (u1.length <= u2.length) {
-                main_arr = temp1;
-                union_collect = u1;
-                srh_name = temp2;
-            } else {
-                main_arr = temp2;
-                union_collect = u2;
-                srh_name = temp1;
-            }
-
-        }
-
-        //////////////////////////////////////////////////////////////////////////
-        function find_main_arr(main_arr, union_collect, srh_name) {//之前的
-            main_arr.arr = [];//忘記為啥要這樣
-            // console.log("00000start find main fun");
-            //第一層級找到第二個要搜尋的name
-            // console.log(union_collect);//錢臻", "錢俊", "方受疇", "錢楷", "吳璥蒐集與錢臻相連的node包含錢臻
-            // console.log(main_arr);//錢臻
-            // console.log('srh_name' + srh_name);//錢臻
-            //判斷union_collect有沒有B
-            if (union_collect.includes(srh_name)) {//union_collect有B
-                // console.log("yesyeesyeseyseyseys");
-                // console.log("main_arr" + main_arr);
-                // console.log("srh_name" + srh_name);
-                option.series[0].categories = data.category.filter(category => {
-
-                    if (main_arr.includes(category.target) && srh_name.includes(category.source)) {
-                        return category;//顯示結果
-                    } else if (main_arr.includes(category.source) && srh_name.includes(category.target)) {
-                        return category;
-                    }
-                })
-                save_obj = save_obj.concat(temp_save_obj);
-                save_obj = save_obj.concat(option.series[0].categories);
-                save_obj = Array.from(new Set(save_obj));
-                // console.log("save_obj");
-                // console.log(save_obj);
-            } else {//union_collect沒有B
-                // console.log("noooooooooooo");
-                var temp_collect;//收集存在["錢俊", "方受疇", "錢楷", "吳璥"]個別的點
-                var temp_minus = [];//第一輪排除錢臻, 與第一個name相連的點
-                // temp_minus.length = 0;
-                temp_minus = $(union_collect).not(main_arr).toArray();//與第一個name相連的點
-                console.log(temp_minus);// ["錢俊", "方受疇", "錢楷", "吳璥"]
-                union_collect = [];
-                temp_name = [];//i = 0 錢俊
-
-                for (let i = 0; i < temp_minus.length; i++) {
-                    // console.log("1212")
-                    // console.log(temp_minus.length);
-                    temp_name.length = 0;
-                    temp_name.push(temp_minus[i]);//要是arr形式
-
-                    // console.log(temp_name);
-                    temp_collect = [];
-                    option.series[0].categories = data.category.filter(category => {
-                        // console.log(temp_minus[i]);
-                        //看有沒有其他link
-                        if (temp_name.includes(category.target) || temp_name.includes(category.source)) {
-                            temp_collect.push(category.target, category.source);//輸入和錢俊相連的點
-                            return category;
-                        }
-                    });
-                    // console.log(option.series[0].categories);
-                    temp_collect = Array.from(new Set(temp_collect));//連結的點放到temp_collect
-                    // 判斷是否有第三layer
-                    if (temp_collect.length === 2) {//此點除了和原本的點連結還沒有其他點
-                        // console.log("1111111");
-                        temp_minus.splice(i, 1);
-                        i = i - 1;
-
-                    } else {//有其他link
-                        // console.log("2222222");
-                        option.series[0].categories = data.category.filter(category => {
-                            // console.log(temp_minus[i]);
-                            //看有沒有其他link
-                            if (main_arr.includes(category.target) && temp_collect.includes(category.source)) {
-                                return category;
-                            } else if (temp_collect.includes(category.target) && main_arr.includes(category.source)) {
-                                return category;
-                            }
-                        });
-                        temp_save_obj = temp_save_obj.concat(option.series[0].categories);
-                        temp_save_obj = Array.from(new Set(temp_save_obj));
-                        //////////
-                        temp_collect = $(temp_collect).toArray();
-                        main_arr.push(temp_name[0]);
-                        // console.log(main_arr);
-                        // console.log(temp_name);
-                        find_main_arr(temp_name, temp_collect, srh_name)
-                    }
-                    // console.log('main_arr' + main_arr);
-
-                }
-            }
-        }
-
-
-
-    }
+    // function search_and(){
+        
+    // }
+ 
     ////搜尋兩個AND --end --
 
     function keyword_search_verify_pass(kwd_search_name) {//kwd_search_name只有一個 name
+
+        kwd_search_name = kwd_search_name.trim();        
+        if(!data.all_nodes.includes(keyword_search_name_s[0])){
+            alert(`Cannot find keyWord : ${kwd_search_name}`);
+            return;
+        }
+        if(kwd_search_name.length == 0){
+            return;
+        }
+        
 
         $(".max_level").show();
         $(".common_show_value").hide();
@@ -461,7 +97,7 @@ function keyword_search(e) {
         data_filter();
         event_setOption_function();
         sidebar_level_render();
-        keyword_item_append();
+        keyword_item_append(kwd_search_name);
         keyword_item_delete();
     };
 
@@ -471,10 +107,10 @@ function keyword_search(e) {
 
     // append keyword div in keyword field
     //下方新增delete鍵
-    function keyword_item_append() {
-        $('.keyword').append(`<div class="keyword_item" data-item="${keyword_search_name}">
-        <p class="keyword_name" >${keyword_search_name}</p>
-        <button class="keyword_delete" data-name='${keyword_search_name}'>delete</button>
+    function keyword_item_append(kwd_search_name) {
+        $('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+        <p class="keyword_name" >${kwd_search_name}</p>
+        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
     </div>`)
         console.log(keyword_search_name);
     };
@@ -1073,5 +709,3 @@ Chart.on('click', e => {
         });
     }
 })
-
-

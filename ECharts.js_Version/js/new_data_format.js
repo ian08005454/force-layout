@@ -309,22 +309,25 @@ var hslLength = HSL.length;
     ret[2]= Math.floor(Math.random() * 100);
     for (var i = 0; i < hslLength; i++) {
         // 色相差異調整
-        if (i > 0 && Math.abs(ret[0] - HSL[i]) < 7) {
-           return getRandomRolor ();
+        if (i > 0 && Math.abs(ret[0] - HSL[i][0]) < 12 || Math.abs(ret[0]*ret[1] - HSL[i][0]*HSL[i][1]) < 1000) {
+            ret[0]= Math.floor(Math.random() * 360);
+            ret[1]= Math.floor(Math.random() * 100);
+            ret[2]= Math.floor(Math.random() * 100);
+            i = 0;
         }
         }
         ret[1] = 70 + (ret[1] * 0.3); // [0.7 - 0.9] 排除过灰颜色
-        ret[2] = 30 + (ret[2] * 0.5); // [0.4 - 0.8] 排除过亮过暗色
+        ret[2] = 30 + (ret[2] * 0.45); // [0.4 - 0.8] 排除过亮过暗色
 
         // 数据转化到小数点后两位
         ret = ret.map(function (item) {
         return parseFloat(item.toFixed(2));
         });
 
-        HSL.push(ret[0]);
-        console.log(ret);
+        HSL.push(ret);
+        // console.log(ret);
         var color = hslToHex(ret[0], ret[1], ret[2])
-        console.log(color);
+        // console.log(color);
         return color;
     }
 //https://stackoverflow.com/questions/36721830/convert-hsl-to-rgb-and-hex
