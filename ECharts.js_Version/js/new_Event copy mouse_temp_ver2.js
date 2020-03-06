@@ -2,24 +2,11 @@
 //搜尋兩個or暫時刪除 02/10
 // variable
 var keyword = [];//single search
-var db_firstkey_search = [];//for double search
-var collect_and = [];//search_and蒐集確定在同一個群的所有nodes ex 張三~戚戚是一群
-var keyword_or = [];
-
 var union_collect = [];
-var and_collect = [];
-var or_collect = [];
-var collect_more = [];//and_search 
 var category_collect = [];
-
 var ui_user;
 var union_collect_category_AND = [];//AND搜尋 蒐集name1 name2之間連結的links
 var save_obj = [];//AND 1不可以改位置 //裝所需要的顯示的所有nodes的array(link) ex 錢臻~方維甸 ->錢臻 方受籌 方維甸的link
-
-// var temp_category = [];
-
-
-
 // window resize //detect window resizing and resize the chart
 window.onresize = () => {
     Chart.resize();
@@ -44,10 +31,10 @@ function keyword_search(e) {
     if (keyword_search_name.includes("&")) {//搜尋兩個 AND
         //keyword
         keyword_search_name_s = keyword_search_name.split("&");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
-        db_firstkey_search.push(keyword_search_name_s[0]);
-        db_firstkey_search = Array.from(new Set(db_firstkey_search));
+        // db_firstkey_search.push(keyword_search_name_s);
+        // db_firstkey_search = Array.from(new Set(db_firstkey_search));
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
-            search_more_and() ? search_more_pass() : keyword_search_verify_fail();
+            search_AND(keyword_search_name_s);
         };
 
     } else if (keyword_search_name.includes("/")) {//搜尋兩個 OR
@@ -64,23 +51,89 @@ function keyword_search(e) {
         };
     }
     ////搜尋兩個AND start------------------------------------------------
-    // function search_and(){
+    //https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
+    function search_AND(keyword_search_name_s){
+        var primaryStack = new Array();
+        var secondaryStack = new Array();
+        var markStack = new Array();
+        for(var i = 0,keywordLen = keyword_search_name_s.length;i<keywordLen; i++){
+            keyword_search_name_s[i] = keyword_search_name_s[i].trim();
+            if(keyword_search_name_s[i].length == 0){
+                return;
+            }       
+            if(!data.all_nodes.includes(keyword_search_name_s[i])){
+                return keyword_search_verify_fail(keyword_search_name);
+            }
+        }
+        $(".max_level").hide();
+        $(".common_show_value").hide();
+        $(".word_strength").hide();
+        // avoid same keyword search twice
+        var keywordTemp = keyword_search_name_s[0];
+        $('#keyword_search_field').val(''); // clear the keyword search field
+        var nodeCollection;
+        do{
+        nodeCollection = [];
+        primaryStack.push(keywordTemp);
+        markStack.push(keywordTemp);
+        var temp = data.category.filter(category => {
+            return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
+        });
+        var linktemp = temp.filter(category => {
+                nodeCollection.push(category.target, category.source);
+        });
+        console.log(nodeCollection);//會記錄所有append的node
+        nodeCollection = Array.from(new Set(nodeCollection));
+        console.log(nodeCollection);
+        var count = 0;
+        for(var i =0,uLen = nodeCollection.length;i < uLen;i++){
+            if(!primaryStack.includes(nodeCollection[i]) && !markStack.includes(nodeCollection[i])){
+                console.log(nodeCollection[i]);
+                secondaryStack.push(nodeCollection[i]);
+                count++;
+            }
+        }
+        console.log(secondaryStack);
+        if (primaryStack.length == 0 || secondaryStack.length == 0){
+            alert(`Error2 : Cannot their route : ${keyword_search_name}`);
+            return;
+        }
+        if(count === 0){
+            secondaryStack.push(" ");
+        }
+        if(primaryStack[primaryStack.length-1] == keyword_search_name_s[1]){
+            break;
+        }
+        keywordTemp = secondaryStack.pop();
+        while (keywordTemp ==" "){
+            primaryStack.pop();
+            keywordTemp = secondaryStack.pop();
+        }
+        console.log(keywordTemp);
+        console.log(primaryStack);
+        console.log(secondaryStack);
+    }while(1)
+    console.log("YA!!!!!");
+    console.log(primaryStack);
+
+        // event_setOption_function();
+        // sidebar_level_render();
+        // keyword_item_append(keyword_search_name);
+        // keyword_item_delete();
         
-    // }
+    }
  
     ////搜尋兩個AND --end --
 
-    function keyword_search_verify_pass(kwd_search_name) {//kwd_search_name只有一個 name
+    function keyword_search_verify_pass(kwd_search_name) {
 
-        kwd_search_name = kwd_search_name.trim();        
-        if(!data.all_nodes.includes(keyword_search_name_s[0])){
-            alert(`Cannot find keyWord : ${kwd_search_name}`);
-            return;
-        }
+        kwd_search_name = kwd_search_name.trim(); 
         if(kwd_search_name.length == 0){
             return;
+        }       
+        if(!data.all_nodes.includes(kwd_search_name)){
+            return keyword_search_verify_fail(kwd_search_name);
         }
-        
 
         $(".max_level").show();
         $(".common_show_value").hide();
@@ -88,7 +141,7 @@ function keyword_search(e) {
 
         // avoid same keyword search twice
         if (keyword.includes(kwd_search_name)) {
-            alert(`Error, same keyword can not search more than twice`);
+            alert(`Error :  same keyword can not search more than twice`);
             $('#keyword_search_field').val('');
             return;
         }
@@ -101,13 +154,15 @@ function keyword_search(e) {
         keyword_item_delete();
     };
 
-    function keyword_search_verify_fail() {//一個 name
-        alert(`Cannot find keyWord : ${keyword_search_name}`);
+    function keyword_search_verify_fail(kwd_search_name) {//一個 name
+        alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
     };
 
     // append keyword div in keyword field
     //下方新增delete鍵
     function keyword_item_append(kwd_search_name) {
+        keyword.push(kwd_search_name);
+        $('#keyword_search_field').val(''); // clear the keyword search field
         $('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
         <p class="keyword_name" >${kwd_search_name}</p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
@@ -125,7 +180,7 @@ function keyword_search(e) {
         function data_filter_max_level_1() {
 
             let union_collect_category_show = [];
-            console.log(keyword);
+            console.log(keyword); 
             option.series[0].categories = data.category.filter(category => {
                 return keyword.includes(category.target) || keyword.includes(category.source);
             });
@@ -231,33 +286,33 @@ function keyword_search(e) {
             }
         });
     };
-    function keyword_item_delete_AND() {
-        // avoid to bind the click(delete) event twice, have to unbind the first click event first.
-        $('.keyword_delete').off('click').click(e => {
-            // keyword.splice(keyword.indexOf(e.currentTarget.dataset.name), 1);
-            let name = e.currentTarget.dataset.name.split(" ");
-            // console.log(db_firstkey_search.indexOf(e.currentTarget.dataset.name));
-            db_firstkey_search.splice(db_firstkey_search.indexOf(name[0]), 1);
-            // console.log("db_firstkey_search" + db_firstkey_search);
-            $(`div[data-item="${e.currentTarget.dataset.name}"]`).remove();
-            // console.log("db_firstke/y_search" + db_firstkey_search);
-            // console.log(keyword);
-            db_firstkey_search_search_reset_AND();//有問題
-            event_setOption_function();
-            sidebar_level_render();
-            if (db_firstkey_search.length == 0) {
-                $(".max_level").hide();
-                if (onlyLOD == 1) {
-                    $(".common_show_value").hide();
-                    $(".word_strength").hide();
-                } else {
-                    $(".common_show_value").show();
-                    $(".word_strength").show();
-                }
+    // function keyword_item_delete_AND() {
+    //     // avoid to bind the click(delete) event twice, have to unbind the first click event first.
+    //     $('.keyword_delete').off('click').click(e => {
+    //         // keyword.splice(keyword.indexOf(e.currentTarget.dataset.name), 1);
+    //         let name = e.currentTarget.dataset.name.split(" ");
+    //         // console.log(db_firstkey_search.indexOf(e.currentTarget.dataset.name));
+    //         db_firstkey_search.splice(db_firstkey_search.indexOf(name[0]), 1);
+    //         // console.log("db_firstkey_search" + db_firstkey_search);
+    //         $(`div[data-item="${e.currentTarget.dataset.name}"]`).remove();
+    //         // console.log("db_firstke/y_search" + db_firstkey_search);
+    //         // console.log(keyword);
+    //         db_firstkey_search_search_reset_AND();//有問題
+    //         event_setOption_function();
+    //         sidebar_level_render();
+    //         if (db_firstkey_search.length == 0) {
+    //             $(".max_level").hide();
+    //             if (onlyLOD == 1) {
+    //                 $(".common_show_value").hide();
+    //                 $(".word_strength").hide();
+    //             } else {
+    //                 $(".common_show_value").show();
+    //                 $(".word_strength").show();
+    //             }
 
-            }
-        });
-    };
+    //         }
+    //     });
+    // };
     // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
     // compute the render data when user choose the data to delete in keyword field 
     function keyword_search_reset() {
@@ -283,41 +338,41 @@ function keyword_search(e) {
         console.log("reset3");
         union_collect = Array.from(new Set(union_collect));
         option.series[0].nodes = data.nodes.filter(node => {
-            console.log(keyword);
             keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : node.itemStyle.normal.color = user_colors[node.gp];//原color[node.gp]
+            console.log(keyword);
             return union_collect.includes(node.name);
         });
         change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
     }
-    function db_firstkey_search_search_reset_AND() {
-        union_collect_category_AND = [];
-        console.log(db_firstkey_search);
-        if (db_firstkey_search.length == 0) {
-            console.log("AND1");
-            option.series[0].categories = data.all_category;
-        } else {//這裡要改
-            console.log("AND2");
-            option.series[0].categories = data.all_category.filter(category => {
-                return db_firstkey_search.includes(category.target) || db_firstkey_search.includes(category.source);
-            })
-        }
-        option.series[0].links = option.series[0].categories.filter(category => {
-            // return the category that show property is true
-            if (category.show == true) {
-                union_collect_category_AND.push(category.target, category.source);
-                return category;
-            }
-        })
-        console.log("AND3");
-        // remove the duplicate name which in the union_collect
-        union_collect_category_AND = Array.from(new Set(union_collect_category_AND));
-        option.series[0].nodes = data.nodes.filter(node => {
-            console.log(db_firstkey_search);
-            db_firstkey_search.includes(node.name) ? node.itemStyle.normal.color = 'red' : node.itemStyle.normal.color = user_colors[node.gp];//原color[node.gp]
-            return union_collect_category_AND.includes(node.name);
-        });
-        change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
-    }
+    // function db_firstkey_search_search_reset_AND() {
+    //     union_collect_category_AND = [];
+    //     console.log(db_firstkey_search);
+    //     if (db_firstkey_search.length == 0) {
+    //         console.log("AND1");
+    //         option.series[0].categories = data.all_category;
+    //     } else {//這裡要改
+    //         console.log("AND2");
+    //         option.series[0].categories = data.all_category.filter(category => {
+    //             return db_firstkey_search.includes(category.target) || db_firstkey_search.includes(category.source);
+    //         })
+    //     }
+    //     option.series[0].links = option.series[0].categories.filter(category => {
+    //         // return the category that show property is true
+    //         if (category.show == true) {
+    //             union_collect_category_AND.push(category.target, category.source);
+    //             return category;
+    //         }
+    //     })
+    //     console.log("AND3");
+    //     // remove the duplicate name which in the union_collect
+    //     union_collect_category_AND = Array.from(new Set(union_collect_category_AND));
+    //     option.series[0].nodes = data.nodes.filter(node => {
+    //         console.log(db_firstkey_search);
+    //         db_firstkey_search.includes(node.name) ? node.itemStyle.normal.color = 'red' : node.itemStyle.normal.color = user_colors[node.gp];//原color[node.gp]
+    //         return union_collect_category_AND.includes(node.name);
+    //     });
+    //     change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
+    // }
 }
 
 // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
