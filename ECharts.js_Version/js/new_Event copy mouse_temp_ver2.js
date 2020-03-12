@@ -6,6 +6,7 @@ var union_collect = [];
 var category_collect = [];
 var ui_user;
 var keyWordAnd = [];
+var route = [];
 window.onresize = () => {
     Chart.resize();
 }
@@ -49,10 +50,12 @@ function keyword_search(e) {
     ////搜尋兩個AND start------------------------------------------------
     //https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
     function search_AND(keyword_search_name_s){
+        route = [];
         var primaryStack = new Array();
         var secondaryStack = new Array();
-        var markStack = new Array();
+        // var markStack = new Array();
         var temp2 = new Array();
+        var Finish = true;
         for(var i = 0,keywordLen = keyword_search_name_s.length;i<keywordLen; i++){
             keyword_search_name_s[i] = keyword_search_name_s[i].trim();
             if(keyword_search_name_s[i].length == 0){
@@ -74,7 +77,7 @@ function keyword_search(e) {
             temp2 = [] ;
         nodeCollection = [];
         primaryStack.push(keywordTemp);
-        markStack.push(keywordTemp);
+        // markStack.push(keywordTemp);
         var temp = data.category.filter(category => {
             return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
         });
@@ -84,7 +87,7 @@ function keyword_search(e) {
         });
         nodeCollection = Array.from(new Set(nodeCollection));
         for(var i =0,uLen = nodeCollection.length;i < uLen;i++){
-            if(!primaryStack.includes(nodeCollection[i]) && !markStack.includes(nodeCollection[i])){
+            if(!primaryStack.includes(nodeCollection[i])){
                 temp2.push(nodeCollection[i]);
             }
         }
@@ -92,29 +95,48 @@ function keyword_search(e) {
         secondaryStack.push(temp2);
         secondaryStackCount++;
         if(primaryStack[primaryStack.length-1] == keyword_search_name_s[1]){
-            break;
+            route.push(Array.from(primaryStack));
+            console.log(primaryStack);
+            console.log(route);
+            for(var i =0,uLen = secondaryStack.length;i < uLen;i++) {
+                if (secondaryStack[i].length != 0){
+                    Finish = false;
+                    break;
+                }
+            }
+            if (Finish == true){break;}
+            else {Finish = false}
         }
-        if (primaryStack.length == 0 || secondaryStack.length == 0){
+        if (primaryStack.length == 0 && route.length == 0){
             alert(`Error2 : Cannot their route : ${keyword_search_name}`);
             return;
         }
         do{
         while(secondaryStack[secondaryStackCount].length == 0)
         {
+            if (secondaryStackCount == 0)
+            {
+                break;
+            }
             primaryStack.pop();
             secondaryStack.pop();
             secondaryStackCount--;
         }
             keywordTemp = secondaryStack[secondaryStackCount].pop();
-        }while(markStack.includes(keywordTemp))
-        console.log(keywordTemp);
+        }while(primaryStack.includes(keywordTemp))
+        if (keywordTemp == undefined)
+            {
+                break;
+            }
+        console.log(keywordTemp);   
         console.log(primaryStack);
         console.log(secondaryStack);
     }while(1)
     console.log("YA!!!!!");
+    console.log(route);
     console.log(primaryStack);
     keyWordAnd.push(primaryStack);
-        // data_filter_and();
+        data_filter();
         event_setOption_function();
         sidebar_level_render();
         keyword_item_append(keyword_search_name);
@@ -152,33 +174,28 @@ function keyword_search(e) {
         keyword_item_delete();
     };
     function data_filter_and(){
-        data_filter();
-        let union_collect_category_show = [];
-            option.series[0].categories = data.category.filter(category => {
-                return keyword.includes(category.target) || keyword.includes(category.source);
+        var sortest = route[0];
+        for(var i = 1,len = route.length;i<len;i++)
+        {
+            if(sortest.length > route[i].length){
+                sortest = route[i];
+            }
+        }
+            var temp = data.category.filter(category => {
+                return sortest.includes(category.target) || sortest.includes(category.source);
             });
-            console.log(option.series[0].categories);
-
-            option.series[0].links = option.series[0].categories.filter(category => {
-                union_collect.push(category.target, category.source);
-                console.log("union_collect" + union_collect);//會記錄所有append的node
+            console.log(temp);
+            option.series[0].categories = option.series[0].categories.concat(temp) ;
+            option.series[0].links = option.series[0].links.concat(temp.filter(category => {
                 if (category.show == true) {
-                    union_collect_category_show.push(category.target, category.source);
                     return category;
                 }
-            });
-            console.log(option.series[0].links);
-
-            union_collect = Array.from(new Set(union_collect));
-            union_collect_category_show = Array.from(new Set(union_collect_category_show));
-            option.series[0].nodes = data.nodes.filter(node => {
-                keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
-                return union_collect.includes(node.name) && union_collect_category_show.includes(node.name)
-            });
-            console.log(option.series[0].nodes);
-
+            }));
+            option.series[0].nodes = option.series[0].nodes.concat(data.nodes.filter(node => {
+                return sortest.includes(node.name);
+            }));
+            console.log(option.series[0].categories);
     }
-
     function keyword_search_verify_fail(kwd_search_name) {//一個 name
         alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
     };
@@ -199,7 +216,6 @@ function keyword_search(e) {
     // compute the data which will render on canvas
     function data_filter() {
         union_collect = [];
-
         $('#max_level').val() === '1' ? data_filter_max_level_1() : data_filter_max_level_2();
 
         function data_filter_max_level_1() {
@@ -231,6 +247,7 @@ function keyword_search(e) {
                 return union_collect.includes(node.name) && union_collect_category_show.includes(node.name)
             });
             console.log(option.series[0].nodes);
+            data_filter_and();
         }
 
         // todo : need to fix the multi search problem
@@ -280,17 +297,19 @@ function keyword_search(e) {
                 keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
                 return collect.includes(node.name);
             })
-
+            data_filter_and();
         }
     };
     // bind the keyword delete button click event
     function keyword_item_delete() {
         // avoid to bind the click(delete) event twice, have to unbind the first click event first.
         $('.keyword_delete').off('click').click(e => {
-
             console.log(e.currentTarget.dataset.name);
             console.log(keyword.indexOf(e.currentTarget.dataset.name));
             keyword.splice(keyword.indexOf(e.currentTarget.dataset.name), 1);
+            if (e.currentTarget.dataset.name.includes("&")) {
+                route  = [];
+            }
             $(`div[data-item="${e.currentTarget.dataset.name}"]`).remove();
             console.log(keyword);
             keyword_search_reset();
@@ -334,7 +353,6 @@ function keyword_search(e) {
         union_collect = Array.from(new Set(union_collect));
         option.series[0].nodes = data.nodes.filter(node => {
             keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : node.itemStyle.normal.color = user_colors[node.gp];//原color[node.gp]
-            console.log(keyword);
             return union_collect.includes(node.name);
         });
         change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
