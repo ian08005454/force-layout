@@ -5,7 +5,6 @@ var keyword = [];//single search
 var union_collect = [];
 var category_collect = [];
 var ui_user;
-var keyWordAnd = [];
 var route = [];
 window.onresize = () => {
     Chart.resize();
@@ -59,7 +58,7 @@ function keyword_search(e) {
         for(var i = 0,keywordLen = keyword_search_name_s.length;i<keywordLen; i++){
             keyword_search_name_s[i] = keyword_search_name_s[i].trim();
             if(keyword_search_name_s[i].length == 0){
-                return;
+                return keyword_search_verify_fail(keyword_search_name);;
             }       
             if(!data.all_nodes.includes(keyword_search_name_s[i])){
                 return keyword_search_verify_fail(keyword_search_name);
@@ -94,7 +93,7 @@ function keyword_search(e) {
         console.log(temp2);
         secondaryStack.push(temp2);
         secondaryStackCount++;
-        if(primaryStack[primaryStack.length-1] == keyword_search_name_s[1]){
+        if(primaryStack[primaryStack.length-1] == keyword_search_name_s[keyword_search_name_s.length -1]){
             route.push(Array.from(primaryStack));
             console.log(primaryStack);
             console.log(route);
@@ -134,8 +133,15 @@ function keyword_search(e) {
     }while(1)
     console.log("YA!!!!!");
     console.log(route);
-    console.log(primaryStack);
-    keyWordAnd.push(primaryStack);
+    for(var i = 0,len = route.length;i<len;i++)
+    {
+        for(var x = 0,len = keyword_search_name_s.length;x<len;x++){
+            if(!route[i].includes(keyword_search_name_s[x])){
+                route.splice(i,1); 
+            }
+        }
+    }
+    console.log(route);
         data_filter();
         event_setOption_function();
         sidebar_level_render();
@@ -165,15 +171,18 @@ function keyword_search(e) {
             $('#keyword_search_field').val('');
             return;
         }
-        keyword.push(kwd_search_name);
         $('#keyword_search_field').val(''); // clear the keyword search field
+        keyword_item_append(kwd_search_name);
         data_filter();
         event_setOption_function();
         sidebar_level_render();
-        keyword_item_append(kwd_search_name);
         keyword_item_delete();
     };
     function data_filter_and(){
+        if(route.length == 0)
+        {
+            return;
+        }
         var sortest = route[0];
         for(var i = 1,len = route.length;i<len;i++)
         {
@@ -181,10 +190,18 @@ function keyword_search(e) {
                 sortest = route[i];
             }
         }
-            var temp = data.category.filter(category => {
-                return sortest.includes(category.target) || sortest.includes(category.source);
-            });
+        var temp = [];
+        for(var i = 0,len = sortest.length;i<len-1;i++)
+            temp = temp.concat(data.category.filter(category => {
+                if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
+                    return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
+                }
+                else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
+                    return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
+                }
+            }));
             console.log(temp);
+            
             option.series[0].categories = option.series[0].categories.concat(temp) ;
             option.series[0].links = option.series[0].links.concat(temp.filter(category => {
                 if (category.show == true) {
@@ -219,7 +236,6 @@ function keyword_search(e) {
         $('#max_level').val() === '1' ? data_filter_max_level_1() : data_filter_max_level_2();
 
         function data_filter_max_level_1() {
-
             let union_collect_category_show = [];
             console.log(keyword); 
             option.series[0].categories = data.category.filter(category => {
@@ -246,8 +262,7 @@ function keyword_search(e) {
                 keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
                 return union_collect.includes(node.name) && union_collect_category_show.includes(node.name)
             });
-            console.log(option.series[0].nodes);
-            data_filter_and();
+                data_filter_and();
         }
 
         // todo : need to fix the multi search problem
@@ -304,6 +319,7 @@ function keyword_search(e) {
     function keyword_item_delete() {
         // avoid to bind the click(delete) event twice, have to unbind the first click event first.
         $('.keyword_delete').off('click').click(e => {
+            console.log(keyword);
             console.log(e.currentTarget.dataset.name);
             console.log(keyword.indexOf(e.currentTarget.dataset.name));
             keyword.splice(keyword.indexOf(e.currentTarget.dataset.name), 1);
@@ -356,6 +372,7 @@ function keyword_search(e) {
             return union_collect.includes(node.name);
         });
         change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
+        data_filter_and();
     }
     
 }
@@ -507,9 +524,6 @@ function max_Level(ui_value) {
         // console.log(test);//全部顯示在螢幕上的點
         // console.log(option.series[0].categories);//links
     };
-
-
-
     event_setOption_function();
     sidebar_level_render();
 }

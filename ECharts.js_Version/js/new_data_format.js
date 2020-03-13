@@ -305,26 +305,33 @@ function getRandomRolor () {
 var hslLength = HSL.length; 
     var ret = [];
     ret[0]= Math.floor(Math.random() * 360);
-    ret[1]= Math.floor(Math.random() * 100);
-    ret[2]= Math.floor(Math.random() * 100);
+    if(HSL.length>36){
+        ret[1]= 80;
+        ret[2]= 70;
+    }
+    else{
+        ret[1]= 70;
+        ret[2]= 50;
+    }
+    
     for (var i = 0; i < hslLength; i++) {
         // 色相差異調整
-        if (i > 0 && Math.abs(ret[0] - HSL[i][0]) < 12 || Math.abs(ret[0]*ret[1] - HSL[i][0]*HSL[i][1]) < 1000) {
+        if (i > 0 && Math.abs(ret[0] - HSL[i][0]) < 8) {
             ret[0]= Math.floor(Math.random() * 360);
-            ret[1]= Math.floor(Math.random() * 100);
-            ret[2]= Math.floor(Math.random() * 100);
+            // ret[1]= Math.floor(Math.random() * 100);
+            // ret[2]= Math.floor(Math.random() * 100);
             i = 0;
         }
         }
-        ret[1] = 70 + (ret[1] * 0.3); // [0.7 - 0.9] 排除过灰颜色
-        ret[2] = 30 + (ret[2] * 0.45); // [0.4 - 0.8] 排除过亮过暗色
+        // ret[1] = 70 + (ret[1] * 0.3); // [0.7 - 0.9] 排除过灰颜色
+        // ret[2] = 40 + (ret[2] * 0.4); // [0.4 - 0.8] 排除过亮过暗色
 
         // 数据转化到小数点后两位
         ret = ret.map(function (item) {
         return parseFloat(item.toFixed(2));
         });
 
-        HSL.push(ret);
+        HSL.push(ret[0]);
         // console.log(ret);
         var color = hslToHex(ret[0], ret[1], ret[2])
         // console.log(color);

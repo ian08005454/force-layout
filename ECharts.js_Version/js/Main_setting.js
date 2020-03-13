@@ -3,10 +3,11 @@ $('.sidebar').hide();//在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
     renderer: 'canvas', //could be svg, but may have performance problems
     width: 1700,
-    height: 1000 //有置中問題
+    height: 700 //有置中問題
 });
 var jdata; // ! api.js variable
 var onlyLOD=0;//0 or 1
+
 
 Chart.showLoading();//轉圈圈~~
 // jQuery ajax data from back-end

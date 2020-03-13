@@ -19,6 +19,7 @@
 </head>
 
 <body>
+    <div class="row">
     <div class="wrap">
         <div class="sidebar">
             <div class="sidebar_level">
@@ -42,37 +43,43 @@
                     <input type="text" value="" id="group_label_distance">
                     <div class="slider_slider" id="group_label_distance"></div>
                 </div> -->
-                <div class="slider_item">
-                    <label class="slider_describe" for="relation_distance">關係線段距離長度 : </label>
-                    <input type="text" value="" id="relation_distance">
-                    <div class="slider_slider" id="relation_distance"></div>
-                </div>
-                <div class="slider_item">
-                    <label class="slider_describe" for="relation_link_width">關係線段粗細 : </label>
-                    <input type="text" value="" id="relation_link_width">
-                    <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
-                    <div class="slider_slider" id="relation_link_width"></div>
-                </div>
-                <div class="slider_item">
-                    <label class="slider_describe" for="main_screen_room">整體圖形縮放 : </label>
-                    <input type="text" value="" id="main_screen_room">
-                    <div class="slider_slider" id="main_screen_room"></div>
-                </div>
-                <div class="slider_item">
-                    <label class="slider_describe" for="relation_font_size">關係線段字體大小 : </label>
-                    <input type="text" value="" id="relation_font_size">
-                    <div class="slider_slider" id="relation_font_size"></div>
-                </div>
-                <div class="slider_item">
-                    <label class="slider_describe" for="subject_font_size">節點字體大小 : </label>
-                    <input type="text" value="" id="subject_font_size">
-                    <div class="slider_slider" id="subject_font_size"></div>
-                </div>
-                <div class="slider_item">
-                    <label class="slider_describe" for="node_size">圓圈大小 : </label>
-                    <input type="text" value="" id="node_size">
-                    <div class="slider_slider" id="node_size"></div>
-                </div>
+                <details>
+                    <summary>線段調整</summary>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="relation_distance">關係線段距離長度 : </label>
+                        <input type="text" value="" id="relation_distance">
+                        <div class="slider_slider" id="relation_distance"></div>
+                    </div>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="relation_link_width">關係線段粗細 : </label>
+                        <input type="text" value="" id="relation_link_width">
+                        <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
+                        <div class="slider_slider" id="relation_link_width"></div>
+                    </div>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="relation_font_size">關係線段字體大小 : </label>
+                        <input type="text" value="" id="relation_font_size">
+                        <div class="slider_slider" id="relation_font_size"></div>
+                    </div>
+                </details>
+                <details>
+                    <summary>圖形調整</summary>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="main_screen_room">整體圖形縮放 : </label>
+                        <input type="text" value="" id="main_screen_room">
+                        <div class="slider_slider" id="main_screen_room"></div>
+                    </div>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="node_size">圓圈大小 : </label>
+                        <input type="text" value="" id="node_size">
+                        <div class="slider_slider" id="node_size"></div>
+                    </div>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="subject_font_size">節點字體大小 : </label>
+                        <input type="text" value="" id="subject_font_size">
+                        <div class="slider_slider" id="subject_font_size"></div>
+                    </div>
+                </details>
                 <div class="slider_item word_strength">
                     <label class="slider_describe" for="word_strength">詞頻強度 ≥ </label>
                     <input type="text" value="" id="word_strength">
@@ -101,7 +108,8 @@
             </div>
             <!-- <div id="choose_color"></div> -->
         </div>
-        <div id="main" style="width: 1480px;height:800px;"></div>
+        <div id="main"  class="col-sm-9 col-md-6 col-lg-8"></div>
+        </div>
     </div>
     <!-- CDN JS library  -->
 
@@ -133,6 +141,7 @@
     <script src="./js/new_data_format.js"></script>
     <script src="./js/API.js"></script>
     <script src="./js/Main_setting.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     <!-- <script src="./js/new_Event.js"></script> -->
     <!-- <script src="./js/new_Event copy.js"></script> -->
     <!-- //new_Event copy2 修復搜尋錯亂 -->
