@@ -6,13 +6,14 @@
 /* canvas */
 #main {
     z-index: 0;
+    position: relative;
 }
 
 /* sidebar */
 .sidebar {
     position : fixed;
-    top : 2%;
-    left : -5px;
+    top : 10px;
+    left : 5px;
     background-color: rgb(243, 243, 243);
     width: 220px;
     padding : 20px 15px;

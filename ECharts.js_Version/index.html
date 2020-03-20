@@ -19,7 +19,6 @@
 </head>
 
 <body>
-    <div class="row">
     <div class="wrap">
         <div class="sidebar">
             <div class="sidebar_level">
@@ -95,6 +94,11 @@
                     <input type="text" value="" id="max_level">
                     <div class="slider_slider" id="max_level"></div>
                 </div>
+                <div class="slider_item selected_route">
+                    <label class="slider_describe" for="selected_route">選擇and路線 : </label>
+                    <input type="text" value="" id="selected_route">
+                    <div class="slider_slider" id="selected_route"></div>
+                </div>
             </div>
             <div class="keyword_search" id ="ksearch">
                 <label>"/"=OR,&=AND</label>
@@ -105,12 +109,11 @@
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
                 <div class="keyword">
                 </div>
-            </div>
+            </div>- 
             <!-- <div id="choose_color"></div> -->
         </div>
-        <div id="main"  class="col-sm-9 col-md-6 col-lg-8"></div>
+        <div id="main"  style="width:85%;height:900px;"></div>
         </div>
-    </div>
     <!-- CDN JS library  -->
 
     <!-- avoid echarts.js library console.warn, use the download file and common out console.warn @lib/echarts 4.2.0-rc.2.js line 72314 which is warning about Legend data should be same with series name or data name-->
@@ -141,7 +144,7 @@
     <script src="./js/new_data_format.js"></script>
     <script src="./js/API.js"></script>
     <script src="./js/Main_setting.js"></script>
-    <script src="./js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="./js/bootstrap.bundle.min.js"></script> -->
     <!-- <script src="./js/new_Event.js"></script> -->
     <!-- <script src="./js/new_Event copy.js"></script> -->
     <!-- //new_Event copy2 修復搜尋錯亂 -->

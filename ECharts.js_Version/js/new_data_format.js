@@ -15,9 +15,6 @@ var all_node_values = [];
 var all_gp = [];
 var all_idf = [];
 var user_colors = [];
-var red =[];
-var green =[];
-var blue = [];
 var HSL = [];
 
 function data_format(data, LODtype=0) {

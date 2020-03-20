@@ -2,8 +2,10 @@
 $('.sidebar').hide();//在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
     renderer: 'canvas', //could be svg, but may have performance problems
-    width: 1700,
-    height: 700 //有置中問題
+    // 如果宽高比大于 1 则宽度为 100，如果小于 1 则高度为 100，保证了不超过 100x100 的区域
+    // 设置这两个值后 left/right/top/bottom/width/height 无效。
+    // width: 1700,
+    // height: 800 //有置中問題
 });
 var jdata; // ! api.js variable
 var onlyLOD=0;//0 or 1
@@ -70,9 +72,12 @@ var option = {
         tooltip: {
             show: true,
         },
+        orient: 'vertical',
+        pageButtonPosition: 'start',
         selectedMode: 'true',
-        width: 1000,
-        height: 100
+        width: 100,
+        height: 140,
+        right: 50
     },
     series: [{
         type: 'graph',
@@ -141,7 +146,7 @@ var option = {
 }
 console.log(option);
 // ! setup all option
-Chart.setOption(option);
+Chart.setOption(option,true);
 sidebar_level_render();
 save_width();
 save_node_size();
@@ -234,6 +239,15 @@ var jquery_slider_setting = [{
     value: min_idf,
     disabled: false,
     range: 'min'
+},{
+    object: 'selected_route',//idf詞頻強度
+    min: -1,
+    max: 29,
+    step: 1,
+    value: -1,
+    disable: false,
+    range: 'min',
+    hide: true
 }
 ];
 
