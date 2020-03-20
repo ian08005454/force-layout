@@ -27,12 +27,9 @@ function keyword_search(e) {
     if (keyword_search_name.includes("&")) {//搜尋兩個 AND
         //keyword
         keyword_search_name_s = keyword_search_name.split("&");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
-        // db_firstkey_search.push(keyword_search_name_s);
-        // db_firstkey_search = Array.from(new Set(db_firstkey_search));
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
-            search_AND(keyword_search_name_s);
+                search_AND(keyword_search_name_s);
         };
-
     } else if (keyword_search_name.includes("/")) {//搜尋兩個 OR
         keyword_search_name_s = keyword_search_name.split("/");//keyword_search_name_s=[]
         if (e.which === 13 || e.type === 'click') { //點搜尋或按ENTER
@@ -132,9 +129,12 @@ function keyword_search(e) {
         console.log(secondaryStack);
     }while(1)
     console.log("YA!!!!!");
+    console.log(route.length);
     console.log(route);
-    for(var i = 0,len = route.length;i<len;i++)
+    for(var i = 0;i<route.length;i++)
     {
+        console.log(route.length);
+        console.log(i);
         for(var x = 0,len = keyword_search_name_s.length;x<len;x++){
             if(!route[i].includes(keyword_search_name_s[x])){
                 route.splice(i,1); 
@@ -151,6 +151,27 @@ function keyword_search(e) {
     }
     ////搜尋兩個AND --end --
 
+    // function fullyConnected(keyword_search_name_s){
+    //         option.series[0].categories = option.series[0].categories.filter(category => {
+    //             return keyword.includes(category.target) && keyword.includes(category.source);
+    //         });
+    //         console.log(option.series[0].categories);
+
+    //         option.series[0].links = option.series[0].categories.filter(category => {
+    //             if (category.show == true) {
+    //                 return category;
+    //             }
+    //         });
+    //         option.series[0].nodes = option.series[0].nodes.filter(node => {
+    //             return keyword_search_name_s.includes(node.name) 
+    //         });
+    //         event_setOption_function();
+    //         sidebar_level_render();
+    //         if(!keyword_search_name.includes(keyword)){
+    //             keyword_item_append(keyword_search_name);
+    //         }
+    //         keyword_item_delete();
+    // }
     function keyword_search_verify_pass(kwd_search_name) {
 
         kwd_search_name = kwd_search_name.trim(); 
@@ -178,41 +199,7 @@ function keyword_search(e) {
         sidebar_level_render();
         keyword_item_delete();
     };
-    function data_filter_and(){
-        if(route.length == 0)
-        {
-            return;
-        }
-        var sortest = route[0];
-        for(var i = 1,len = route.length;i<len;i++)
-        {
-            if(sortest.length > route[i].length){
-                sortest = route[i];
-            }
-        }
-        var temp = [];
-        for(var i = 0,len = sortest.length;i<len-1;i++)
-            temp = temp.concat(data.category.filter(category => {
-                if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
-                    return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
-                }
-                else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
-                    return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
-                }
-            }));
-            console.log(temp);
-            
-            option.series[0].categories = option.series[0].categories.concat(temp) ;
-            option.series[0].links = option.series[0].links.concat(temp.filter(category => {
-                if (category.show == true) {
-                    return category;
-                }
-            }));
-            option.series[0].nodes = option.series[0].nodes.concat(data.nodes.filter(node => {
-                return sortest.includes(node.name);
-            }));
-            console.log(option.series[0].categories);
-    }
+ 
     function keyword_search_verify_fail(kwd_search_name) {//一個 name
         alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
     };
@@ -324,6 +311,7 @@ function keyword_search(e) {
             console.log(keyword.indexOf(e.currentTarget.dataset.name));
             keyword.splice(keyword.indexOf(e.currentTarget.dataset.name), 1);
             if (e.currentTarget.dataset.name.includes("&")) {
+                $('.selected_route').hide();
                 route  = [];
             }
             $(`div[data-item="${e.currentTarget.dataset.name}"]`).remove();
@@ -376,7 +364,67 @@ function keyword_search(e) {
     }
     
 }
+function data_filter_and(request = -1){
+    if(route.length == 0)
+    {
+        return;
+    }
+    if(request === -1)
+    {
+        var sortest = route[0];
+        for(var i = 1,len = route.length;i<len;i++)
+        {
+            if(sortest.length > route[i].length){
+                sortest = route[i];
+            }
+        }
+    }
+    else{
+        var sortest = route[request];
+    }
+   $('.selected_route').show();
+   $('#selected_route').slider( "option", "max", route.length-1 );
+   console.log($( "#selected_route" ).slider( "option", "max" ));
+    var temp = [];
+    if(keyword.length === 0){
+        for(var i = 0,len = sortest.length;i<len-1;i++)
+        temp = temp.concat(data.category.filter(category => {
+            if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
+                return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
+            }
+            else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
+                return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
+            }
+        }));
+    }
+    else{
+        for(var i = 0,len = sortest.length;i<len-1;i++)
+        temp = temp.concat(data.category.filter(category => {
+            if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
+                return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
+            }
+            else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
+                return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
+            }
+        }));
+    }    
+        console.log(temp);
+        option.series[0].categories = temp ;
+        option.series[0].links = temp.filter(category => {
+            if (category.show == true) {
+                return category;
+            }
+        });
+        option.series[0].nodes =data.nodes.filter(node => {
+            return sortest.includes(node.name);
+        });
+}
+function selectRoute(request){
+    data_filter_and(request);
+    event_setOption_function();
+    sidebar_level_render();
 
+}
 // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
 // compute the data when occurs the legendselectchanged event on category bar
 
@@ -601,6 +649,9 @@ $(() => {
                 case 'common_show_value'://共現次數
                     common_value(ui.value);
                     break;
+                case 'selected_route': //選擇路線
+                    selectRoute(ui.value);
+                    break;
             };
         }
 
@@ -736,11 +787,7 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 }
 // The function to render the data to canvas after set all option finish
 function event_setOption_function() {
-    Chart.setOption(option, {
-        notMerge: false,
-        lazyUpdate: false,
-        silent: false
-    });
+    Chart.setOption(option,true);
 };
 
 Chart.on('click', e => {
