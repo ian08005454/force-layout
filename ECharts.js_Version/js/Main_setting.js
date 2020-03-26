@@ -157,7 +157,7 @@ var jquery_slider_setting = [{
     max: 10,//最大階層數
     step: 1,
     value: 1, //current option setting value
-    disabled: true,
+    disable: false,
     range: 'min'
 }, {
     object: 'relation_strength',
@@ -165,7 +165,7 @@ var jquery_slider_setting = [{
     max: 100,
     step: 1,
     value: 0,
-    disabled: true,
+    disable: false,
     range: 'min'
 }, {
     object: 'group_label_distance',
@@ -173,7 +173,7 @@ var jquery_slider_setting = [{
     max: 100,
     step: 1,
     value: 0,
-    disabled: true,
+    disable: false,
     range: 'min'
 }, {
     object: 'relation_distance',
@@ -181,7 +181,7 @@ var jquery_slider_setting = [{
     max: 800,
     step: 1,
     value: option.series[0].force.edgeLength,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'relation_link_width',
@@ -189,7 +189,7 @@ var jquery_slider_setting = [{
     max: 5,
     step: 0.5,
     value: 1,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'main_screen_room',
@@ -197,7 +197,7 @@ var jquery_slider_setting = [{
     max: 2,
     step: 0.1,
     value: option.series[0].zoom,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'relation_font_size',
@@ -205,7 +205,7 @@ var jquery_slider_setting = [{
     max: 100,
     step: 1,
     value: option.series[0].edgeLabel.normal.textStyle.fontSize,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'subject_font_size',
@@ -213,7 +213,7 @@ var jquery_slider_setting = [{
     max: 100,
     step: 1,
     value: option.series[0].itemStyle.normal.label.textStyle.fontSize,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'node_size',
@@ -221,7 +221,7 @@ var jquery_slider_setting = [{
     max: 5,
     step: 0.2,
     value: 1,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'common_show_value',
@@ -229,7 +229,7 @@ var jquery_slider_setting = [{
     max: max_common_show_value,
     step: 1,
     value: min_common_show_value,
-    disabled: false,
+    disable: false,
     range: 'min'
 }, {
     object: 'word_strength',//idf詞頻強度
@@ -237,7 +237,7 @@ var jquery_slider_setting = [{
     max: max_idf,
     step: 1,
     value: min_idf,
-    disabled: false,
+    disable: false,
     range: 'min'
 },{
     object: 'selected_route',//idf詞頻強度

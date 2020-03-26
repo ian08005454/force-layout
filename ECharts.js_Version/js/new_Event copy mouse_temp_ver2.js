@@ -14,7 +14,7 @@ $('#keyword_search_field').keyup((e) => {
     keyword_search(e)
 });
 $('#keyword_search_button').on('click', keyword_search);
-keyword.length == 0 ? $(".max_level").hide() : $(".max_level").show();
+keyword.length == 0 ? (($(".max_level").hide()),($('.selected_route').hide())): $(".max_level").show();
 /**
  * keyword_search function
  * @param {event} e
@@ -52,14 +52,21 @@ function keyword_search(e) {
         // var markStack = new Array();
         var temp2 = new Array();
         var Finish = true;
+        console.log(option.series[0].nodes);
         for(var i = 0,keywordLen = keyword_search_name_s.length;i<keywordLen; i++){
             keyword_search_name_s[i] = keyword_search_name_s[i].trim();
             if(keyword_search_name_s[i].length == 0){
-                return keyword_search_verify_fail(keyword_search_name);;
+                return keyword_search_verify_fail(keyword_search_name);
             }       
             if(!data.all_nodes.includes(keyword_search_name_s[i])){
                 return keyword_search_verify_fail(keyword_search_name);
             }
+            if(option.series[0].nodes.map(function(item, index, array) {
+                return item.name;}
+                ).indexOf(keyword_search_name_s[i]) === -1){
+                return keyword_search_verify_fail_in_page(keyword_search_name);
+            }
+
         }
         $(".max_level").hide();
         $(".common_show_value").hide();
@@ -104,7 +111,7 @@ function keyword_search(e) {
             else {Finish = false}
         }
         if (primaryStack.length == 0 && route.length == 0){
-            alert(`Error2 : Cannot their route : ${keyword_search_name}`);
+            alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
             return;
         }
         do{
@@ -133,14 +140,26 @@ function keyword_search(e) {
     console.log(route);
     for(var i = 0;i<route.length;i++)
     {
-        console.log(route.length);
-        console.log(i);
         for(var x = 0,len = keyword_search_name_s.length;x<len;x++){
             if(!route[i].includes(keyword_search_name_s[x])){
                 route.splice(i,1); 
             }
         }
     }
+    if(route.length === 0){
+        alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
+        return;
+    }
+    // for(var i = 0;i<route.length;i++)
+    // {
+    //     if(option.series[0].nodes.map(function( item, index, array) {
+    //         return item.name;}
+    //         ).indexOf(keyword_search_name_s[i]) === -1){
+    //             route.splice(i,1); 
+    //         }
+    // }
+    if(route.length === 0)
+        return keyword_search_verify_fail_in_page(keyword_search_name);
     console.log(route);
         data_filter();
         event_setOption_function();
@@ -173,15 +192,14 @@ function keyword_search(e) {
     //         keyword_item_delete();
     // }
     function keyword_search_verify_pass(kwd_search_name) {
-
-        kwd_search_name = kwd_search_name.trim(); 
-        if(kwd_search_name.length == 0){
-            return;
-        }       
-        if(!data.all_nodes.includes(kwd_search_name)){
-            return keyword_search_verify_fail(kwd_search_name);
-        }
-
+            kwd_search_name = kwd_search_name.trim(); 
+            if(kwd_search_name.length == 0){
+                return;
+            }       
+            if(!data.all_nodes.includes(kwd_search_name)){
+                return keyword_search_verify_fail(kwd_search_name);
+            }
+        
         $(".max_level").show();
         $(".common_show_value").hide();
         $(".word_strength").hide();
@@ -203,7 +221,9 @@ function keyword_search(e) {
     function keyword_search_verify_fail(kwd_search_name) {//一個 name
         alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
     };
-
+    function keyword_search_verify_fail_in_page(kwd_search_name) {//一個 name
+        alert(`Error : keyWord not in this page: ${kwd_search_name}`);
+    };
     // append keyword div in keyword field
     //下方新增delete鍵
     function keyword_item_append(kwd_search_name) {
@@ -360,7 +380,18 @@ function keyword_search(e) {
             return union_collect.includes(node.name);
         });
         change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
-        data_filter_and();
+        if(route.length != 0){
+            data_filter_and();
+            break;
+        }
+        for(var i = keyword.length;i>0;i--){
+            if (keyword[i].includes("&")) {//搜尋兩個 AND
+                keyword_search_name_s = keyword[i].split("&");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
+                search_AND(keyword_search_name_s);
+                keyword.splice(i, 1);    
+            } 
+
+        }
     }
     
 }
@@ -369,54 +400,65 @@ function data_filter_and(request = -1){
     {
         return;
     }
-    if(request === -1)
-    {
-        var sortest = route[0];
-        for(var i = 1,len = route.length;i<len;i++)
-        {
-            if(sortest.length > route[i].length){
-                sortest = route[i];
-            }
-        }
+    if(request === -1){
+        route.sort(function (a, b) {
+            if (a.length > b.length) {
+                return -1;
+              }
+              if (a.length < b.length) {
+                return 1;
+              }
+              return 0;
+          });
+         var sortest = 0;
     }
     else{
-        var sortest = route[request];
+       var  maxLen = route[0].length - request;
+       if(route[route.length-1].length<maxLen)
+            return console.log("error: maxlen too small");
+       for(var i=1;i<route.length;i++){
+           if(route[i].length = maxLen){
+            var sortest = i;
+            break;
+           }
+       }
     }
    $('.selected_route').show();
    $('#selected_route').slider( "option", "max", route.length-1 );
    console.log($( "#selected_route" ).slider( "option", "max" ));
     var temp = [];
-    if(keyword.length === 0){
-        for(var i = 0,len = sortest.length;i<len-1;i++)
+    var nodeCollection = [];
+    for(var y=sortest;y<route.length;y++){
+        for(var i = 0,len = route[y].length;i<len-1;i++)
         temp = temp.concat(data.category.filter(category => {
-            if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
-                return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
+            if(route[y][i].includes(category.target) && route[y][i+1].includes(category.source)){
+                return route[y][i].includes(category.target) && route[y][i+1].includes(category.source);
             }
-            else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
-                return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
+            else if(route[y][i+1].includes(category.target) && route[y][i].includes(category.source)){
+                return route[y][i+1].includes(category.target) && route[y][i].includes(category.source);
             }
         }));
-    }
-    else{
-        for(var i = 0,len = sortest.length;i<len-1;i++)
-        temp = temp.concat(data.category.filter(category => {
-            if(sortest[i].includes(category.target) && sortest[i+1].includes(category.source)){
-                return sortest[i].includes(category.target) && sortest[i+1].includes(category.source);
-            }
-            else if(sortest[i+1].includes(category.target) && sortest[i].includes(category.source)){
-                return sortest[i+1].includes(category.target) && sortest[i].includes(category.source);
-            }
-        }));
-    }    
+    console.log(temp);
+    a = option.series[0].nodes.map(function(item, index, array) {
+        return item.name;});
+        temp = temp.filter(category => {
+            return !a.includes(category.id);
+        });
         console.log(temp);
-        option.series[0].categories = temp ;
-        option.series[0].links = temp.filter(category => {
+        nodeCollection = nodeCollection.concat(route[y]);
+        nodeCollection = Array.from( new Set(nodeCollection) );
+        option.series[0].categories = option.series[0].categories.concat(temp);
+        console.log(temp);
+        if(route[y+1].length != route[sortest].length)
+            break;
+    }
+        option.series[0].links = option.series[0].categories.filter(category => {
             if (category.show == true) {
                 return category;
             }
         });
         option.series[0].nodes =data.nodes.filter(node => {
-            return sortest.includes(node.name);
+            return nodeCollection.includes(node.name);
         });
 }
 function selectRoute(request){

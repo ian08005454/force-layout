@@ -16,7 +16,7 @@ var all_gp = [];
 var all_idf = [];
 var user_colors = [];
 var HSL = [];
-
+var id = 0;
 function data_format(data, LODtype=0) {
     start = new Date().getTime();//回傳Date()物件
     const set = new Set(); //為了之後去除重複
@@ -60,7 +60,6 @@ function data_format(data, LODtype=0) {
                     }
                 });
             }
-
             // foreach kg2 array
             data_element.kg2.forEach(kg2_element => {
 
@@ -138,6 +137,7 @@ function data_format(data, LODtype=0) {
                     ttype = linksolid;
                 }
                 buf.all_category.push({
+                    id: id++,
                     name: kg2_element.type[0],
                     itemStyle: {
                         color: linkcolor,
@@ -161,11 +161,20 @@ function data_format(data, LODtype=0) {
                         }
                     },
                 });
-
                 // buf.all_category has the every property that links object need, etc : source, target, value, lineStyle
                 buf.links = buf.all_category;
             })
         });
+        buf.all_category.sort(function (a, b) {
+            if (a.id < b.id) {
+                return -1;
+              }
+              if (a.id > b.id) {
+                return 1;
+              }
+              return 0;
+          });
+          console.log(buf.all_category);
     } else {//1的話只呈現LOD
         $(".common_show_value").hide();
         $(".word_strength").hide();
@@ -244,6 +253,7 @@ function data_format(data, LODtype=0) {
                 }
                 
                 buf.all_category.push({
+                    id: id++,
                     name: kg2_element.type[0],
                     itemStyle: {
                         color: linkcolor,
