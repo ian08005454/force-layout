@@ -63,7 +63,7 @@ function keyword_search(e) {
             }
             if(option.series[0].nodes.map(function(item, index, array) {
                 return item.name;}
-                ).indexOf(keyword_search_name_s[i]) === -1){
+                ).indexOf(keyword_search_name_s[i]) === -1 && keyword.length != 0){
                 return keyword_search_verify_fail_in_page(keyword_search_name);
             }
 
@@ -94,7 +94,6 @@ function keyword_search(e) {
                 temp2.push(nodeCollection[i]);
             }
         }
-        console.log(temp2);
         secondaryStack.push(temp2);
         secondaryStackCount++;
         if(primaryStack[primaryStack.length-1] == keyword_search_name_s[keyword_search_name_s.length -1]){
@@ -212,7 +211,7 @@ function keyword_search(e) {
         }
         $('#keyword_search_field').val(''); // clear the keyword search field
         keyword_item_append(kwd_search_name);
-        data_filter();
+        data_filter(window.ui_user);
         event_setOption_function();
         sidebar_level_render();
         keyword_item_delete();
@@ -234,93 +233,6 @@ function keyword_search(e) {
         <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
     </div>`)
         console.log(keyword_search_name);
-    };
-
-    // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
-    // compute the data which will render on canvas
-    function data_filter() {
-        union_collect = [];
-        $('#max_level').val() === '1' ? data_filter_max_level_1() : data_filter_max_level_2();
-
-        function data_filter_max_level_1() {
-            let union_collect_category_show = [];
-            console.log(keyword); 
-            option.series[0].categories = data.category.filter(category => {
-                return keyword.includes(category.target) || keyword.includes(category.source);
-            });
-            console.log(option.series[0].categories);
-
-            option.series[0].links = option.series[0].categories.filter(category => {
-                union_collect.push(category.target, category.source);
-                console.log("union_collect" + union_collect);//會記錄所有append的node
-                if (category.show == true) {
-                    union_collect_category_show.push(category.target, category.source);
-                    return category;
-                }
-            });
-            console.log(option.series[0].links);
-
-            union_collect = Array.from(new Set(union_collect));
-            union_collect_category_show = Array.from(new Set(union_collect_category_show));
-            console.log("***********down");
-            console.log(union_collect);
-            console.log(union_collect_category_show);
-            option.series[0].nodes = data.nodes.filter(node => {
-                keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
-                return union_collect.includes(node.name) && union_collect_category_show.includes(node.name)
-            });
-                data_filter_and();
-        }
-
-        // todo : need to fix the multi search problem
-        // rename : test array;
-        function data_filter_max_level_2() {
-            let collect = [];
-            let category_collect = [];
-            console.log("data_filter_max_level_2");
-            option.series[0].categories = data.category.filter(category => {
-                if (keyword.includes(category.target) || keyword.includes(category.source)) {
-                    union_collect.push(category.target, category.source);
-                    console.log(union_collect);
-                    return category;
-                }
-                // return keyword.includes(category.target) || keyword.includes(category.source);
-            });
-
-            let minus = $(union_collect).not(keyword).toArray();
-            console.log(minus);
-
-            for (let i = 1; i < window.ui_user; i++) {
-                option.series[0].categories = data.category.filter(category => {
-                    console.log("work");
-                    if (minus.includes(category.target) || minus.includes(category.source)) {
-                        category_collect.push(category.target, category.source);
-                        return category;
-                    }
-                });
-                category_collect = Array.from(new Set(category_collect));
-                minus = $(category_collect).not(keyword).toArray();
-
-            };
-            console.log("category_collect" + category_collect);//這個!!
-
-            option.series[0].links = option.series[0].categories.filter(category => {
-                if (category.show == true) {
-                    collect.push(category.source, category.target);
-                    return category;
-                }
-            })
-            collect = Array.from(new Set(collect));
-            console.log(collect);
-            option.series[0].nodes = data.nodes.filter(node => {
-                console.log("keywordddddd" + keyword);
-                console.log("collecttttt" + collect);
-
-                keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
-                return collect.includes(node.name);
-            })
-            data_filter_and();
-        }
     };
     // bind the keyword delete button click event
     function keyword_item_delete() {
@@ -360,7 +272,6 @@ function keyword_search(e) {
             option.series[0].categories = data.all_category;
         } else {//刪除完還有剩
             console.log("reset2");
-
             option.series[0].categories = data.all_category.filter(category => {
                 return keyword.includes(category.target) || keyword.includes(category.source);
             })
@@ -381,14 +292,18 @@ function keyword_search(e) {
         });
         change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
         if(route.length != 0){
+            console.log(route.length);
             data_filter_and();
-            break;
+            return;
         }
-        for(var i = keyword.length;i>0;i--){
+        for(var i = keyword.length-1;i>=0;i--){
             if (keyword[i].includes("&")) {//搜尋兩個 AND
-                keyword_search_name_s = keyword[i].split("&");//keyword_search_name_s=[]//存打入的字 形式:[a,b]
+                keyword_search_name_s = keyword[i].split("&");
+                keyword_search_name = keyword[i];
+                $(`div[data-item="${keyword[i]}"]`).remove();
+                keyword.splice(i, 1);
                 search_AND(keyword_search_name_s);
-                keyword.splice(i, 1);    
+                return;
             } 
 
         }
@@ -411,13 +326,17 @@ function data_filter_and(request = -1){
               return 0;
           });
          var sortest = 0;
+         console.log(route);
     }
     else{
        var  maxLen = route[0].length - request;
-       if(route[route.length-1].length<maxLen)
-            return console.log("error: maxlen too small");
+       console.log(maxLen);
+       if(route[route.length-1].length>maxLen){
+             console.log("error: maxlen too small");
+             return -1;
+       }
        for(var i=1;i<route.length;i++){
-           if(route[i].length = maxLen){
+           if(route[i].length === maxLen){
             var sortest = i;
             break;
            }
@@ -425,9 +344,10 @@ function data_filter_and(request = -1){
     }
    $('.selected_route').show();
    $('#selected_route').slider( "option", "max", route.length-1 );
-   console.log($( "#selected_route" ).slider( "option", "max" ));
+   console.log(sortest);
     var temp = [];
     var nodeCollection = [];
+    option.series[0].categories = [];
     for(var y=sortest;y<route.length;y++){
         for(var i = 0,len = route[y].length;i<len-1;i++)
         temp = temp.concat(data.category.filter(category => {
@@ -440,7 +360,8 @@ function data_filter_and(request = -1){
         }));
     console.log(temp);
     a = option.series[0].nodes.map(function(item, index, array) {
-        return item.name;});
+        return item.id;});
+        console.log(a);
         temp = temp.filter(category => {
             return !a.includes(category.id);
         });
@@ -448,24 +369,83 @@ function data_filter_and(request = -1){
         nodeCollection = nodeCollection.concat(route[y]);
         nodeCollection = Array.from( new Set(nodeCollection) );
         option.series[0].categories = option.series[0].categories.concat(temp);
-        console.log(temp);
-        if(route[y+1].length != route[sortest].length)
+        console.log(option.series[0].categories);
+        if(y+1 === route.length || route[y+1].length != route[sortest].length)
             break;
     }
-        option.series[0].links = option.series[0].categories.filter(category => {
-            if (category.show == true) {
+    temp = option.series[0].categories.filter(category => {
+        if (category.show == true) {
+            return category;
+        }
+    });
+    a = option.series[0].links.map(function(item, index, array) {
+        return item.id;})
+        temp = temp.filter(links => {
+            return !a.includes(links.id);
+        });
+        option.series[0].links = option.series[0].links.concat(temp);
+        temp = data.nodes.filter(node => {
+            route[0][0].includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
+            route[0][route[0].length - 1].includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
+            return nodeCollection.includes(node.name);
+        });
+        a = option.series[0].nodes.map(function(item, index, array) {
+            return item.name;});
+            temp = temp.filter(node => {
+                return !a.includes(node.name);
+            });
+        option.series[0].nodes = option.series[0].nodes.concat(temp);
+        change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
+
+}
+function selectRoute(request){
+   if(data_filter_and(request) != -1){
+        event_setOption_function();
+        sidebar_level_render();
+   }
+}
+// IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
+ // compute the data which will render on canvas
+function data_filter(ui_user) {
+    union_collect = [];
+    let collect = [];
+    let category_collect = [];
+    console.log("data_filter_max_level_2");
+    option.series[0].categories = data.category.filter(category => {
+        if (keyword.includes(category.target) || keyword.includes(category.source)) {
+            union_collect.push(category.target, category.source);
+            console.log(union_collect);
+            return category;
+        }
+        // return keyword.includes(category.target) || keyword.includes(category.source);
+    });
+    let minus = $(union_collect).not(keyword).toArray();
+    console.log(minus);
+    for (let i = 1; i < ui_user; i++) {
+        option.series[0].categories = data.category.filter(category => {
+            console.log("work");
+            if (minus.includes(category.target) || minus.includes(category.source)) {
+                category_collect.push(category.target, category.source);
                 return category;
             }
         });
-        option.series[0].nodes =data.nodes.filter(node => {
-            return nodeCollection.includes(node.name);
-        });
-}
-function selectRoute(request){
-    data_filter_and(request);
-    event_setOption_function();
-    sidebar_level_render();
-
+        category_collect = Array.from(new Set(category_collect));
+        console.log(category_collect);
+        minus = $(category_collect).not(keyword).toArray();
+    };
+    console.log("category_collect" + category_collect);//這個!!
+    option.series[0].links = option.series[0].categories.filter(category => {
+        if (category.show == true) {
+            collect.push(category.source, category.target);
+            return category;
+        }
+    })
+    collect = Array.from(new Set(collect));
+    option.series[0].nodes = data.nodes.filter(node => {
+        keyword.includes(node.name) ? node.itemStyle.normal.color = 'red' : null;
+        return collect.includes(node.name);
+    })
+    data_filter_and();
 }
 // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
 // compute the data when occurs the legendselectchanged event on category bar
@@ -539,81 +519,7 @@ Chart.on('legendselectchanged', (category_select) => {
 
 // max_level
 function max_Level(ui_value) {
-    console.log("max_Level work");
-    ui_value == 1 ? ui_value_1() : ui_value_2();
-    ui_user = ui_value;
-    console.log(ui_user);
-
-    function ui_value_1() {
-        let collect = [];
-
-        option.series[0].categories = data.category.filter(category => {//把第一階層過濾出來
-            return keyword.includes(category.source) || keyword.includes(category.target);
-        });
-
-        option.series[0].links = data.category.filter(category => {
-            // if (category.show == true) {
-            if (keyword.includes(category.source) || keyword.includes(category.target)) {
-                collect.push(category.source, category.target);
-                return category;
-            }
-            // }
-        });
-        collect = Array.from(new Set(collect));//set 有不重複的功能 並變成陣列
-        // console.log(collect); //[a,b]
-
-        option.series[0].nodes = data.nodes.filter(node => {
-            return collect.includes(node.name);
-        })
-    };
-
-    function ui_value_2() {
-        // let collect = [];
-        let category_collect = [];
-        let minus = $(union_collect).not(keyword).toArray();
-        test1 = [];
-        console.log("ui_value_2");
-
-        console.log("union_collect"+union_collect);
-        console.log("minus"+minus);//紀錄由keyword連結的兩個點
-        // console.log(category_collect);
-        for (let i = 1; i < ui_value; i++) {
-            option.series[0].categories = data.category.filter(category => {
-                // return minus.includes(category.target) || minus.includes(category.source);
-                if (minus.includes(category.target) || minus.includes(category.source)) {
-                    category_collect.push(category.target, category.source);
-                    console.log(category_collect);
-                    return category;
-                }
-            });
-            category_collect = Array.from(new Set(category_collect));
-            console.log(category_collect);//全部顯示在螢幕上的點
-            minus = $(category_collect).not(keyword).toArray();
-        };
-        var testet = data.category.filter(category => {
-            if (keyword.includes(category.target) && keyword.includes(category.source)){
-                console.log(category);
-                category_collect.push(category.target, category.source);
-                return category;
-            }
-        });
-        console.log(testet);
-        option.series[0].links = option.series[0].categories.concat(testet);
-        option.series[0].categories = option.series[0].links;
-        console.log(option.series[0].links);//和category一樣
-        console.log(option.series[0].categories);
-        // collect = Array.from(new Set(collect));
-        option.series[0].nodes = data.nodes.filter(node => {
-            // return collect.includes(node.name);
-            if (category_collect.includes(node.name)) {
-                // test1.push(node.name);
-                return node
-            }
-        })
-        console.log(option.series[0].nodes);
-        // console.log(test);//全部顯示在螢幕上的點
-        // console.log(option.series[0].categories);//links
-    };
+    data_filter(ui_value);
     event_setOption_function();
     sidebar_level_render();
 }
@@ -765,21 +671,16 @@ function common_value(value) {
             return category;
             // }
         })
-        // console.log(value_filter);
         value_filter = Array.from(new Set(value_filter));
-        // console.log(value_filter);
 
         option.series[0].nodes = data.nodes.filter(node => {
-            // console.log(value_filter.includes(node.name));
             return value_filter.includes(node.name);
         });
     }
-    // console.log(option);
-    // console.log(value_filter);
-
     // sidebar_level_render();
     event_setOption_function();
 }
+
 
 none_orign_idf_node(csType.css_link[0].borderType, csType.css_link[0].borderColor, csType.css_link[0].borderWidth);//可以改變idf=0的樣式
 function none_orign_idf_node(bType = 'solid', bColor = 'orange', bWidth = 5) {//idf==0的點有border
@@ -798,32 +699,33 @@ function none_orign_idf_node(bType = 'solid', bColor = 'orange', bWidth = 5) {//
 }
 change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);//可以改變同時為輸出及輸入的樣式
 function change_spaecialone_type(symbol = 'circle', color = 'pink') {
-    var temp;
-    var ttarget = [];
-    var tsource = [];
-    var result_t;
-    var result_s;
-    var concat;
-    var Result;
+    var result_t = []; //裝target的點
+    var result_s = []; //裝source的點
+    var concat; //target source合併之後的點
+    var Result; //要變成咖啡色的點
     user_colors[3] = color;
 
     data.category.forEach(c => {
-        ttarget.push(c.target);
-        tsource.push(c.source);
+        result_t.push(c.target);
+        result_s.push(c.source);
     })
-    result_t = Array.from(new Set(ttarget));
-    result_s = Array.from(new Set(tsource));
-
+    result_t = Array.from(new Set(result_t));
+    result_s = Array.from(new Set(result_s));
+    // console.log(result_s);
     concat = result_t.concat(result_s);
-    Result = concat.filter(function (element, index, arr) {
-        return arr.indexOf(element) !== index;
-    })
-    temp = data.nodes.filter(node => {
+
+    Result = concat.filter((element, index, arr) => {
+            return arr.indexOf(element) !== index;
+        })
+        // console.log(Result);
+    Result = data.nodes.filter(node => {
         return Result.includes(node.name);
     })
-    temp.forEach(t => {
+    Result.forEach(t => {
         t.symbol = symbol;
-        t.itemStyle.normal.color = color;
+        if (t.itemStyle.normal.color !== "red") {
+            t.itemStyle.normal.color = color;
+        }
     })
     Chart.setOption(option);
 }
