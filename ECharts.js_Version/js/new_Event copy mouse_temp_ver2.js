@@ -303,7 +303,6 @@ function keyword_search(e) {
                 $(`div[data-item="${keyword[i]}"]`).remove();
                 keyword.splice(i, 1);
                 search_AND(keyword_search_name_s);
-                return;
             } 
 
         }
