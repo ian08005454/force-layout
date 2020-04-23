@@ -152,14 +152,6 @@ save_width();
 save_node_size();
 // jquery_slider_setting
 var jquery_slider_setting = [{
-    object: 'max_level',
-    min: 1,
-    max: 10,//最大階層數
-    step: 1,
-    value: 1, //current option setting value
-    disable: false,
-    range: 'min'
-}, {
     object: 'relation_strength',
     min: 0,
     max: 100,

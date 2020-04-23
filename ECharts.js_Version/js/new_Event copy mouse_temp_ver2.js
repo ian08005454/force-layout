@@ -227,8 +227,7 @@ function keyword_search(e) {
 		$('.word_strength').hide();
 
 		// avoid same keyword search twice
-		if (sliderValue == 0) data_filter(keyword_search_name_s, 1, keywordSearchType);
-		else data_filter(keyword_search_name_s, sliderValue, keywordSearchType);
+		data_filter(keyword_search_name_s, 100, keywordSearchType);
 		event_setOption_function();
 		sidebar_level_render();
 		keyword_item_delete();
@@ -270,8 +269,8 @@ function keyword_search(e) {
 			keyword_search_reset(index);
 			event_setOption_function();
 			sidebar_level_render();
+			$('.max_level').hide();
 			if (keyword.length == 0) {
-				$('.max_level').hide();
 				if (onlyLOD == 1) {
 					$('.common_show_value').hide();
 					$('.word_strength').hide();
@@ -437,9 +436,9 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 			return a.includes(item);
 		});
 	}
-	// console.log(categories);
-	// console.log(minus);
-	var layer;
+	console.log(categories);
+	console.log(minus);
+	var layer = 0;
 	for (let i = 1; i < ui_user; i++) {
 		categories = data.category.filter((category) => {
 			if (minus.includes(category.target) || minus.includes(category.source)) {
@@ -448,25 +447,38 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 			}
 		});
 		category_collect = Array.from(new Set(category_collect));
+		console.log(categories);
 		console.log(category_collect);
 		minus = category_collect.filter((item) => {
 			return !item.includes(keywordSearch);
 		});
+		console.log(minus);
 		if (keywordSearchType === 'and') {
 			categories = categories.filter((category) => {
 				if (a.includes(category.target) && a.includes(category.source)) return category;
 			});
-			minus = union_collect.filter((item) => {
+			minus = minus.filter((item) => {
 				return a.includes(item);
 			});
 		}
+		console.log(categories);
 		console.log(minus);
 		if (categories.length === layer) {
 			maxlevel = i;
+			sliderValue = maxlevel;
 			console.log(maxlevel);
 			break;
 		} else layer = categories.length;
 	}
+	$(`.slider_item > #max_level`).slider({
+		min: 1,
+		max: maxlevel,//最大階層數
+		step: 1,
+		value: sliderValue, //current option setting value
+		disable: false,
+		range: 'min'
+	});
+	$(`.slider_item > input[id=max_level]`).val(sliderValue);
 	links = categories.filter((category) => {
 		if (category.show == true) {
 			collect.push(category.source, category.target);
@@ -551,6 +563,8 @@ Chart.on('legendselectchanged', (category_select) => {
 
 // max_level
 function max_Level(ui_value) {
+	sliderValue = ui_value;
+	$(`.slider_item > input[id=max_level]`).val(sliderValue);
 	option.series[0].categories = categoryTemp;
 	option.series[0].links = linktemp;
 	option.series[0].nodes = nodeTemp;
@@ -563,7 +577,6 @@ function max_Level(ui_value) {
 	data_filter(keywordSearch, ui_value, keywordType[keywordType.length - 1]);
 	event_setOption_function();
 	sidebar_level_render();
-	sliderValue = ui_value;
 }
 
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
