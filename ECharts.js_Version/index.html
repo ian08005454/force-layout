@@ -94,16 +94,15 @@
                     <input type="text" value="" id="max_level">
                     <div class="slider_slider" id="max_level"></div>
                 </div>
-                <div class="slider_item selected_route">
-                    <label class="slider_describe" for="selected_route">選擇and路線 : </label>
-                    <input type="text" value="" id="selected_route">
-                    <div class="slider_slider" id="selected_route"></div>
-                </div>
             </div>
             <div class="keyword_search" id ="ksearch">
                 <label>"/" = 無相關,  & = 有相關</label>
                 <!-- <button id="addmore_btn" type="submit">+</button> -->
-                <input type="text" placeholder="搜尋節點" id="keyword_search_field">
+                <select class="keywordClass" id = "kClass">
+                    <option value="and" selected>AND</option>
+                    <option value="or">OR</option>
+                   </select>
+                <input type="text" placeholder="搜尋節點" id="keyword_search_field" style="width:60px;">
                 <button id="keyword_search_button" type="submit">搜尋</button>
                 <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
@@ -146,6 +145,7 @@
     <script src="./js/Main_setting.js"></script>
     <!-- <script src="./js/bootstrap.bundle.min.js"></script> -->
     <script src="./js/new_Event copy mouse_temp_ver2.js"></script>
+    <!-- <script src="./js/new_Event copy.js"></script> -->
 </body>
 
 </html>

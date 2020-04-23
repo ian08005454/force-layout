@@ -106,7 +106,7 @@ var option = {
             }
         },
         draggable: true,//單獨點的移動
-        roam: 'move',//禁止使用者作放大縮小 只准拖動
+        roam: true,//禁止使用者作放大縮小 只准拖動 true,'move','scale',false
         focusNodeAdjacency: true,
         circular: {
             rotateLabel: false
@@ -239,15 +239,6 @@ var jquery_slider_setting = [{
     value: min_idf,
     disable: false,
     range: 'min'
-},{
-    object: 'selected_route',//idf詞頻強度
-    min: -1,
-    max: 29,
-    step: 1,
-    value: -1,
-    disable: false,
-    range: 'min',
-    hide: true
 }
 ];
 
