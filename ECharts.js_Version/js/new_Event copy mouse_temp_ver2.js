@@ -38,6 +38,7 @@ function keyword_search(e) {
 		keywordFliter(keyword_search_name, keywordSearchType);
 	}
 	function keywordFliter(keyword_search_name, keywordSearchType) {
+		$('#road').children().remove();
 		categoryTemp = option.series[0].categories;
 		linktemp = option.series[0].links;
 		nodeTemp = option.series[0].nodes;
@@ -49,7 +50,15 @@ function keyword_search(e) {
 			);
 			console.log(pageTemp[pageTemp.length - 1]);
 		}
+		// if(keywordSearchType === 'and')
 		var keyword_search_name_s = [];
+		if (keyword_search_name.includes('/')) {
+			keyword_search_name_s = keyword_search_name.split('/');
+			keyword_search_name_s.forEach(function(item, index, array) {
+				if (item.includes('&')) search_AND(item, 'or');
+				else keyword_search_verify_pass(item, 'or');
+			});
+		}
 		if (keyword_search_name.includes('&')) {
 			//搜尋兩個 AND
 			search_AND(keyword_search_name, keywordSearchType);
@@ -58,7 +67,6 @@ function keyword_search(e) {
 			keyword_search_verify_pass(keyword_search_name, keywordSearchType);
 		}
 	}
-
 	////搜尋兩個AND start------------------------------------------------
 	//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
 	function search_AND(keyword_search_name, keywordSearchType) {
@@ -101,7 +109,6 @@ function keyword_search(e) {
 			temp2 = [];
 			nodeCollection = [];
 			primaryStack.push(keywordTemp);
-			// markStack.push(keywordTemp);
 			var temp = data.category.filter((category) => {
 				return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
 			});
@@ -192,11 +199,6 @@ function keyword_search(e) {
 	////搜尋兩個AND --end --
 	function keyword_search_verify_pass(keyword_search_name, keywordSearchType) {
 		keyword_search_name_s = keyword_search_name.split('/'); //keyword_search_name_s=[]
-		console.log(
-			option.series[0].nodes.map(function(item, index, array) {
-				return item.name;
-			})
-		);
 		if (keyword_search_name_s.length == 0) {
 			return;
 		}
@@ -235,6 +237,7 @@ function keyword_search(e) {
 	function keywordRemove(kwd_search_name) {
 		keyword.splice(keyword.indexOf(kwd_search_name), 1);
 		$(`div[data-item="${kwd_search_name}"]`).remove();
+		// $('#road').remove();
 	}
 	function keyword_search_verify_fail(kwd_search_name) {
 		//一個 name
@@ -266,10 +269,11 @@ function keyword_search(e) {
 			keywordRemove(e.currentTarget.dataset.name);
 			keywordType.splice(index, 1);
 			pageTemp.splice(index);
+			$('.max_level').hide();
+			$('#road').children().remove();
 			keyword_search_reset(index);
 			event_setOption_function();
 			sidebar_level_render();
-			$('.max_level').hide();
 			if (keyword.length == 0) {
 				if (onlyLOD == 1) {
 					$('.common_show_value').hide();
@@ -376,6 +380,12 @@ function data_filter_and(keywordSearchType) {
 	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
 	if (keywordSearchType === 'and') dataAppendAnd(categories, links, nodes);
 	else if (keywordSearchType === 'or') dataAppendOr(categories, links, nodes);
+	route.forEach(function(item, index, array) {
+		$('#road').append(`<div class="road_item" id="${index}" onmouseover="highlightRoad(id);"
+		onmouseout="recoveryRoad();">
+        <p class="road_name" >${item}</p>
+		</div>`);
+	});
 }
 function dataAppendOr(categories, links, nodes) {
 	a = option.series[0].categories.map(function(item, index, array) {
@@ -467,18 +477,18 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 			maxlevel = i;
 			sliderValue = maxlevel;
 			console.log(maxlevel);
+			$(`.slider_item > #max_level`).slider({
+				min: 1,
+				max: maxlevel, //最大階層數
+				step: 1,
+				value: sliderValue, //current option setting value
+				disable: false,
+				range: 'min'
+			});
+			$(`.slider_item > input[id=max_level]`).val(sliderValue);
 			break;
 		} else layer = categories.length;
 	}
-	$(`.slider_item > #max_level`).slider({
-		min: 1,
-		max: maxlevel,//最大階層數
-		step: 1,
-		value: sliderValue, //current option setting value
-		disable: false,
-		range: 'min'
-	});
-	$(`.slider_item > input[id=max_level]`).val(sliderValue);
 	links = categories.filter((category) => {
 		if (category.show == true) {
 			collect.push(category.source, category.target);
@@ -557,7 +567,7 @@ Chart.on('legendselectchanged', (category_select) => {
 		});
 	}
 
-	event_setOption_function();
+	event_setOption_function(false);
 	sidebar_level_render();
 });
 
@@ -575,7 +585,7 @@ function max_Level(ui_value) {
 		keywordSearch.forEach((item) => item.trim());
 	}
 	data_filter(keywordSearch, ui_value, keywordType[keywordType.length - 1]);
-	event_setOption_function();
+	event_setOption_function(false);
 	sidebar_level_render();
 }
 
@@ -780,8 +790,8 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 	Chart.setOption(option);
 }
 // The function to render the data to canvas after set all option finish
-function event_setOption_function() {
-	Chart.setOption(option, true);
+function event_setOption_function(rander = true) {
+	Chart.setOption(option, rander);
 }
 
 Chart.on('click', (e) => {
@@ -810,3 +820,43 @@ Chart.on('click', (e) => {
 		);
 	}
 });
+function highlightRoad(e) {
+	var routIndex = e;
+	console.log(e);
+	option.series[0].nodes.forEach((item) => {
+		item.itemStyle.normal.opacity = 0.3;
+	});
+	option.series[0].categories.forEach((item) => {
+		item.lineStyle.normal.opacity = 0.3;
+	});
+	option.series[0].links.forEach((item) => {
+		item.lineStyle.normal.opacity = 0.3;
+	});
+	// route.forEach(index => {if(index == e) routIndex = index;})
+	option.series[0].nodes.forEach((item) => {
+		if (route[e].includes(item.name)) item.itemStyle.normal.opacity = 1;
+	});
+	option.series[0].categories.forEach((category) => {
+		if (route[routIndex].includes(category.target) && route[routIndex].includes(category.source))
+			category.lineStyle.normal.opacity = 1;
+	});
+	option.series[0].links.forEach((category) => {
+		if (route[routIndex].includes(category.target) && route[routIndex].includes(category.source))
+			category.lineStyle.normal.opacity = 1;
+	});
+	// sidebar_level_render();
+	event_setOption_function(false);
+}
+function recoveryRoad() {
+	option.series[0].nodes.forEach((item) => {
+		item.itemStyle.normal.opacity = 1;
+	});
+	option.series[0].categories.forEach((item) => {
+		item.lineStyle.normal.opacity = 1;
+	});
+	option.series[0].links.forEach((item) => {
+		item.lineStyle.normal.opacity = 1;
+	});
+	// sidebar_level_render();
+	event_setOption_function(false);
+}

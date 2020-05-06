@@ -52,6 +52,7 @@ function data_format(data, LODtype=0) {
                     symbol: symbol,//data_element.css[0].symbol,
                     itemStyle: {
                         normal: {
+                            opacity:1,//work
                             borderType: bType, //'solid',
                             borderColor: bColor,//'orange',
                             borderWidth: bWidth,//css_ele.borderWidth,  //0,
@@ -105,7 +106,7 @@ function data_format(data, LODtype=0) {
                         symbol: symbol,//kg2_element.css[0].symbol,
                         itemStyle: {
                             normal: {
-                                // opacity:0.5,//wotk
+                                opacity:1,//work
                                 borderType: bType,   //'solid',
                                 borderColor: bColor,  //'orange',
                                 borderWidth: bWidth, //0,
@@ -154,6 +155,7 @@ function data_format(data, LODtype=0) {
                     },
                     lineStyle: {
                         normal: {
+                            opacity:1,//work
                             color: linkcolor,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
                             width: Math.sqrt(kg2_element.v, 2),
@@ -197,6 +199,7 @@ function data_format(data, LODtype=0) {
                     symbol: symbol,
                     itemStyle: {
                         normal: {
+                            opacity:1,//work
                             borderType: bType, //'solid',
                             borderColor: bColor,//'orange',
                             borderWidth: bWidth,//css_ele.borderWidth,  //0,
@@ -234,6 +237,7 @@ function data_format(data, LODtype=0) {
                         symbol: symbol,
                         itemStyle: {
                             normal: {
+                                opacity:1,//work
                                 borderType: bType,   //'solid',
                                 borderColor: bColor,  //'orange',
                                 borderWidth: bWidth, //0,
@@ -265,6 +269,7 @@ function data_format(data, LODtype=0) {
                     show: true,//不知道要做甚麼
                     lineStyle: {
                         normal: {
+                            opacity:1,//work
                             color: linkcolor,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
                             width: 1,
