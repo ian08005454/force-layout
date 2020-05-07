@@ -82,6 +82,14 @@
     overflow-x: hidden;
     overflow-y: scroll;
 }
+.nodeSelected {
+    margin-top: 10px;
+    width: 174px;
+    height: 80px;
+    background-color: rgb(231, 229, 229);
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
 .keyword_item {
     margin: 5px 0px;
     padding-left: 5px;

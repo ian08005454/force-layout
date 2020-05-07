@@ -12,6 +12,7 @@ var linktemp, nodeTemp, categoryTemp;
 var pageTemp = [];
 var routeFloor = 'All';
 var routeHash = [];
+var routeBackup;
 window.onresize = () => {
 	Chart.resize();
 };
@@ -938,4 +939,13 @@ function recoveryRoad() {
 	});
 	// sidebar_level_render();
 	event_setOption_function(false);
+}
+function nodeList(){
+	$('.nodeSelected').children().remove();
+	option.series[0].nodes.forEach((item) => {
+		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${kwd_search_name}">
+        <label><input type="checkbox" name="lang-1" value="${item.name}" checked>JavaScript</label>
+    </div>`);
+	});
+	
 }
