@@ -10,6 +10,8 @@ var sliderValue = 0;
 var keywordType = [];
 var linktemp, nodeTemp, categoryTemp;
 var pageTemp = [];
+var routeFloor = 'All';
+var routeHash = [];
 window.onresize = () => {
 	Chart.resize();
 };
@@ -18,7 +20,7 @@ $('#keyword_search_field').keyup((e) => {
 	keyword_search(e);
 });
 $('#keyword_search_button').on('click', keyword_search);
-keyword.length == 0 ? $('.max_level').hide() : $('.max_level').show();
+keyword.length == 0 ? ($('.max_level').hide(), $('.route_level').hide()) : $('.max_level').show();
 /**
  * keyword_search function
  * @param {event} e
@@ -38,6 +40,7 @@ function keyword_search(e) {
 		keywordFliter(keyword_search_name, keywordSearchType);
 	}
 	function keywordFliter(keyword_search_name, keywordSearchType) {
+		$('.route_level').hide();
 		$('#road').children().remove();
 		categoryTemp = option.series[0].categories;
 		linktemp = option.series[0].links;
@@ -71,11 +74,9 @@ function keyword_search(e) {
 	//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
 	function search_AND(keyword_search_name, keywordSearchType) {
 		keyword_search_name_s = keyword_search_name.split('&'); //keyword_search_name_s=[]//存打入的字 形式:[a,b]
+		first = [];
 		route = [];
-		var primaryStack = new Array();
-		var secondaryStack = new Array();
-		var temp2 = new Array();
-		var Finish = true;
+		routeHash = [];
 		for (var i = 0, keywordLen = keyword_search_name_s.length; i < keywordLen; i++) {
 			keyword_search_name_s[i] = keyword_search_name_s[i].trim();
 			if (keyword_search_name_s[i].length == 0) {
@@ -84,114 +85,163 @@ function keyword_search(e) {
 			if (!data.all_nodes.includes(keyword_search_name_s[i])) {
 				return keyword_search_verify_fail(keyword_search_name);
 			}
-			if (keywordSearchType === 'and') {
-				if (
-					option.series[0].nodes
-						.map(function(item, index, array) {
-							return item.name;
-						})
-						.indexOf(keyword_search_name_s[i]) === -1 &&
-					keyword.length != 0
-				) {
-					return keyword_search_verify_fail_in_page(keyword_search_name);
-				}
-			}
 		}
 		$('.max_level').hide();
 		$('.common_show_value').hide();
 		$('.word_strength').hide();
 		// avoid same keyword search twice
-		var keywordTemp = keyword_search_name_s[0];
 		$('#keyword_search_field').val(''); // clear the keyword search field
-		var nodeCollection;
-		var secondaryStackCount = -1;
-		do {
-			temp2 = [];
-			nodeCollection = [];
-			primaryStack.push(keywordTemp);
-			var temp = data.category.filter((category) => {
-				return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
-			});
-			// console.log(temp);
-			var linkstemp = temp.filter((category) => {
-				nodeCollection.push(category.target, category.source);
-			});
-			nodeCollection = Array.from(new Set(nodeCollection));
-			for (var i = 0, uLen = nodeCollection.length; i < uLen; i++) {
-				if (!primaryStack.includes(nodeCollection[i])) {
-					temp2.push(nodeCollection[i]);
-				}
-			}
-			secondaryStack.push(temp2);
-			secondaryStackCount++;
-			if (primaryStack[primaryStack.length - 1] == keyword_search_name_s[keyword_search_name_s.length - 1]) {
-				route.push(Array.from(primaryStack));
-				console.log(primaryStack);
-				console.log(route);
-				for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
-					if (secondaryStack[i].length != 0) {
-						Finish = false;
-						break;
-					}
-				}
-				if (Finish == true) {
-					break;
-				} else {
-					Finish = false;
-				}
-			}
-			if (primaryStack.length == 0 && route.length == 0) {
-				alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
-				return;
-			}
+		keyword_search_name_s.forEach((item) => {
+			minus = [];
+			minus.push(item);
+			category_collect = [];
+			count = 0;
 			do {
-				while (secondaryStack[secondaryStackCount].length == 0) {
-					if (secondaryStackCount == 0) {
-						break;
+				cat = data.category.filter((category) => {
+					if (minus.includes(category.target) || minus.includes(category.source)) {
+						category_collect.push(category.target, category.source);
+						return category;
 					}
-					primaryStack.pop();
-					secondaryStack.pop();
-					secondaryStackCount--;
+				});
+				category_collect = Array.from(new Set(category_collect));
+				console.log(category_collect);
+				minus = category_collect;
+				count++;
+				var countdown = 0;
+				keyword_search_name_s.forEach((item) => {
+					if (minus.includes(item)) countdown++;
+				});
+				console.log(countdown);
+				if (countdown === keyword_search_name_s.length) {
+					break;
 				}
-				keywordTemp = secondaryStack[secondaryStackCount].pop();
-			} while (primaryStack.includes(keywordTemp));
-			if (keywordTemp == undefined) {
-				break;
+			} while (1);
+			first.push(count);
+		});
+		var top = 0,
+			topVal = 0;
+		first.forEach(function(item, index, array) {
+			if (item > topVal) {
+				top = index;
+				topVal = item;
 			}
-			console.log(keywordTemp);
-			console.log(primaryStack);
-			console.log(secondaryStack);
-		} while (1);
+		});
+
+		for (var z = 1; z < keyword_search_name_s.length; z++) {
+			var primaryStack = new Array();
+			var secondaryStack = new Array();
+			var temp2 = new Array();
+			var Finish = true;
+			var keywordTemp = keyword_search_name_s[top];
+			var nodeCollection;
+			var secondaryStackCount = -1;
+			goal = keyword_search_name_s[z];
+			do {
+				temp2 = [];
+				nodeCollection = [];
+				primaryStack.push(keywordTemp);
+				var temp = data.category.filter((category) => {
+					return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
+				});
+				// console.log(temp);
+				var linkstemp = temp.filter((category) => {
+					nodeCollection.push(category.target, category.source);
+				});
+				nodeCollection = Array.from(new Set(nodeCollection));
+				for (var i = 0, uLen = nodeCollection.length; i < uLen; i++) {
+					if (!primaryStack.includes(nodeCollection[i])) {
+						temp2.push(nodeCollection[i]);
+					}
+				}
+				secondaryStack.push(temp2);
+				secondaryStackCount++;
+				if (primaryStack[primaryStack.length - 1] == goal) {
+					route.push(Array.from(primaryStack));
+					console.log(primaryStack);
+					console.log(route);
+					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
+						if (secondaryStack[i].length != 0) {
+							Finish = false;
+							break;
+						}
+					}
+					if (Finish == true) {
+						break;
+					} else {
+						Finish = false;
+					}
+				}
+				if (primaryStack.length == 0 && route.length == 0) {
+					alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
+					return;
+				}
+				do {
+					while (secondaryStack[secondaryStackCount].length == 0) {
+						if (secondaryStackCount == 0) {
+							break;
+						}
+						primaryStack.pop();
+						secondaryStack.pop();
+						secondaryStackCount--;
+					}
+					keywordTemp = secondaryStack[secondaryStackCount].pop();
+				} while (primaryStack.includes(keywordTemp));
+				if (keywordTemp == undefined) {
+					break;
+				}
+				console.log(keywordTemp);
+				console.log(primaryStack);
+				console.log(secondaryStack);
+			} while (1);
+		}
 		console.log('YA!!!!!');
 		console.log(route.length);
 		console.log(route);
 		for (var i = 0; i < route.length; i++) {
-			for (var x = 0, len = keyword_search_name_s.length; x < len; x++) {
-				if (!route[i].includes(keyword_search_name_s[x])) {
-					route.splice(i, 1);
-				}
+			var count = 0;
+			keyword_search_name_s.forEach((item) => {
+				if (route[i].includes(item)) count++;
+			});
+			if (count != keyword_search_name_s.length) {
+				route.splice(i, 1);
+				i--;
 			}
 		}
 		if (route.length === 0) {
 			alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
-			return keywordRemove(kwd_search_name);
+			return keywordRemove(keyword_search_name);
 		}
-		if (keywordSearchType === 'and') {
-			for (var i = 0; i < route.length; i++) {
-				if (
-					option.series[0].nodes
-						.map(function(item, index, array) {
-							return item.name;
-						})
-						.indexOf(keyword_search_name_s[i]) === -1
-				) {
-					route.splice(i, 1);
-				}
+		route.sort(function(a, b) {
+			if (a.length > b.length) {
+				return 1;
 			}
-			if (route.length === 0) return keyword_search_verify_fail_in_page(keyword_search_name);
-		}
-		console.log(route);
-		data_filter_and(keywordSearchType);
+			if (a.length < b.length) {
+				return -1;
+			}
+			return 0;
+		});
+		var lenTemp = route[0].length;
+		routeHash.push(lenTemp-1);
+		route.forEach((item) => {
+			if (lenTemp < item.length) {
+				lenTemp = item.length;
+				routeHash.push(lenTemp-1);
+			}
+		});
+		console.log(routeHash)
+		console.log(routeHash.length);
+		routeFloor = 'All';
+		$(`.slider_item > #route_level`).slider({
+			min: -1,
+			max: routeHash.length-1, //最大階層數
+			step: 1,
+			value: -1, //current option setting value
+			disable: false,
+			range: 'min'
+		});
+		$(`.slider_item > input[id=route_level]`).val(routeFloor);
+		$('.route_level').show();
+		data_filter_and(keywordSearchType, keyword_search_name_s);
 		event_setOption_function();
 		sidebar_level_render();
 		keyword_item_delete();
@@ -259,7 +309,6 @@ function keyword_search(e) {
         <p class="keyword_name" >${keywordSearchType} ${kwd_search_name}</p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
     </div>`);
-		console.log(keyword_search_name);
 	}
 	// bind the keyword delete button click event
 	function keyword_item_delete() {
@@ -270,7 +319,9 @@ function keyword_search(e) {
 			keywordType.splice(index, 1);
 			pageTemp.splice(index);
 			$('.max_level').hide();
+			$('.route_level').hide();
 			$('#road').children().remove();
+			routeHash = [];
 			keyword_search_reset(index);
 			event_setOption_function();
 			sidebar_level_render();
@@ -336,13 +387,24 @@ function keyword_search(e) {
 		}
 	}
 }
-function data_filter_and(keywordSearchType) {
+function data_filter_and(keywordSearchType, keyword_search_name_s) {
+	$('#road').children().remove();
 	var categories = [],
 		links = [],
 		nodes = [];
 	var temp = [];
 	var nodeCollection = [];
-	for (var y = 0; y < route.length; y++) {
+	if (routeFloor === 'All') {
+		var y = 0;
+	} else {
+		for(var i =0, q= route.length;i<q;i++){
+			if (route[i].length -1 === routeFloor){
+				y = i;
+				break;
+			}
+		}
+	}
+	for (; y < route.length; y++) {
 		for (var i = 0, len = route[y].length; i < len - 1; i++)
 			temp = temp.concat(
 				data.category.filter((category) => {
@@ -360,12 +422,15 @@ function data_filter_and(keywordSearchType) {
 		temp = temp.filter((category) => {
 			return !a.includes(category.id);
 		});
-		console.log(temp);
 		nodeCollection = nodeCollection.concat(route[y]);
 		nodeCollection = Array.from(new Set(nodeCollection));
 		categories = categories.concat(temp);
-		console.log(categories);
+		$('#road').append(`<div class="road_item" id="${y}" onmouseover="highlightRoad(id);"
+		onmouseout="recoveryRoad();">
+        <p class="road_name" >${route[y]}</p>
+		</div>`);
 		if (y + 1 === route.length) break;
+		if(routeFloor !== 'All' && route[y].length !== route[y+1].length) break;
 	}
 	links = categories.filter((category) => {
 		if (category.show == true) {
@@ -373,19 +438,12 @@ function data_filter_and(keywordSearchType) {
 		}
 	});
 	nodes = data.nodes.filter((node) => {
-		route[0][0].includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
-		route[0][route[0].length - 1].includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
+		keyword_search_name_s.includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
 		return nodeCollection.includes(node.name);
 	});
 	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
 	if (keywordSearchType === 'and') dataAppendAnd(categories, links, nodes);
 	else if (keywordSearchType === 'or') dataAppendOr(categories, links, nodes);
-	route.forEach(function(item, index, array) {
-		$('#road').append(`<div class="road_item" id="${index}" onmouseover="highlightRoad(id);"
-		onmouseout="recoveryRoad();">
-        <p class="road_name" >${item}</p>
-		</div>`);
-	});
 }
 function dataAppendOr(categories, links, nodes) {
 	a = option.series[0].categories.map(function(item, index, array) {
@@ -570,6 +628,18 @@ Chart.on('legendselectchanged', (category_select) => {
 	event_setOption_function(false);
 	sidebar_level_render();
 });
+function routeLevel(ui_value) {
+	if(ui_value === -1)
+	routeFloor = 'All'
+	else
+	routeFloor = routeHash[ui_value];
+	$(`.slider_item > input[id=route_level]`).val(routeFloor);
+	keyword_search_name_s = keyword[keyword.length - 1].split('&');
+	data_filter_and(keywordType[keywordType.length - 1], keyword_search_name_s);
+	event_setOption_function(false);
+	sidebar_level_render();
+
+}
 
 // max_level
 function max_Level(ui_value) {
@@ -660,6 +730,9 @@ $(() => {
 					break;
 				case 'common_show_value': //共現次數
 					common_value(ui.value);
+					break;
+				case 'route_level': //共現次數
+					routeLevel(ui.value);
 					break;
 			}
 		}
@@ -824,25 +897,31 @@ function highlightRoad(e) {
 	var routIndex = e;
 	console.log(e);
 	option.series[0].nodes.forEach((item) => {
-		item.itemStyle.normal.opacity = 0.3;
+		item.itemStyle.normal.opacity = 0.1;
 	});
 	option.series[0].categories.forEach((item) => {
-		item.lineStyle.normal.opacity = 0.3;
+		item.lineStyle.normal.opacity = 0.1;
 	});
 	option.series[0].links.forEach((item) => {
-		item.lineStyle.normal.opacity = 0.3;
+		item.lineStyle.normal.opacity = 0.1;
 	});
 	// route.forEach(index => {if(index == e) routIndex = index;})
 	option.series[0].nodes.forEach((item) => {
 		if (route[e].includes(item.name)) item.itemStyle.normal.opacity = 1;
 	});
 	option.series[0].categories.forEach((category) => {
-		if (route[routIndex].includes(category.target) && route[routIndex].includes(category.source))
-			category.lineStyle.normal.opacity = 1;
+		for (var i = 0, len = route[routIndex].length; i < len - 1; i++)
+			if (route[routIndex][i].includes(category.target) && route[routIndex][i + 1].includes(category.source))
+				category.lineStyle.normal.opacity = 1;
+			else if (route[routIndex][i + 1].includes(category.target) && route[routIndex][i].includes(category.source))
+				category.lineStyle.normal.opacity = 1;
 	});
 	option.series[0].links.forEach((category) => {
-		if (route[routIndex].includes(category.target) && route[routIndex].includes(category.source))
-			category.lineStyle.normal.opacity = 1;
+		for (var i = 0, len = route[routIndex].length; i < len - 1; i++)
+			if (route[routIndex][i].includes(category.target) && route[routIndex][i + 1].includes(category.source))
+				category.lineStyle.normal.opacity = 1;
+			else if (route[routIndex][i + 1].includes(category.target) && route[routIndex][i].includes(category.source))
+				category.lineStyle.normal.opacity = 1;
 	});
 	// sidebar_level_render();
 	event_setOption_function(false);
