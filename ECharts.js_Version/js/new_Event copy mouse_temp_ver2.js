@@ -15,7 +15,7 @@ var routeBackup = [];
 var keywordCount = 0;
 var keywordPoint = 0;
 var keyword_search_name;
-var CollectionTemp,CountTemp,PointTemp;
+var CollectionTemp, CountTemp, PointTemp;
 var keywords = [];
 var notKeyword = [];
 window.onresize = () => {
@@ -47,371 +47,354 @@ function keyword_search(e) {
 		keywordFliter();
 	}
 }
-	function keywordCleanUp(keyword_search_name, keywordSearchType){
-		CollectionTemp =JSON.parse(JSON.stringify(keywordCollection));
-		CountTemp = keywordCount;
-		PointTemp = keywordPoint;
-		if(keywordSearchType === 'and'){
-			if (keyword_search_name.includes('/')) {
-				keyword_search_name_s = keyword_search_name.split('/');
-				if(keywordCount === 0){
-						for(var i = 0;i < keyword_search_name_s.length;i++)
-							keywordCollection.push([]);
+function keywordCleanUp(keyword_search_name, keywordSearchType) {
+	CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
+	CountTemp = keywordCount;
+	PointTemp = keywordPoint;
+	if (keywordSearchType === 'and') {
+		if (keyword_search_name.includes('/')) {
+			keyword_search_name_s = keyword_search_name.split('/');
+			if (keywordCount === 0) {
+				for (var i = 0; i < keyword_search_name_s.length; i++) keywordCollection.push([]);
+			} else {
+				for (var x = 1; x < keyword_search_name_s.length; x++) {
+					for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
+						keywordCollection.push(Array.from(keywordCollection[i]));
+					}
 				}
-				else{
-					for(var x = 1;x<keyword_search_name_s.length;x++){
-						for(var i = keywordPoint;i<keywordPoint+keywordCount;i++){
-							keywordCollection.push(Array.from(keywordCollection[i]));
-						}
-					}
 			}
-				console.log(keywordCollection);
-				keyword_search_name_s.forEach(function(item, index, array) {
-					item = item.trim();
-					if(item.includes('&'))
-					item = keyword_search_name.split('&');
-					else
-					item = Array(item);
-					for(var i = keywordPoint+(index*keywordCount);i<keywordPoint+((index+1)*keywordCount);i++){
-						for (var z = 0, keywordLen = item.length; z < keywordLen; z++) {
-							console.log(i);
-							keywordCollection[i].push(item[z]);
-							console.log(keywordCollection[i]);
+			console.log(keywordCollection);
+			keyword_search_name_s.forEach(function(item, index, array) {
+				item = item.trim();
+				if (item.includes('&')) item = keyword_search_name.split('&');
+				else item = Array(item);
+				for (var i = keywordPoint + index * keywordCount; i < keywordPoint + (index + 1) * keywordCount; i++) {
+					for (var z = 0, keywordLen = item.length; z < keywordLen; z++) {
+						console.log(i);
+						keywordCollection[i].push(item[z]);
+						console.log(keywordCollection[i]);
 					}
-				}	
+				}
 			});
 			keywordCount *= keyword_search_name_s.length;
-		}
-		else{
-				console.log(keywordCount);
-				if(keyword_search_name.includes('&'))
-				 	keyword_search_name = keyword_search_name.split('&');
-				 else
-				 	keyword_search_name = Array(keyword_search_name);
-				if(keywordCount === 0){
-					keywordCollection.push([]);
-					keywordCount++;
-				}	
-				console.log(keywordCount);
-				for(var i = keywordPoint;i<keywordPoint+keywordCount;i++){
-					for (var z = 0, keywordLen = keyword_search_name.length; z < keywordLen; z++) {
-						keywordCollection[i].push(keyword_search_name[z]);
-				}
+		} else {
+			console.log(keywordCount);
+			if (keyword_search_name.includes('&')) keyword_search_name = keyword_search_name.split('&');
+			else keyword_search_name = Array(keyword_search_name);
+			if (keywordCount === 0) {
+				keywordCollection.push([]);
+				keywordCount++;
+			}
+			console.log(keywordCount);
+			for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
+				for (var z = 0, keywordLen = keyword_search_name.length; z < keywordLen; z++) {
+					keywordCollection[i].push(keyword_search_name[z]);
 				}
 			}
 		}
-		else{
-			keywordPoint = keywordCollection.length -1;
-			keywordCount = 0;
-			if (keyword_search_name.includes('/')) {
-				keyword_search_name_s = keyword_search_name.split('/');
-				keywordCount += keyword_search_name_s.length;
-				keyword_search_name_s.forEach(function(item, index, array) {
-					if(item.includes('&'))
-						item = keyword_search_name.split('&');
-					else
-						item = Array(item);
-					keywordCollection.push(item);
-				});
-		}else{
-		 	if(keyword_search_name.includes('&'))
-				keyword_search_name = keyword_search_name.split('&');
-			else
-				keyword_search_name = Array(keyword_search_name);
+	} else {
+		keywordPoint = keywordCollection.length - 1;
+		keywordCount = 0;
+		if (keyword_search_name.includes('/')) {
+			keyword_search_name_s = keyword_search_name.split('/');
+			keywordCount += keyword_search_name_s.length;
+			keyword_search_name_s.forEach(function(item, index, array) {
+				if (item.includes('&')) item = keyword_search_name.split('&');
+				else item = Array(item);
+				keywordCollection.push(item);
+			});
+		} else {
+			if (keyword_search_name.includes('&')) keyword_search_name = keyword_search_name.split('&');
+			else keyword_search_name = Array(keyword_search_name);
 			keywordCount++;
 			keywordCollection.push(keyword_search_name);
 		}
 	}
-		console.log(keywordCollection);
-	}
-	function keywordFliter() {
-		$('#road').children().remove();
-		$('.common_show_value').hide();
-		$('.word_strength').hide();
-		routeFloor = 'All';
-		route = [];
-		routeHash = [];
-		option.series[0].categories = [];
-		kwTemp = [];
-		option.series[0].links = [];
-		option.series[0].nodes = [];
-		keywordCollection.forEach(item =>{
-			for (var i = 0, keywordLen = item.length; i < keywordLen; i++) {
-				item[i] = item[i].trim();
-				keywords.push(item[i]);
-				if (!data.all_nodes.includes(item[i]) || item[i].length === 0) {
-					return keyword_search_verify_fail(keyword_search_name);
-				}
-			}
-			item = Array.from(new Set(item));
-			if(item.length > 1)
-				search_AND(item);
-			else if(item.length === 1)
-				kwTemp.push(item[0]);
-		});
-		keywords = Array.from(new Set(keywords));
-		if (route.length === 0 && kwTemp.length === 0) 
-			return andSearchNoRoute(keyword_search_name);
-		console.log(kwTemp)
-		if(kwTemp.length>0)
-			keyword_search_verify_pass(kwTemp);
-		
-	}
-	////搜尋兩個AND start------------------------------------------------
-	//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
-	function search_AND(keyword_search_name_s) {
-		first = [];
-		routeTemp = [];
-		$('.max_level').hide();
-		$('.common_show_value').hide();
-		$('.word_strength').hide();
-		// avoid same keyword search twice
-		$('#keyword_search_field').val(''); // clear the keyword search field
-		keyword_search_name_s.forEach((item) => {
-			minus = [];
-			minus.push(item);
-			category_collect = [];
-			count = 0;
-			do {
-				cat = data.category.filter((category) => {
-					if (minus.includes(category.target) || minus.includes(category.source)) {
-						category_collect.push(category.target, category.source);
-						return category;
-					}
-				});
-				category_collect = Array.from(new Set(category_collect));
-				// console.log(category_collect);
-				minus = category_collect.filter((items) => {
-					return !items.includes(item);
-				});
-				console.log(minus);
-				count++;
-				var countdown = 0;
-				keyword_search_name_s.forEach((item) => {
-					if (minus.includes(item)) countdown++;
-				});
-				if (countdown === keyword_search_name_s.length-1) {
-					break;
-				}
-			} while (1);
-			first.push(count);
-		});
-		console.log(first);
-		var top = 0,
-			topVal = 0;
-		first.forEach(function(item, index, array) {
-			if (item > topVal) {
-				top = index;
-				topVal = item;
-			}
-		});
-		for (var z = 1; z < keyword_search_name_s.length; z++) {
-			var primaryStack = new Array();
-			var secondaryStack = new Array();
-			var temp2 = new Array();
-			var Finish = true;
-			var keywordTemp = keyword_search_name_s[top];
-			var nodeCollection;
-			var secondaryStackCount = -1;
-			goal = keyword_search_name_s[z];
-			do {
-				temp2 = [];
-				nodeCollection = [];
-				primaryStack.push(keywordTemp);
-				var temp = data.category.filter((category) => {
-					return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
-				});
-				// console.log(temp);
-				var linkstemp = temp.filter((category) => {
-					nodeCollection.push(category.target, category.source);
-				});
-				nodeCollection = Array.from(new Set(nodeCollection));
-				for (var i = 0, uLen = nodeCollection.length; i < uLen; i++) {
-					if (!primaryStack.includes(nodeCollection[i])) {
-						temp2.push(nodeCollection[i]);
-					}
-				}
-				secondaryStack.push(temp2);
-				secondaryStackCount++;
-				if (primaryStack[primaryStack.length - 1] == goal) {
-					routeTemp.push(Array.from(primaryStack));
-					// console.log(primaryStack);
-					// console.log(routeTemp);
-					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
-						if (secondaryStack[i].length != 0) {
-							Finish = false;
-							break;
-						}
-					}
-					if (Finish == true) {
-						break;
-					} else {
-						Finish = false;
-					}
-				}
-				if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name);
-				do {
-					while (secondaryStack[secondaryStackCount].length == 0) {
-						if (secondaryStackCount == 0) {
-							break;
-						}
-						primaryStack.pop();
-						secondaryStack.pop();
-						secondaryStackCount--;
-					}
-					keywordTemp = secondaryStack[secondaryStackCount].pop();
-				} while (primaryStack.includes(keywordTemp));
-				if (keywordTemp == undefined) {
-					break;
-				}
-				// console.log(keywordTemp);
-				// console.log(primaryStack);
-				// console.log(secondaryStack);
-			} while (1);
-		}
-		console.log('YA!!!!!');
-		// console.log(routeTemp.length);
-		console.log(routeTemp);
-		for (var i = 0; i < routeTemp.length; i++) {
-			var count = 0;
-			keyword_search_name_s.forEach((item) => {
-				if (routeTemp[i].includes(item)) count++;
-			});
-			if (count != keyword_search_name_s.length) {
-				routeTemp.splice(i, 1);
-				i--;
+	console.log(keywordCollection);
+}
+function keywordFliter() {
+	$('#road').children().remove();
+	$('.common_show_value').hide();
+	$('.word_strength').hide();
+	routeFloor = 'All';
+	route = [];
+	routeHash = [];
+	option.series[0].categories = [];
+	kwTemp = [];
+	option.series[0].links = [];
+	option.series[0].nodes = [];
+	keywordCollection.forEach((item) => {
+		for (var i = 0, keywordLen = item.length; i < keywordLen; i++) {
+			item[i] = item[i].trim();
+			keywords.push(item[i]);
+			if (!data.all_nodes.includes(item[i]) || item[i].length === 0) {
+				return keyword_search_verify_fail(keyword_search_name);
 			}
 		}
-		// if (routeTemp.length === 0) 
-		// 	return andSearchNoRoute(keyword_search_name);
-			routeTemp.forEach(item =>{
-				route.push(item);
-			});
-		route.sort(function(a, b) {
-			if (a.length > b.length) {
-				return 1;
-			}
-			if (a.length < b.length) {
-				return -1;
-			}
-			return 0;
-		});
-		routeBackup = JSON.parse(JSON.stringify(route));
-		routeHash = [];
-		var lenTemp = route[0].length;
-		routeHash.push(lenTemp-1);
-		route.forEach((item) => {
-			if (lenTemp < item.length) {
-				lenTemp = item.length;
-				routeHash.push(lenTemp-1);
-			}
-		});
-		// console.log(routeHash)
-		// console.log(routeHash.length);
-		routeFloor = 'All';
-		maxLevelSlider();
-		data_filter_and();
-		event_setOption_function();
-		sidebar_level_render();
-		keyword_item_delete();
-	}
-	////搜尋兩個AND --end --
-	function keyword_search_verify_pass(keyword_search_name_s) {
-		if (keyword_search_name_s.length == 0) {
-			return;
-		}
-		$('.max_level').show();
-		data_filter(keyword_search_name_s);
-		event_setOption_function();
-		sidebar_level_render();
-		keyword_item_delete();
-	}
-	function keywordRemove(kwd_search_name) {
-		index = keyword.indexOf(kwd_search_name);
-		keyword.splice(index, 1);
-		keywordType.splice(index, 1);
-		$(`div[data-item="${kwd_search_name}"]`).remove();
-		// $('#road').remove();
-	}
-	function keyword_search_verify_fail(kwd_search_name) {
-		//一個 name
-		alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
-		keywordCollection = CollectionTemp;
-		keywordCount = CountTemp;
-		keywordPoint = PointTemp;
-		console.log(CollectionTemp);
-		keywordRemove(kwd_search_name);
-	}
-	function andSearchNoRoute(keyword_search_name){
-		keywordCollection = CollectionTemp;
-		keywordCount = CountTemp;
-		keywordPoint = PointTemp;
-		alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
-		keywordRemove(keyword_search_name);
-	}
-	// append keyword div in keyword field
-	//下方新增delete鍵
-	function keyword_item_append(kwd_search_name, keywordSearchType) {
-		keyword.push(kwd_search_name);
-		keywordType.push(keywordSearchType);
-		$('#keyword_search_field').val(''); // clear the keyword search field
-		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >${keywordSearchType} ${kwd_search_name}</p>
-        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
-    </div>`);
-	}
-	// bind the keyword delete button click event
-	function keyword_item_delete() {
-		// avoid to bind the click(delete) event twice, have to unbind the first click event first.
-		$('.keyword_delete').off('click').click((e) => {
-			index = keyword.indexOf(e.currentTarget.dataset.name);
-			keywordRemove(e.currentTarget.dataset.name);
-			$('.max_level').hide();
-			$('#road').children().remove();
-			$('.nodeSelected').children().remove();
-			routeHash = [];
-			keywordCollection = [];
-			keywordPoint = 0;
-			keywordCount = 0;
-			keyword_search_reset();
-			if (keyword.length == 0) {
-				if (onlyLOD == 1) {
-					$('.common_show_value').hide();
-					$('.word_strength').hide();
-				} else {
-					$('.common_show_value').show();
-					$('.word_strength').show();
-				}
-			}
-		});
-	}
-
-	function keyword_search_reset() {
-		union_collect = [];
-		if (keyword.length === 0) {
-			//刪除完全數清空或是砍了第一層
-			option.series[0].categories = data.all_category;
-			option.series[0].links = option.series[0].categories.filter((category) => {
-				// return the category that show property is true
-				if (category.show == true) {
-					union_collect.push(category.source, category.target);
+		item = Array.from(new Set(item));
+		if (item.length > 1) search_AND(item);
+		else if (item.length === 1) kwTemp.push(item[0]);
+	});
+	keywords = Array.from(new Set(keywords));
+	if (route.length === 0 && kwTemp.length === 0) return andSearchNoRoute(keyword_search_name);
+	console.log(kwTemp);
+	if (kwTemp.length > 0) keyword_search_verify_pass(kwTemp);
+}
+////搜尋兩個AND start------------------------------------------------
+//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
+function search_AND(keyword_search_name_s) {
+	first = [];
+	routeTemp = [];
+	$('.max_level').hide();
+	$('.common_show_value').hide();
+	$('.word_strength').hide();
+	// avoid same keyword search twice
+	$('#keyword_search_field').val(''); // clear the keyword search field
+	keyword_search_name_s.forEach((item) => {
+		minus = [];
+		minus.push(item);
+		category_collect = [];
+		count = 0;
+		do {
+			cat = data.category.filter((category) => {
+				if (minus.includes(category.target) || minus.includes(category.source)) {
+					category_collect.push(category.target, category.source);
 					return category;
 				}
 			});
-			union_collect = Array.from(new Set(union_collect));
+			category_collect = Array.from(new Set(category_collect));
+			// console.log(category_collect);
+			minus = category_collect.filter((items) => {
+				return !items.includes(item);
+			});
+			console.log(minus);
+			count++;
+			var countdown = 0;
+			keyword_search_name_s.forEach((item) => {
+				if (minus.includes(item)) countdown++;
+			});
+			if (countdown === keyword_search_name_s.length - 1) {
+				break;
+			}
+		} while (1);
+		first.push(count);
+	});
+	console.log(first);
+	var top = 0,
+		topVal = 0;
+	first.forEach(function(item, index, array) {
+		if (item > topVal) {
+			top = index;
+			topVal = item;
+		}
+	});
+	for (var z = 1; z < keyword_search_name_s.length; z++) {
+		var primaryStack = new Array();
+		var secondaryStack = new Array();
+		var temp2 = new Array();
+		var Finish = true;
+		var keywordTemp = keyword_search_name_s[top];
+		var nodeCollection;
+		var secondaryStackCount = -1;
+		goal = keyword_search_name_s[z];
+		do {
+			temp2 = [];
+			nodeCollection = [];
+			primaryStack.push(keywordTemp);
+			var temp = data.category.filter((category) => {
+				return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
+			});
+			// console.log(temp);
+			var linkstemp = temp.filter((category) => {
+				nodeCollection.push(category.target, category.source);
+			});
+			nodeCollection = Array.from(new Set(nodeCollection));
+			for (var i = 0, uLen = nodeCollection.length; i < uLen; i++) {
+				if (!primaryStack.includes(nodeCollection[i])) {
+					temp2.push(nodeCollection[i]);
+				}
+			}
+			secondaryStack.push(temp2);
+			secondaryStackCount++;
+			if (primaryStack[primaryStack.length - 1] == goal) {
+				routeTemp.push(Array.from(primaryStack));
+				// console.log(primaryStack);
+				// console.log(routeTemp);
+				for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
+					if (secondaryStack[i].length != 0) {
+						Finish = false;
+						break;
+					}
+				}
+				if (Finish == true) {
+					break;
+				} else {
+					Finish = false;
+				}
+			}
+			if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name);
+			do {
+				while (secondaryStack[secondaryStackCount].length == 0) {
+					if (secondaryStackCount == 0) {
+						break;
+					}
+					primaryStack.pop();
+					secondaryStack.pop();
+					secondaryStackCount--;
+				}
+				keywordTemp = secondaryStack[secondaryStackCount].pop();
+			} while (primaryStack.includes(keywordTemp));
+			if (keywordTemp == undefined) {
+				break;
+			}
+			// console.log(keywordTemp);
+			// console.log(primaryStack);
+			// console.log(secondaryStack);
+		} while (1);
+	}
+	console.log('YA!!!!!');
+	// console.log(routeTemp.length);
+	console.log(routeTemp);
+	for (var i = 0; i < routeTemp.length; i++) {
+		var count = 0;
+		keyword_search_name_s.forEach((item) => {
+			if (routeTemp[i].includes(item)) count++;
+		});
+		if (count != keyword_search_name_s.length) {
+			routeTemp.splice(i, 1);
+			i--;
+		}
+	}
+	// if (routeTemp.length === 0)
+	// 	return andSearchNoRoute(keyword_search_name);
+	routeTemp.forEach((item) => {
+		route.push(item);
+	});
+	route.sort(function(a, b) {
+		if (a.length > b.length) {
+			return 1;
+		}
+		if (a.length < b.length) {
+			return -1;
+		}
+		return 0;
+	});
+	routeBackup = JSON.parse(JSON.stringify(route));
+	routeHash = [];
+	var lenTemp = route[0].length;
+	routeHash.push(lenTemp - 1);
+	route.forEach((item) => {
+		if (lenTemp < item.length) {
+			lenTemp = item.length;
+			routeHash.push(lenTemp - 1);
+		}
+	});
+	// console.log(routeHash)
+	// console.log(routeHash.length);
+	routeFloor = 'All';
+	maxLevelSlider();
+	data_filter_and();
+	event_setOption_function();
+	sidebar_level_render();
+	keyword_item_delete();
+}
+////搜尋兩個AND --end --
+function keyword_search_verify_pass(keyword_search_name_s) {
+	if (keyword_search_name_s.length == 0) {
+		return;
+	}
+	$('.max_level').show();
+	data_filter(keyword_search_name_s);
+	event_setOption_function();
+	sidebar_level_render();
+	keyword_item_delete();
+}
+function keywordRemove(kwd_search_name) {
+	index = keyword.indexOf(kwd_search_name);
+	keyword.splice(index, 1);
+	keywordType.splice(index, 1);
+	$(`div[data-item="${kwd_search_name}"]`).remove();
+	// $('#road').remove();
+}
+function keyword_search_verify_fail(kwd_search_name) {
+	//一個 name
+	alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
+	keywordCollection = CollectionTemp;
+	keywordCount = CountTemp;
+	keywordPoint = PointTemp;
+	console.log(CollectionTemp);
+	keywordRemove(kwd_search_name);
+}
+function andSearchNoRoute(keyword_search_name) {
+	keywordCollection = CollectionTemp;
+	keywordCount = CountTemp;
+	keywordPoint = PointTemp;
+	alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
+	keywordRemove(keyword_search_name);
+}
+// append keyword div in keyword field
+//下方新增delete鍵
+function keyword_item_append(kwd_search_name, keywordSearchType) {
+	keyword.push(kwd_search_name);
+	keywordType.push(keywordSearchType);
+	$('#keyword_search_field').val(''); // clear the keyword search field
+	$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+        <p class="keyword_name" >${keywordSearchType} ${kwd_search_name}</p>
+        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
+    </div>`);
+}
+// bind the keyword delete button click event
+function keyword_item_delete() {
+	// avoid to bind the click(delete) event twice, have to unbind the first click event first.
+	$('.keyword_delete').off('click').click((e) => {
+		index = keyword.indexOf(e.currentTarget.dataset.name);
+		keywordRemove(e.currentTarget.dataset.name);
+		$('.max_level').hide();
+		$('#road').children().remove();
+		$('.nodeSelected').children().remove();
+		routeHash = [];
+		keywordCollection = [];
+		keywordPoint = 0;
+		keywordCount = 0;
+		keyword_search_reset();
+		if (keyword.length == 0) {
+			if (onlyLOD == 1) {
+				$('.common_show_value').hide();
+				$('.word_strength').hide();
+			} else {
+				$('.common_show_value').show();
+				$('.word_strength').show();
+			}
+		}
+	});
+}
+
+function keyword_search_reset() {
+	union_collect = [];
+	if (keyword.length === 0) {
+		//刪除完全數清空或是砍了第一層
+		option.series[0].categories = data.all_category;
+		option.series[0].links = option.series[0].categories.filter((category) => {
+			// return the category that show property is true
+			if (category.show == true) {
+				union_collect.push(category.source, category.target);
+				return category;
+			}
+		});
+		union_collect = Array.from(new Set(union_collect));
 		option.series[0].nodes = data.nodes.filter((node) => {
 			return union_collect.includes(node.name);
 		});
 		sidebar_level_render();
 		event_setOption_function();
-		} else {
-			//刪除完還有剩
-			keyword.forEach( function(item,index,array) {
-				keywordCleanUp(item,keywordType[index]);
-			});
-			keywordFliter();
-		}
+	} else {
+		//刪除完還有剩
+		keyword.forEach(function(item, index, array) {
+			keywordCleanUp(item, keywordType[index]);
+		});
+		keywordFliter();
 	}
+}
 
 function data_filter_and() {
 	$('#road').children().remove();
@@ -423,8 +406,8 @@ function data_filter_and() {
 	if (routeFloor === 'All') {
 		var y = 0;
 	} else {
-		for(var i =0, q= route.length;i<q;i++){
-			if (route[i].length -1 === routeFloor){
+		for (var i = 0, q = route.length; i < q; i++) {
+			if (route[i].length - 1 === routeFloor) {
 				y = i;
 				break;
 			}
@@ -455,7 +438,7 @@ function data_filter_and() {
         <p class="road_name" >${route[y]}</p>
 		</div>`);
 		if (y + 1 === route.length) break;
-		if(routeFloor !== 'All' && route[y].length !== route[y+1].length) break;
+		if (routeFloor !== 'All' && route[y].length !== route[y + 1].length) break;
 	}
 	links = categories.filter((category) => {
 		if (category.show == true) {
@@ -463,9 +446,9 @@ function data_filter_and() {
 		}
 	});
 	nodes = data.nodes.filter((node) => {
-		keywordCollection.forEach(item =>{
+		keywordCollection.forEach((item) => {
 			item.includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
-		})
+		});
 		return nodeCollection.includes(node.name);
 	});
 	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
@@ -496,12 +479,9 @@ function dataAppendOr(categories, links, nodes) {
 }
 // compute the data which will render on canvas
 function data_filter(keywordSearch) {
-	if(keywordSearch.length === 0)
-		return;
-	if(routeFloor === 'All')
-	ui_user = 100;
-	else
-	ui_user = routeFloor;
+	if (keywordSearch.length === 0) return;
+	if (routeFloor === 'All') ui_user = 100;
+	else ui_user = routeFloor;
 	var categories, links, nodes;
 	union_collect = [];
 	let collect = [];
@@ -511,10 +491,10 @@ function data_filter(keywordSearch) {
 	});
 	categories = data.category.filter((category) => {
 		if (keywordSearch.includes(category.target) || keywordSearch.includes(category.source)) {
-			if(!notKeyword.includes(category.target) && !notKeyword.includes(category.source)){
-			union_collect.push(category.target, category.source);
-			// console.log(union_collect);
-			return category;
+			if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+				union_collect.push(category.target, category.source);
+				// console.log(union_collect);
+				return category;
 			}
 		}
 		// return keyword.includes(category.target) || keyword.includes(category.source);
@@ -523,16 +503,15 @@ function data_filter(keywordSearch) {
 	console.log(notKeyword);
 	let minus = union_collect.filter((item) => {
 		return !item.includes(keywordSearch);
-
 	});
 	minus = Array.from(new Set(minus));
 	var layer = 0;
 	for (let i = 1; i < ui_user; i++) {
 		categories = data.category.filter((category) => {
 			if (minus.includes(category.target) || minus.includes(category.source)) {
-				if(!notKeyword.includes(category.target) && !notKeyword.includes(category.source)){
-				category_collect.push(category.target, category.source);
-				return category;
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					category_collect.push(category.target, category.source);
+					return category;
 				}
 			}
 		});
@@ -546,15 +525,14 @@ function data_filter(keywordSearch) {
 		if (categories.length === layer) {
 			maxlevel = i;
 			sliderValue = maxlevel;
-			for(var x = 1; x<=maxlevel;x++){
-				if(!routeHash.includes(x))
-				routeHash.push(x);
+			for (var x = 1; x <= maxlevel; x++) {
+				if (!routeHash.includes(x)) routeHash.push(x);
 			}
 			routeHash.sort(function(a, b) {
 				return a - b;
-			  });
-			  console.log(routeHash);
-			  maxLevelSlider();
+			});
+			console.log(routeHash);
+			maxLevelSlider();
 			break;
 		} else layer = categories.length;
 	}
@@ -577,73 +555,40 @@ function data_filter(keywordSearch) {
 // todo : improve the performance
 
 Chart.on('legendselectchanged', (category_select) => {
-	// console.log(category_select);
-	// console.log($('#max_level').val());
-	// console.log($('[name="cs_value"]').val());
-	// $('#max_level').val() === '1' ? category_max_level_1() : category_max_level_2();原本的
-	// // $('#common_show_value').val() === '0' ? category_max_level_3() : category_max_level_4();//新增的會打架 有問題
-	$('slider').change($('.slider').val() === '1' ? category_max_level_1() : category_max_level_2()); //超級奇怪的
-
-	function category_max_level_1() {
-		let collect = [];
-		console.log('category_max_level_1');
-		option.series[0].categories = data.all_category.filter((category) => {
+		data.all_category = data.all_category.filter((category) => {
 			if (category.name == category_select.name) category.show = !category.show;
-
-			if (keyword.length == 0) {
-				return category;
-			} else {
-				return keyword.includes(category.target) || keyword.includes(category.source);
-			}
+			return category;	
 		});
-
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			if (category.show == true) {
-				collect.push(category.source, category.target);
-				return category;
-			}
-		});
-
-		collect = Array.from(new Set(collect));
-
-		option.series[0].nodes = data.nodes.filter((node) => {
-			return collect.includes(node.name);
-		});
-	}
-
-	function category_max_level_2() {
-		let collect = [];
-		console.log('category_max_level_2');
-
-		option.series[0].categories = option.series[0].categories.filter((category) => {
-			if (category.name == category_select.name) category.show = !category.show;
-			console.log(category);
-			return category;
-		});
-
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			if (category.show == true) {
-				collect.push(category.source, category.target);
-				return category;
-			}
-		});
-
-		collect = Array.from(new Set(collect));
-
-		option.series[0].nodes = data.nodes.filter((node) => {
-			return collect.includes(node.name);
-		});
-	}
-
-	event_setOption_function(false);
-	sidebar_level_render();
+		if (keyword.length === 0) {
+			let collect = [];
+			//刪除完全數清空或是砍了第一層
+			option.series[0].categories = data.all_category;
+			option.series[0].links = option.series[0].categories.filter((category) => {
+				// return the category that show property is true
+				if (category.show == true) {
+					collect.push(category.source, category.target);
+					return category;
+				}
+			});
+			collect = Array.from(new Set(collect));
+			option.series[0].nodes = data.nodes.filter((node) => {
+				return collect.includes(node.name);
+			});
+		}	
+		else{
+			option.series[0].categories = [];
+			option.series[0].links = [];
+			option.series[0].nodes = [];
+			data_filter_and();
+			data_filter(kwTemp);
+		}
+		event_setOption_function(false);
+		sidebar_level_render();
 });
 // max_level
 function max_Level(ui_value) {
-	if(ui_value === -1)
-	routeFloor = 'All'
-	else
-	routeFloor = routeHash[ui_value];
+	if (ui_value === -1) routeFloor = 'All';
+	else routeFloor = routeHash[ui_value];
 	option.series[0].categories = [];
 	option.series[0].links = [];
 	option.series[0].nodes = [];
@@ -856,8 +801,7 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = true) {
 	Chart.setOption(option, rander);
-	if(keyword.length !== 0)
-		nodeList();
+	if (keyword.length !== 0) nodeList();
 }
 
 Chart.on('click', (e) => {
@@ -932,25 +876,25 @@ function recoveryRoad() {
 	// sidebar_level_render();
 	event_setOption_function(false);
 }
-function nodeList(){
+function nodeList() {
 	$('.nodeSelected').children().remove();
 	console.log(notKeyword);
-	notKeyword.forEach(item =>{
+	notKeyword.forEach((item) => {
 		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item}">
         <label><input type="checkbox" name="node_list" value="${item}" onclick="nodeListChange(this)">${item}</label>
     </div>`);
 	});
 	option.series[0].nodes.forEach((item) => {
-		if(!keywords.includes(item.name))
-		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+		if (!keywords.includes(item.name))
+			$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
         <label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label>
     </div>`);
 	});
 }
-function maxLevelSlider(){
+function maxLevelSlider() {
 	$(`.slider_item > #max_level`).slider({
 		min: -1,
-		max: routeHash.length-1, //最大階層數
+		max: routeHash.length - 1, //最大階層數
 		step: 1,
 		value: -1, //current option setting value
 		disable: false,
@@ -959,20 +903,19 @@ function maxLevelSlider(){
 	$(`.slider_item > input[id=max_level]`).val(routeFloor);
 	$('.max_level').show();
 }
-function nodeListChange(e){
+function nodeListChange(e) {
 	routeHash = [];
 	option.series[0].categories = [];
 	option.series[0].links = [];
 	option.series[0].nodes = [];
-	routeFloor = 'All'
-	if (e.checked == true){
+	routeFloor = 'All';
+	if (e.checked == true) {
 		notKeyword.splice(notKeyword.indexOf(e.value), 1);
-	  } else {
+	} else {
 		notKeyword.push(e.value);
-	  }
-	  if(routeBackup.length !== 0)
-		route = JSON.parse(JSON.stringify(routeBackup));
-	  for (var i = 0; i < route.length; i++) {
+	}
+	if (routeBackup.length !== 0) route = JSON.parse(JSON.stringify(routeBackup));
+	for (var i = 0; i < route.length; i++) {
 		var count = 0;
 		notKeyword.forEach((item) => {
 			if (route[i].includes(item)) count++;
@@ -982,15 +925,15 @@ function nodeListChange(e){
 			i--;
 		}
 	}
-	if(route.length != 0){
-	var lenTemp = route[0].length;
-	routeHash.push(lenTemp-1);
-	route.forEach((item) => {
-		if (lenTemp < item.length) {
-			lenTemp = item.length;
-			routeHash.push(lenTemp-1);
-		}
-	});
+	if (route.length != 0) {
+		var lenTemp = route[0].length;
+		routeHash.push(lenTemp - 1);
+		route.forEach((item) => {
+			if (lenTemp < item.length) {
+				lenTemp = item.length;
+				routeHash.push(lenTemp - 1);
+			}
+		});
 	}
 	maxLevelSlider();
 	data_filter_and();
@@ -998,9 +941,13 @@ function nodeListChange(e){
 	event_setOption_function(false);
 	sidebar_level_render();
 }
-function checkedAll(){
-	var checkboxs = document.getElementsByName("node_list");
-	for(var i=0;i<checkboxs.length;i++){checkboxs[i].checked = true;}
+function checkedAll() {
+	var checkboxs = document.getElementsByName('node_list');
+	for (var i = 0; i < checkboxs.length; i++) {
+		checkboxs[i].checked = true;
+	}
+	routeFloor = 'All';
+	if (routeBackup.length !== 0) route = JSON.parse(JSON.stringify(routeBackup));
 	notKeyword = [];
 	maxLevelSlider();
 	data_filter_and();
