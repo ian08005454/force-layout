@@ -11,11 +11,13 @@ var keywordType = [];
 var kwTemp = [];
 var routeFloor = 'All';
 var routeHash = [];
-var routeBackup;
+var routeBackup = [];
 var keywordCount = 0;
 var keywordPoint = 0;
 var keyword_search_name;
 var CollectionTemp,CountTemp,PointTemp;
+var keywords = [];
+var notKeyword = [];
 window.onresize = () => {
 	Chart.resize();
 };
@@ -46,7 +48,7 @@ function keyword_search(e) {
 	}
 }
 	function keywordCleanUp(keyword_search_name, keywordSearchType){
-		CollectionTemp =JSON.parse(JSON.stringify(keywordCollection));;
+		CollectionTemp =JSON.parse(JSON.stringify(keywordCollection));
 		CountTemp = keywordCount;
 		PointTemp = keywordPoint;
 		if(keywordSearchType === 'and'){
@@ -136,6 +138,7 @@ function keyword_search(e) {
 		keywordCollection.forEach(item =>{
 			for (var i = 0, keywordLen = item.length; i < keywordLen; i++) {
 				item[i] = item[i].trim();
+				keywords.push(item[i]);
 				if (!data.all_nodes.includes(item[i]) || item[i].length === 0) {
 					return keyword_search_verify_fail(keyword_search_name);
 				}
@@ -146,6 +149,7 @@ function keyword_search(e) {
 			else if(item.length === 1)
 				kwTemp.push(item[0]);
 		});
+		keywords = Array.from(new Set(keywords));
 		if (route.length === 0 && kwTemp.length === 0) 
 			return andSearchNoRoute(keyword_search_name);
 		console.log(kwTemp)
@@ -231,8 +235,8 @@ function keyword_search(e) {
 				secondaryStackCount++;
 				if (primaryStack[primaryStack.length - 1] == goal) {
 					routeTemp.push(Array.from(primaryStack));
-					console.log(primaryStack);
-					console.log(routeTemp);
+					// console.log(primaryStack);
+					// console.log(routeTemp);
 					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
 						if (secondaryStack[i].length != 0) {
 							Finish = false;
@@ -292,6 +296,7 @@ function keyword_search(e) {
 			}
 			return 0;
 		});
+		routeBackup = JSON.parse(JSON.stringify(route));
 		routeHash = [];
 		var lenTemp = route[0].length;
 		routeHash.push(lenTemp-1);
@@ -301,19 +306,10 @@ function keyword_search(e) {
 				routeHash.push(lenTemp-1);
 			}
 		});
-		console.log(routeHash)
+		// console.log(routeHash)
 		// console.log(routeHash.length);
 		routeFloor = 'All';
-		$(`.slider_item > #max_level`).slider({
-			min: -1,
-			max: routeHash.length-1, //最大階層數
-			step: 1,
-			value: -1, //current option setting value
-			disable: false,
-			range: 'min'
-		});
-		$(`.slider_item > input[id=max_level]`).val(routeFloor);
-		$('.max_level').show();
+		maxLevelSlider();
 		data_filter_and();
 		event_setOption_function();
 		sidebar_level_render();
@@ -331,7 +327,7 @@ function keyword_search(e) {
 		keyword_item_delete();
 	}
 	function keywordRemove(kwd_search_name) {
-		index = keyword.indexOf(kwd_search_name)
+		index = keyword.indexOf(kwd_search_name);
 		keyword.splice(index, 1);
 		keywordType.splice(index, 1);
 		$(`div[data-item="${kwd_search_name}"]`).remove();
@@ -372,6 +368,7 @@ function keyword_search(e) {
 			keywordRemove(e.currentTarget.dataset.name);
 			$('.max_level').hide();
 			$('#road').children().remove();
+			$('.nodeSelected').children().remove();
 			routeHash = [];
 			keywordCollection = [];
 			keywordPoint = 0;
@@ -409,7 +406,7 @@ function keyword_search(e) {
 		event_setOption_function();
 		} else {
 			//刪除完還有剩
-			keyword.forEach(item,index =>{
+			keyword.forEach( function(item,index,array) {
 				keywordCleanUp(item,keywordType[index]);
 			});
 			keywordFliter();
@@ -514,23 +511,29 @@ function data_filter(keywordSearch) {
 	});
 	categories = data.category.filter((category) => {
 		if (keywordSearch.includes(category.target) || keywordSearch.includes(category.source)) {
+			if(!notKeyword.includes(category.target) && !notKeyword.includes(category.source)){
 			union_collect.push(category.target, category.source);
 			// console.log(union_collect);
 			return category;
+			}
 		}
 		// return keyword.includes(category.target) || keyword.includes(category.source);
 	});
 	// console.log(union_collect);
+	console.log(notKeyword);
 	let minus = union_collect.filter((item) => {
 		return !item.includes(keywordSearch);
+
 	});
-	console.log(minus);
+	minus = Array.from(new Set(minus));
 	var layer = 0;
 	for (let i = 1; i < ui_user; i++) {
 		categories = data.category.filter((category) => {
 			if (minus.includes(category.target) || minus.includes(category.source)) {
+				if(!notKeyword.includes(category.target) && !notKeyword.includes(category.source)){
 				category_collect.push(category.target, category.source);
 				return category;
+				}
 			}
 		});
 		category_collect = Array.from(new Set(category_collect));
@@ -551,16 +554,7 @@ function data_filter(keywordSearch) {
 				return a - b;
 			  });
 			  console.log(routeHash);
-			$(`.slider_item > #max_level`).slider({
-				min: -1,
-				max: routeHash.length-1, //最大階層數
-				step: 1,
-				value: -1, //current option setting value
-				disable: false,
-				range: 'min'
-			});
-			$(`.slider_item > input[id=max_level]`).val(routeFloor);
-			$('.max_level').show();
+			  maxLevelSlider();
 			break;
 		} else layer = categories.length;
 	}
@@ -862,6 +856,8 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = true) {
 	Chart.setOption(option, rander);
+	if(keyword.length !== 0)
+		nodeList();
 }
 
 Chart.on('click', (e) => {
@@ -938,10 +934,77 @@ function recoveryRoad() {
 }
 function nodeList(){
 	$('.nodeSelected').children().remove();
+	console.log(notKeyword);
+	notKeyword.forEach(item =>{
+		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item}">
+        <label><input type="checkbox" name="node_list" value="${item}" onclick="nodeListChange(this)">${item}</label>
+    </div>`);
+	});
 	option.series[0].nodes.forEach((item) => {
 		if(!keywords.includes(item.name))
 		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-        <label><input type="checkbox" name="${item.name}" value="${item.name}" checked>JavaScript</label>
+        <label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label>
     </div>`);
 	});
+}
+function maxLevelSlider(){
+	$(`.slider_item > #max_level`).slider({
+		min: -1,
+		max: routeHash.length-1, //最大階層數
+		step: 1,
+		value: -1, //current option setting value
+		disable: false,
+		range: 'min'
+	});
+	$(`.slider_item > input[id=max_level]`).val(routeFloor);
+	$('.max_level').show();
+}
+function nodeListChange(e){
+	routeHash = [];
+	option.series[0].categories = [];
+	option.series[0].links = [];
+	option.series[0].nodes = [];
+	routeFloor = 'All'
+	if (e.checked == true){
+		notKeyword.splice(notKeyword.indexOf(e.value), 1);
+	  } else {
+		notKeyword.push(e.value);
+	  }
+	  if(routeBackup.length !== 0)
+		route = JSON.parse(JSON.stringify(routeBackup));
+	  for (var i = 0; i < route.length; i++) {
+		var count = 0;
+		notKeyword.forEach((item) => {
+			if (route[i].includes(item)) count++;
+		});
+		if (count != 0) {
+			route.splice(i, 1);
+			i--;
+		}
+	}
+	if(route.length != 0){
+	var lenTemp = route[0].length;
+	routeHash.push(lenTemp-1);
+	route.forEach((item) => {
+		if (lenTemp < item.length) {
+			lenTemp = item.length;
+			routeHash.push(lenTemp-1);
+		}
+	});
+	}
+	maxLevelSlider();
+	data_filter_and();
+	data_filter(kwTemp);
+	event_setOption_function(false);
+	sidebar_level_render();
+}
+function checkedAll(){
+	var checkboxs = document.getElementsByName("node_list");
+	for(var i=0;i<checkboxs.length;i++){checkboxs[i].checked = true;}
+	notKeyword = [];
+	maxLevelSlider();
+	data_filter_and();
+	data_filter(kwTemp);
+	event_setOption_function(false);
+	sidebar_level_render();
 }
