@@ -84,6 +84,7 @@ var option = {
         layout: 'force',
         categories: data.category,
         nodes: data.nodes,
+        modularity: true,
         links: data.links,
         // edges : {
         //     label : {

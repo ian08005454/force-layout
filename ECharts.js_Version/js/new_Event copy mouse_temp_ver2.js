@@ -1,18 +1,21 @@
 // 這個是兩個點同時搜尋 名為new_event copy mouse_ver2
 // variable
 var keyword = []; //single search
+var keywordCollection = [];
 var union_collect = [];
 var category_collect = [];
-var ui_user;
 var route = [];
 var maxlevel;
 var sliderValue = 0;
 var keywordType = [];
-var linktemp, nodeTemp, categoryTemp;
-var pageTemp = [];
+var kwTemp = [];
 var routeFloor = 'All';
 var routeHash = [];
 var routeBackup;
+var keywordCount = 0;
+var keywordPoint = 0;
+var keyword_search_name;
+var CollectionTemp,CountTemp,PointTemp;
 window.onresize = () => {
 	Chart.resize();
 };
@@ -21,7 +24,7 @@ $('#keyword_search_field').keyup((e) => {
 	keyword_search(e);
 });
 $('#keyword_search_button').on('click', keyword_search);
-keyword.length == 0 ? ($('.max_level').hide(), $('.route_level').hide()) : $('.max_level').show();
+keyword.length == 0 ? $('.max_level').hide() : $('.max_level').show();
 /**
  * keyword_search function
  * @param {event} e
@@ -30,7 +33,7 @@ function keyword_search(e) {
 	// get the search name
 	if (e.which === 13 || e.type === 'click') {
 		//點搜尋或按ENTER
-		var keyword_search_name = $('#keyword_search_field').val();
+		keyword_search_name = $('#keyword_search_field').val();
 		var keywordSearchType = $('#kClass').val();
 		if (keyword.includes(keyword_search_name)) {
 			alert(`Error :  same keyword can not search more than twice`);
@@ -38,55 +41,123 @@ function keyword_search(e) {
 			return;
 		}
 		keyword_item_append(keyword_search_name, keywordSearchType);
-		keywordFliter(keyword_search_name, keywordSearchType);
+		keywordCleanUp(keyword_search_name, keywordSearchType);
+		keywordFliter();
 	}
-	function keywordFliter(keyword_search_name, keywordSearchType) {
-		$('.route_level').hide();
-		$('#road').children().remove();
-		categoryTemp = option.series[0].categories;
-		linktemp = option.series[0].links;
-		nodeTemp = option.series[0].nodes;
-		if (keyword_search_name !== keyword[0]) {
-			pageTemp.push(
-				option.series[0].categories.map(function(item, index, array) {
-					return item.id;
-				})
-			);
-			console.log(pageTemp[pageTemp.length - 1]);
-		}
-		// if(keywordSearchType === 'and')
-		var keyword_search_name_s = [];
-		if (keyword_search_name.includes('/')) {
-			keyword_search_name_s = keyword_search_name.split('/');
-			keyword_search_name_s.forEach(function(item, index, array) {
-				if (item.includes('&')) search_AND(item, 'or');
-				else keyword_search_verify_pass(item, 'or');
+}
+	function keywordCleanUp(keyword_search_name, keywordSearchType){
+		CollectionTemp =JSON.parse(JSON.stringify(keywordCollection));;
+		CountTemp = keywordCount;
+		PointTemp = keywordPoint;
+		if(keywordSearchType === 'and'){
+			if (keyword_search_name.includes('/')) {
+				keyword_search_name_s = keyword_search_name.split('/');
+				if(keywordCount === 0){
+						for(var i = 0;i < keyword_search_name_s.length;i++)
+							keywordCollection.push([]);
+				}
+				else{
+					for(var x = 1;x<keyword_search_name_s.length;x++){
+						for(var i = keywordPoint;i<keywordPoint+keywordCount;i++){
+							keywordCollection.push(Array.from(keywordCollection[i]));
+						}
+					}
+			}
+				console.log(keywordCollection);
+				keyword_search_name_s.forEach(function(item, index, array) {
+					item = item.trim();
+					if(item.includes('&'))
+					item = keyword_search_name.split('&');
+					else
+					item = Array(item);
+					for(var i = keywordPoint+(index*keywordCount);i<keywordPoint+((index+1)*keywordCount);i++){
+						for (var z = 0, keywordLen = item.length; z < keywordLen; z++) {
+							console.log(i);
+							keywordCollection[i].push(item[z]);
+							console.log(keywordCollection[i]);
+					}
+				}	
 			});
+			keywordCount *= keyword_search_name_s.length;
 		}
-		if (keyword_search_name.includes('&')) {
-			//搜尋兩個 AND
-			search_AND(keyword_search_name, keywordSearchType);
-		} else {
-			//搜尋一個
-			keyword_search_verify_pass(keyword_search_name, keywordSearchType);
+		else{
+				console.log(keywordCount);
+				if(keyword_search_name.includes('&'))
+				 	keyword_search_name = keyword_search_name.split('&');
+				 else
+				 	keyword_search_name = Array(keyword_search_name);
+				if(keywordCount === 0){
+					keywordCollection.push([]);
+					keywordCount++;
+				}	
+				console.log(keywordCount);
+				for(var i = keywordPoint;i<keywordPoint+keywordCount;i++){
+					for (var z = 0, keywordLen = keyword_search_name.length; z < keywordLen; z++) {
+						keywordCollection[i].push(keyword_search_name[z]);
+				}
+				}
+			}
 		}
+		else{
+			keywordPoint = keywordCollection.length -1;
+			keywordCount = 0;
+			if (keyword_search_name.includes('/')) {
+				keyword_search_name_s = keyword_search_name.split('/');
+				keywordCount += keyword_search_name_s.length;
+				keyword_search_name_s.forEach(function(item, index, array) {
+					if(item.includes('&'))
+						item = keyword_search_name.split('&');
+					else
+						item = Array(item);
+					keywordCollection.push(item);
+				});
+		}else{
+		 	if(keyword_search_name.includes('&'))
+				keyword_search_name = keyword_search_name.split('&');
+			else
+				keyword_search_name = Array(keyword_search_name);
+			keywordCount++;
+			keywordCollection.push(keyword_search_name);
+		}
+	}
+		console.log(keywordCollection);
+	}
+	function keywordFliter() {
+		$('#road').children().remove();
+		$('.common_show_value').hide();
+		$('.word_strength').hide();
+		routeFloor = 'All';
+		route = [];
+		routeHash = [];
+		option.series[0].categories = [];
+		kwTemp = [];
+		option.series[0].links = [];
+		option.series[0].nodes = [];
+		keywordCollection.forEach(item =>{
+			for (var i = 0, keywordLen = item.length; i < keywordLen; i++) {
+				item[i] = item[i].trim();
+				if (!data.all_nodes.includes(item[i]) || item[i].length === 0) {
+					return keyword_search_verify_fail(keyword_search_name);
+				}
+			}
+			item = Array.from(new Set(item));
+			if(item.length > 1)
+				search_AND(item);
+			else if(item.length === 1)
+				kwTemp.push(item[0]);
+		});
+		if (route.length === 0 && kwTemp.length === 0) 
+			return andSearchNoRoute(keyword_search_name);
+		console.log(kwTemp)
+		if(kwTemp.length>0)
+			keyword_search_verify_pass(kwTemp);
+		
 	}
 	////搜尋兩個AND start------------------------------------------------
 	//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
-	function search_AND(keyword_search_name, keywordSearchType) {
-		keyword_search_name_s = keyword_search_name.split('&'); //keyword_search_name_s=[]//存打入的字 形式:[a,b]
+	function search_AND(keyword_search_name_s) {
 		first = [];
-		route = [];
-		routeHash = [];
-		for (var i = 0, keywordLen = keyword_search_name_s.length; i < keywordLen; i++) {
-			keyword_search_name_s[i] = keyword_search_name_s[i].trim();
-			if (keyword_search_name_s[i].length == 0) {
-				return keyword_search_verify_fail(keyword_search_name);
-			}
-			if (!data.all_nodes.includes(keyword_search_name_s[i])) {
-				return keyword_search_verify_fail(keyword_search_name);
-			}
-		}
+		routeTemp = [];
 		$('.max_level').hide();
 		$('.common_show_value').hide();
 		$('.word_strength').hide();
@@ -105,20 +176,23 @@ function keyword_search(e) {
 					}
 				});
 				category_collect = Array.from(new Set(category_collect));
-				console.log(category_collect);
-				minus = category_collect;
+				// console.log(category_collect);
+				minus = category_collect.filter((items) => {
+					return !items.includes(item);
+				});
+				console.log(minus);
 				count++;
 				var countdown = 0;
 				keyword_search_name_s.forEach((item) => {
 					if (minus.includes(item)) countdown++;
 				});
-				console.log(countdown);
-				if (countdown === keyword_search_name_s.length) {
+				if (countdown === keyword_search_name_s.length-1) {
 					break;
 				}
 			} while (1);
 			first.push(count);
 		});
+		console.log(first);
 		var top = 0,
 			topVal = 0;
 		first.forEach(function(item, index, array) {
@@ -127,7 +201,6 @@ function keyword_search(e) {
 				topVal = item;
 			}
 		});
-
 		for (var z = 1; z < keyword_search_name_s.length; z++) {
 			var primaryStack = new Array();
 			var secondaryStack = new Array();
@@ -157,9 +230,9 @@ function keyword_search(e) {
 				secondaryStack.push(temp2);
 				secondaryStackCount++;
 				if (primaryStack[primaryStack.length - 1] == goal) {
-					route.push(Array.from(primaryStack));
+					routeTemp.push(Array.from(primaryStack));
 					console.log(primaryStack);
-					console.log(route);
+					console.log(routeTemp);
 					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
 						if (secondaryStack[i].length != 0) {
 							Finish = false;
@@ -172,10 +245,7 @@ function keyword_search(e) {
 						Finish = false;
 					}
 				}
-				if (primaryStack.length == 0 && route.length == 0) {
-					alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
-					return;
-				}
+				if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name);
 				do {
 					while (secondaryStack[secondaryStackCount].length == 0) {
 						if (secondaryStackCount == 0) {
@@ -190,28 +260,29 @@ function keyword_search(e) {
 				if (keywordTemp == undefined) {
 					break;
 				}
-				console.log(keywordTemp);
-				console.log(primaryStack);
-				console.log(secondaryStack);
+				// console.log(keywordTemp);
+				// console.log(primaryStack);
+				// console.log(secondaryStack);
 			} while (1);
 		}
 		console.log('YA!!!!!');
-		console.log(route.length);
-		console.log(route);
-		for (var i = 0; i < route.length; i++) {
+		// console.log(routeTemp.length);
+		console.log(routeTemp);
+		for (var i = 0; i < routeTemp.length; i++) {
 			var count = 0;
 			keyword_search_name_s.forEach((item) => {
-				if (route[i].includes(item)) count++;
+				if (routeTemp[i].includes(item)) count++;
 			});
 			if (count != keyword_search_name_s.length) {
-				route.splice(i, 1);
+				routeTemp.splice(i, 1);
 				i--;
 			}
 		}
-		if (route.length === 0) {
-			alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
-			return keywordRemove(keyword_search_name);
-		}
+		// if (routeTemp.length === 0) 
+		// 	return andSearchNoRoute(keyword_search_name);
+			routeTemp.forEach(item =>{
+				route.push(item);
+			});
 		route.sort(function(a, b) {
 			if (a.length > b.length) {
 				return 1;
@@ -221,6 +292,7 @@ function keyword_search(e) {
 			}
 			return 0;
 		});
+		routeHash = [];
 		var lenTemp = route[0].length;
 		routeHash.push(lenTemp-1);
 		route.forEach((item) => {
@@ -230,9 +302,9 @@ function keyword_search(e) {
 			}
 		});
 		console.log(routeHash)
-		console.log(routeHash.length);
+		// console.log(routeHash.length);
 		routeFloor = 'All';
-		$(`.slider_item > #route_level`).slider({
+		$(`.slider_item > #max_level`).slider({
 			min: -1,
 			max: routeHash.length-1, //最大階層數
 			step: 1,
@@ -240,65 +312,46 @@ function keyword_search(e) {
 			disable: false,
 			range: 'min'
 		});
-		$(`.slider_item > input[id=route_level]`).val(routeFloor);
-		$('.route_level').show();
-		data_filter_and(keywordSearchType, keyword_search_name_s);
+		$(`.slider_item > input[id=max_level]`).val(routeFloor);
+		$('.max_level').show();
+		data_filter_and();
 		event_setOption_function();
 		sidebar_level_render();
 		keyword_item_delete();
 	}
 	////搜尋兩個AND --end --
-	function keyword_search_verify_pass(keyword_search_name, keywordSearchType) {
-		keyword_search_name_s = keyword_search_name.split('/'); //keyword_search_name_s=[]
+	function keyword_search_verify_pass(keyword_search_name_s) {
 		if (keyword_search_name_s.length == 0) {
 			return;
 		}
-		for (let i = 0; i < keyword_search_name_s.length; i++) {
-			keyword_search_name_s[i] = keyword_search_name_s[i].trim();
-			if (keyword_search_name_s[i].length == 0) {
-				return keyword_search_verify_fail(keyword_search_name);
-			}
-			if (!data.all_nodes.includes(keyword_search_name_s[i])) {
-				return keyword_search_verify_fail(keyword_search_name);
-			}
-			if (keywordSearchType === 'and') {
-				if (
-					option.series[0].nodes
-						.map(function(item, index, array) {
-							return item.name;
-						})
-						.indexOf(keyword_search_name_s[i]) === -1 &&
-					keyword.length != 0
-				) {
-					console.log(keyword_search_name);
-					return keyword_search_verify_fail_in_page(keyword_search_name);
-				}
-			}
-		}
 		$('.max_level').show();
-		$('.common_show_value').hide();
-		$('.word_strength').hide();
-
-		// avoid same keyword search twice
-		data_filter(keyword_search_name_s, 100, keywordSearchType);
+		data_filter(keyword_search_name_s);
 		event_setOption_function();
 		sidebar_level_render();
 		keyword_item_delete();
 	}
 	function keywordRemove(kwd_search_name) {
-		keyword.splice(keyword.indexOf(kwd_search_name), 1);
+		index = keyword.indexOf(kwd_search_name)
+		keyword.splice(index, 1);
+		keywordType.splice(index, 1);
 		$(`div[data-item="${kwd_search_name}"]`).remove();
 		// $('#road').remove();
 	}
 	function keyword_search_verify_fail(kwd_search_name) {
 		//一個 name
 		alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
+		keywordCollection = CollectionTemp;
+		keywordCount = CountTemp;
+		keywordPoint = PointTemp;
+		console.log(CollectionTemp);
 		keywordRemove(kwd_search_name);
 	}
-	function keyword_search_verify_fail_in_page(kwd_search_name) {
-		//一個 name
-		alert(`Error : keyWord not in this page: ${kwd_search_name}`);
-		keywordRemove(kwd_search_name);
+	function andSearchNoRoute(keyword_search_name){
+		keywordCollection = CollectionTemp;
+		keywordCount = CountTemp;
+		keywordPoint = PointTemp;
+		alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
+		keywordRemove(keyword_search_name);
 	}
 	// append keyword div in keyword field
 	//下方新增delete鍵
@@ -317,15 +370,13 @@ function keyword_search(e) {
 		$('.keyword_delete').off('click').click((e) => {
 			index = keyword.indexOf(e.currentTarget.dataset.name);
 			keywordRemove(e.currentTarget.dataset.name);
-			keywordType.splice(index, 1);
-			pageTemp.splice(index);
 			$('.max_level').hide();
-			$('.route_level').hide();
 			$('#road').children().remove();
 			routeHash = [];
-			keyword_search_reset(index);
-			event_setOption_function();
-			sidebar_level_render();
+			keywordCollection = [];
+			keywordPoint = 0;
+			keywordCount = 0;
+			keyword_search_reset();
 			if (keyword.length == 0) {
 				if (onlyLOD == 1) {
 					$('.common_show_value').hide();
@@ -338,57 +389,34 @@ function keyword_search(e) {
 		});
 	}
 
-	function keyword_search_reset(index) {
+	function keyword_search_reset() {
 		union_collect = [];
-		var redNode = [];
-		if (keyword.length === 0 || pageTemp.length === 0) {
+		if (keyword.length === 0) {
 			//刪除完全數清空或是砍了第一層
 			option.series[0].categories = data.all_category;
-		} else {
-			//刪除完還有剩
-			console.log(pageTemp.length);
-			page = pageTemp.pop();
-			console.log(page);
-			option.series[0].categories = data.all_category.filter((category) => {
-				return page.includes(category.id);
-			});
-			console.log(option.series[0].categories);
-			keyword.forEach((item) => {
-				if (item.includes('&')) {
-					redNode = redNode.concat(item.split('&'));
-				} else if (item.includes('/')) {
-					redNode = redNode.concat(item.split('/'));
-				} else {
-					redNode.push(item);
+			option.series[0].links = option.series[0].categories.filter((category) => {
+				// return the category that show property is true
+				if (category.show == true) {
+					union_collect.push(category.source, category.target);
+					return category;
 				}
 			});
-			redNode.forEach((item) => {
-				item = item.trim();
-			});
-		}
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			// return the category that show property is true
-			if (category.show == true) {
-				union_collect.push(category.target, category.source);
-				return category;
-			}
-		});
-		union_collect = Array.from(new Set(union_collect));
-		console.log(union_collect);
+			union_collect = Array.from(new Set(union_collect));
 		option.series[0].nodes = data.nodes.filter((node) => {
-			redNode.includes(node.name)
-				? (node.itemStyle.normal.color = 'red')
-				: (node.itemStyle.normal.color = user_colors[node.gp]); //原color[node.gp]
 			return union_collect.includes(node.name);
 		});
-		for (var i = index; i < keyword.length; i++) {
-			console.log(index);
-			console.log(keyword[i], keywordType[i]);
-			keywordFliter(keyword[i], keywordType[i]);
+		sidebar_level_render();
+		event_setOption_function();
+		} else {
+			//刪除完還有剩
+			keyword.forEach(item,index =>{
+				keywordCleanUp(item,keywordType[index]);
+			});
+			keywordFliter();
 		}
 	}
-}
-function data_filter_and(keywordSearchType, keyword_search_name_s) {
+
+function data_filter_and() {
 	$('#road').children().remove();
 	var categories = [],
 		links = [],
@@ -416,7 +444,6 @@ function data_filter_and(keywordSearchType, keyword_search_name_s) {
 					}
 				})
 			);
-		console.log(temp);
 		a = categories.map(function(item, index, array) {
 			return item.id;
 		});
@@ -439,12 +466,13 @@ function data_filter_and(keywordSearchType, keyword_search_name_s) {
 		}
 	});
 	nodes = data.nodes.filter((node) => {
-		keyword_search_name_s.includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
+		keywordCollection.forEach(item =>{
+			item.includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
+		})
 		return nodeCollection.includes(node.name);
 	});
 	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
-	if (keywordSearchType === 'and') dataAppendAnd(categories, links, nodes);
-	else if (keywordSearchType === 'or') dataAppendOr(categories, links, nodes);
+	dataAppendOr(categories, links, nodes);
 }
 function dataAppendOr(categories, links, nodes) {
 	a = option.series[0].categories.map(function(item, index, array) {
@@ -469,13 +497,14 @@ function dataAppendOr(categories, links, nodes) {
 	});
 	option.series[0].nodes = option.series[0].nodes.concat(nodes);
 }
-function dataAppendAnd(categories, links, nodes) {
-	option.series[0].categories = categories;
-	option.series[0].links = links;
-	option.series[0].nodes = nodes;
-}
 // compute the data which will render on canvas
-function data_filter(keywordSearch, ui_user, keywordSearchType) {
+function data_filter(keywordSearch) {
+	if(keywordSearch.length === 0)
+		return;
+	if(routeFloor === 'All')
+	ui_user = 100;
+	else
+	ui_user = routeFloor;
 	var categories, links, nodes;
 	union_collect = [];
 	let collect = [];
@@ -495,17 +524,6 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 	let minus = union_collect.filter((item) => {
 		return !item.includes(keywordSearch);
 	});
-	// console.log(minus);
-	// console.log(a);
-	if (keywordSearchType === 'and') {
-		categories = categories.filter((category) => {
-			if (a.includes(category.target) && a.includes(category.source)) return category;
-		});
-		minus = minus.filter((item) => {
-			return a.includes(item);
-		});
-	}
-	console.log(categories);
 	console.log(minus);
 	var layer = 0;
 	for (let i = 1; i < ui_user; i++) {
@@ -516,35 +534,33 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 			}
 		});
 		category_collect = Array.from(new Set(category_collect));
-		console.log(categories);
-		console.log(category_collect);
+		// console.log(categories);
+		// console.log(category_collect);
 		minus = category_collect.filter((item) => {
 			return !item.includes(keywordSearch);
 		});
 		console.log(minus);
-		if (keywordSearchType === 'and') {
-			categories = categories.filter((category) => {
-				if (a.includes(category.target) && a.includes(category.source)) return category;
-			});
-			minus = minus.filter((item) => {
-				return a.includes(item);
-			});
-		}
-		console.log(categories);
-		console.log(minus);
 		if (categories.length === layer) {
 			maxlevel = i;
 			sliderValue = maxlevel;
-			console.log(maxlevel);
+			for(var x = 1; x<=maxlevel;x++){
+				if(!routeHash.includes(x))
+				routeHash.push(x);
+			}
+			routeHash.sort(function(a, b) {
+				return a - b;
+			  });
+			  console.log(routeHash);
 			$(`.slider_item > #max_level`).slider({
-				min: 1,
-				max: maxlevel, //最大階層數
+				min: -1,
+				max: routeHash.length-1, //最大階層數
 				step: 1,
-				value: sliderValue, //current option setting value
+				value: -1, //current option setting value
 				disable: false,
 				range: 'min'
 			});
-			$(`.slider_item > input[id=max_level]`).val(sliderValue);
+			$(`.slider_item > input[id=max_level]`).val(routeFloor);
+			$('.max_level').show();
 			break;
 		} else layer = categories.length;
 	}
@@ -559,8 +575,7 @@ function data_filter(keywordSearch, ui_user, keywordSearchType) {
 		keywordSearch.includes(node.name) ? (node.itemStyle.normal.color = 'red') : null;
 		return collect.includes(node.name);
 	});
-	if (keywordSearchType === 'and') dataAppendAnd(categories, links, nodes);
-	else if (keywordSearchType === 'or') dataAppendOr(categories, links, nodes);
+	dataAppendOr(categories, links, nodes);
 }
 // IMPORTANT FUNCTION !! DO NOT CHANGE ANY PARAMETER IN THIS FUNCTION
 // compute the data when occurs the legendselectchanged event on category bar
@@ -629,33 +644,18 @@ Chart.on('legendselectchanged', (category_select) => {
 	event_setOption_function(false);
 	sidebar_level_render();
 });
-function routeLevel(ui_value) {
+// max_level
+function max_Level(ui_value) {
 	if(ui_value === -1)
 	routeFloor = 'All'
 	else
 	routeFloor = routeHash[ui_value];
-	$(`.slider_item > input[id=route_level]`).val(routeFloor);
-	keyword_search_name_s = keyword[keyword.length - 1].split('&');
-	data_filter_and(keywordType[keywordType.length - 1], keyword_search_name_s);
-	event_setOption_function(false);
-	sidebar_level_render();
-
-}
-
-// max_level
-function max_Level(ui_value) {
-	sliderValue = ui_value;
-	$(`.slider_item > input[id=max_level]`).val(sliderValue);
-	option.series[0].categories = categoryTemp;
-	option.series[0].links = linktemp;
-	option.series[0].nodes = nodeTemp;
-	var keywordSearch = keyword[keyword.length - 1];
-	if (keywordSearch.includes('/')) {
-		//搜尋兩個 OR
-		keywordSearch = keywordSearch.split('/');
-		keywordSearch.forEach((item) => item.trim());
-	}
-	data_filter(keywordSearch, ui_value, keywordType[keywordType.length - 1]);
+	option.series[0].categories = [];
+	option.series[0].links = [];
+	option.series[0].nodes = [];
+	$(`.slider_item > input[id=max_level]`).val(routeFloor);
+	data_filter_and();
+	data_filter(kwTemp);
 	event_setOption_function(false);
 	sidebar_level_render();
 }
@@ -691,7 +691,6 @@ $(() => {
 			switch (e.target.id) {
 				case 'max_level':
 					max_Level(ui.value);
-
 					break;
 				case 'relation_strength':
 					break;
@@ -731,9 +730,6 @@ $(() => {
 					break;
 				case 'common_show_value': //共現次數
 					common_value(ui.value);
-					break;
-				case 'route_level': //共現次數
-					routeLevel(ui.value);
 					break;
 			}
 		}
@@ -943,9 +939,9 @@ function recoveryRoad() {
 function nodeList(){
 	$('.nodeSelected').children().remove();
 	option.series[0].nodes.forEach((item) => {
-		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${kwd_search_name}">
-        <label><input type="checkbox" name="lang-1" value="${item.name}" checked>JavaScript</label>
+		if(!keywords.includes(item.name))
+		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+        <label><input type="checkbox" name="${item.name}" value="${item.name}" checked>JavaScript</label>
     </div>`);
 	});
-	
 }
