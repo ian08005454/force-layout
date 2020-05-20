@@ -990,10 +990,25 @@ function recoveryRoad() {
 function nodeList() {
 	$('.nodeSelected').children().remove();
 	option.series[0].nodes.forEach((item) => {
-		if (!keywords.includes(item.name))
+		if (!keywords.includes(item.name)){
+			if(route.length !== 0){
+				var routeCount = 0;
+				route.forEach(element =>{
+					if(element.includes(item.name)) routeCount++;
+				});
+				if(route.length === routeCount)
+					$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+					<label><font color="red"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</front></label>
+					</div>`);
+				else
+				$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+				<label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label></div>`);
+			}
+			else
 			$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-        <label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label>
-    </div>`);
+			<label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label></div>`);
+			
+		}
 	});
 }
 function maxLevelSlider() {
