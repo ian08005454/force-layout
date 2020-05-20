@@ -18,6 +18,7 @@ var keyword_search_name;
 var CollectionTemp, CountTemp, PointTemp;
 var keywords = [];
 var notKeyword = [];
+var lineAnd = [],lineNot = [];
 window.onresize = () => {
 	Chart.resize();
 };
@@ -37,15 +38,60 @@ function keyword_search(e) {
 		//點搜尋或按ENTER
 		keyword_search_name = $('#keyword_search_field').val();
 		var keywordSearchType = $('#kClass').val();
+		var keywordModel = $('#kModel').val();
 		if (keyword.includes(keyword_search_name)) {
 			alert(`Error :  same keyword can not search more than twice`);
 			$('#keyword_search_field').val('');
 			return;
 		}
-		keyword_item_append(keyword_search_name, keywordSearchType);
-		keywordCleanUp(keyword_search_name, keywordSearchType);
-		keywordFliter();
+		if (keywordModel === "line") {
+			keyword_search_name_s = [];
+			if (keyword_search_name.includes('&')) keyword_search_name_s = keyword_search_name.split('&');
+			else keyword_search_name_s.push(keyword_search_name);
+			keyword_search_name_s.forEach((item) => {
+				item = item.trim();
+			});
+			lineAppend(keyword_search_name_s,keywordSearchType,keyword_search_name);
+			lineCtrl();
+			if (keyword.length === 0) 
+			resetChart();
+		 	else 
+			reRunKeyword();
+			
+		} else {
+			if (keywordSearchType === 'not') {
+				keyword_search_name_s = [];
+				if (keyword_search_name.includes('&')) keyword_search_name_s = keyword_search_name.split('&');
+				else keyword_search_name_s.push(keyword_search_name);
+				keyword_search_name_s.forEach((item) => {
+					item = item.trim();
+					if (!data.all_nodes.includes(item)) {
+						return alert(`Error : Can't find keyWord : ${keyword_search_name}`);
+					}
+				});
+				keywordNot(keyword_search_name_s, keyword_search_name);
+				if(keyword.length !== 0)
+				reRunKeyword();
+			else
+				resetChart();	
+				keyword_item_delete();
+			} else {
+				keyword_item_append(keyword_search_name, keywordSearchType);
+				keywordCleanUp(keyword_search_name, keywordSearchType);
+				keywordFliter();
+			}
+		}
 	}
+}
+function keywordNot(keyword_search_name_s, keyword_search_name) {
+	keyword_search_name_s.forEach((item) => {
+		notKeyword.push(item);
+	});
+	$('#keyword_search_field').val(''); // clear the keyword search field
+	$('.keyword').append(`<div class="keyword_item" data-item="${keyword_search_name}">
+        <p class="keyword_name" >Node: not ${keyword_search_name}</p>
+        <button class="keyword_delete" data-name='not ${keyword_search_name}'>delete</button>
+    </div>`);
 }
 function keywordCleanUp(keyword_search_name, keywordSearchType) {
 	CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
@@ -113,9 +159,6 @@ function keywordCleanUp(keyword_search_name, keywordSearchType) {
 	console.log(keywordCollection);
 }
 function keywordFliter() {
-	$('#road').children().remove();
-	$('.common_show_value').hide();
-	$('.word_strength').hide();
 	routeFloor = 'All';
 	route = [];
 	routeHash = [];
@@ -135,13 +178,17 @@ function keywordFliter() {
 		if (item.length > 1) search_AND(item);
 		else if (item.length === 1) kwTemp.push(item[0]);
 	});
+	$('#road').children().remove();
+	$('.common_show_value').hide();
+	$('.word_strength').hide();
 	keywords = Array.from(new Set(keywords));
 	if (route.length === 0 && kwTemp.length === 0) return andSearchNoRoute(keyword_search_name);
 	console.log(kwTemp);
 	if (kwTemp.length > 0) keyword_search_verify_pass(kwTemp);
+	reRunKeyword();
 }
 ////搜尋兩個AND start------------------------------------------------
-//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/
+//https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2
 function search_AND(keyword_search_name_s) {
 	first = [];
 	routeTemp = [];
@@ -339,7 +386,7 @@ function keyword_item_append(kwd_search_name, keywordSearchType) {
 	keywordType.push(keywordSearchType);
 	$('#keyword_search_field').val(''); // clear the keyword search field
 	$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >${keywordSearchType} ${kwd_search_name}</p>
+        <p class="keyword_name" >Node: ${keywordSearchType} ${kwd_search_name}</p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
     </div>`);
 }
@@ -347,23 +394,63 @@ function keyword_item_append(kwd_search_name, keywordSearchType) {
 function keyword_item_delete() {
 	// avoid to bind the click(delete) event twice, have to unbind the first click event first.
 	$('.keyword_delete').off('click').click((e) => {
-		index = keyword.indexOf(e.currentTarget.dataset.name);
-		keywordRemove(e.currentTarget.dataset.name);
-		$('.max_level').hide();
-		$('#road').children().remove();
-		$('.nodeSelected').children().remove();
-		routeHash = [];
-		keywordCollection = [];
-		keywordPoint = 0;
-		keywordCount = 0;
-		keyword_search_reset();
-		if (keyword.length == 0) {
-			if (onlyLOD == 1) {
-				$('.common_show_value').hide();
-				$('.word_strength').hide();
+		var name = e.currentTarget.dataset.name;
+		console.log(name);
+		if (name.includes('not ')) {
+			// name = name.replace('not ','');
+			name = name.slice(4);
+			console.log(name);
+			$(`div[data-item="${name}"]`).remove();
+			if (name.includes('&')) {
+				name = name.split('&');
+				name.forEach((element) => {
+					element = element.trim();
+					notKeyword.splice(notKeyword.indexOf(element), 1);
+				});
+			} else notKeyword.splice(notKeyword.indexOf(name), 1);
+			if(keyword.length !== 0)
+				reRunKeyword();
+			else
+				resetChart();	
+		} else if(name.includes('line ')){
+			name = name.slice(5);
+			$(`div[data-item="${name}"]`).remove();
+			if (name.includes('&')) {
+				name = name.split('&');
+				name.forEach((element) => {
+					element = element.trim();
+					lineNot.splice(lineNot.indexOf(element), 1);
+					lineAnd.splice(lineAnd.indexOf(element), 1);
+				});
 			} else {
-				$('.common_show_value').show();
-				$('.word_strength').show();
+				lineNot.splice(lineNot.indexOf(name), 1);
+				lineAnd.splice(lineAnd.indexOf(name), 1);
+				}
+			lineCtrl();
+			if(keyword.length !== 0)
+				reRunKeyword();
+			else
+				resetChart();
+		}
+		else {
+			index = keyword.indexOf(e.currentTarget.dataset.name);
+			keywordRemove(e.currentTarget.dataset.name);
+			$('.max_level').hide();
+			$('#road').children().remove();
+			$('.nodeSelected').children().remove();
+			routeHash = [];
+			keywordCollection = [];
+			keywordPoint = 0;
+			keywordCount = 0;
+			keyword_search_reset();
+			if (keyword.length == 0) {
+				if (onlyLOD == 1) {
+					$('.common_show_value').hide();
+					$('.word_strength').hide();
+				} else {
+					$('.common_show_value').show();
+					$('.word_strength').show();
+				}
 			}
 		}
 	});
@@ -371,23 +458,9 @@ function keyword_item_delete() {
 
 function keyword_search_reset() {
 	union_collect = [];
-	if (keyword.length === 0) {
-		//刪除完全數清空或是砍了第一層
-		option.series[0].categories = data.all_category;
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			// return the category that show property is true
-			if (category.show == true) {
-				union_collect.push(category.source, category.target);
-				return category;
-			}
-		});
-		union_collect = Array.from(new Set(union_collect));
-		option.series[0].nodes = data.nodes.filter((node) => {
-			return union_collect.includes(node.name);
-		});
-		sidebar_level_render();
-		event_setOption_function();
-	} else {
+	if (keyword.length === 0) 
+		resetChart(); 
+	else {
 		//刪除完還有剩
 		keyword.forEach(function(item, index, array) {
 			keywordCleanUp(item, keywordType[index]);
@@ -418,9 +491,11 @@ function data_filter_and() {
 			temp = temp.concat(
 				data.category.filter((category) => {
 					if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
-						return route[y][i].includes(category.target) && route[y][i + 1].includes(category.source);
+						if(category.show === true)
+						return category;
 					} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
-						return route[y][i + 1].includes(category.target) && route[y][i].includes(category.source);
+						if(category.show === true)
+						return category;
 					}
 				})
 			);
@@ -492,12 +567,12 @@ function data_filter(keywordSearch) {
 	categories = data.category.filter((category) => {
 		if (keywordSearch.includes(category.target) || keywordSearch.includes(category.source)) {
 			if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-				union_collect.push(category.target, category.source);
-				// console.log(union_collect);
-				return category;
+				if(category.show === true){
+					union_collect.push(category.target, category.source);
+					return category;
+				}
 			}
 		}
-		// return keyword.includes(category.target) || keyword.includes(category.source);
 	});
 	// console.log(union_collect);
 	console.log(notKeyword);
@@ -510,8 +585,10 @@ function data_filter(keywordSearch) {
 		categories = data.category.filter((category) => {
 			if (minus.includes(category.target) || minus.includes(category.source)) {
 				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if(category.show === true){
 					category_collect.push(category.target, category.source);
 					return category;
+					}
 				}
 			}
 		});
@@ -553,38 +630,72 @@ function data_filter(keywordSearch) {
 // compute the data when occurs the legendselectchanged event on category bar
 
 // todo : improve the performance
-
-Chart.on('legendselectchanged', (category_select) => {
-		data.all_category = data.all_category.filter((category) => {
-			if (category.name == category_select.name) category.show = !category.show;
-			return category;	
+function lineAppend(lineName,type,keyword_search_name){
+	if(type === 'not'){
+		lineName.forEach((item) => {
+			lineNot.push(item);
 		});
-		if (keyword.length === 0) {
-			let collect = [];
-			//刪除完全數清空或是砍了第一層
-			option.series[0].categories = data.all_category;
-			option.series[0].links = option.series[0].categories.filter((category) => {
-				// return the category that show property is true
-				if (category.show == true) {
+	}
+	else if(type === 'and'){
+		lineName.forEach((item) => {
+			lineAnd.push(item);
+		});
+	}
+	$('#keyword_search_field').val(''); // clear the keyword search field
+	$('.keyword').append(`<div class="keyword_item" data-item="${keyword_search_name}">
+        <p class="keyword_name">Line: ${type} ${keyword_search_name}</p>
+        <button class="keyword_delete" data-name='line ${keyword_search_name}'>delete</button>
+	</div>`);
+	keyword_item_delete();
+}
+function lineCtrl(){
+	data.all_category = data.all_category.filter((category) => {
+		category.show = true;
+		return category;
+	});
+	if(lineAnd.length !== 0)
+	data.all_category = data.all_category.filter((category) => {
+		if (lineAnd.includes(category.name)) category.show = true;
+		else category.show = false;
+		return category;
+	});
+	if(lineNot.length !== 0)
+	data.all_category = data.all_category.filter((category) => {
+		if (lineNot.includes(category.name)) category.show = false;
+		return category;
+	});
+}
+Chart.on('legendselectchanged', (category_select) => {
+	console.log(category_select.name);
+	var arr = [];
+	arr.push(category_select.name);
+	lineAppend(arr,'not',category_select.name);
+	lineCtrl();
+	if (keyword.length === 0) 
+		resetChart();
+	 else 
+		reRunKeyword();
+});
+function resetChart(){
+	let collect = [];
+		//刪除完全數清空或是砍了第一層
+		option.series[0].categories = data.all_category.filter((category) => {
+			// return the category that show property is true
+			if (category.show == true) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)){
 					collect.push(category.source, category.target);
 					return category;
 				}
-			});
-			collect = Array.from(new Set(collect));
-			option.series[0].nodes = data.nodes.filter((node) => {
-				return collect.includes(node.name);
-			});
-		}	
-		else{
-			option.series[0].categories = [];
-			option.series[0].links = [];
-			option.series[0].nodes = [];
-			data_filter_and();
-			data_filter(kwTemp);
-		}
-		event_setOption_function(false);
+			}
+		});
+		option.series[0].links = option.series[0].categories;
+		collect = Array.from(new Set(collect));
+		option.series[0].nodes = data.nodes.filter((node) => {
+			return collect.includes(node.name);
+		});
+		event_setOption_function();
 		sidebar_level_render();
-});
+}
 // max_level
 function max_Level(ui_value) {
 	if (ui_value === -1) routeFloor = 'All';
@@ -878,12 +989,6 @@ function recoveryRoad() {
 }
 function nodeList() {
 	$('.nodeSelected').children().remove();
-	console.log(notKeyword);
-	notKeyword.forEach((item) => {
-		$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item}">
-        <label><input type="checkbox" name="node_list" value="${item}" onclick="nodeListChange(this)">${item}</label>
-    </div>`);
-	});
 	option.series[0].nodes.forEach((item) => {
 		if (!keywords.includes(item.name))
 			$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
@@ -904,16 +1009,18 @@ function maxLevelSlider() {
 	$('.max_level').show();
 }
 function nodeListChange(e) {
+	var arr = [];
+	arr.push(e.value);
+	keywordNot(arr, e.value);
+	reRunKeyword();
+	keyword_item_delete();
+}
+function reRunKeyword() {
 	routeHash = [];
 	option.series[0].categories = [];
 	option.series[0].links = [];
 	option.series[0].nodes = [];
 	routeFloor = 'All';
-	if (e.checked == true) {
-		notKeyword.splice(notKeyword.indexOf(e.value), 1);
-	} else {
-		notKeyword.push(e.value);
-	}
 	if (routeBackup.length !== 0) route = JSON.parse(JSON.stringify(routeBackup));
 	for (var i = 0; i < route.length; i++) {
 		var count = 0;
@@ -925,6 +1032,25 @@ function nodeListChange(e) {
 			i--;
 		}
 	}
+	notShow = false;
+	for (var y = 0; y < route.length; y++) {
+		for (var i = 0, len = route[y].length; i < len - 1; i++){
+			data.category.filter((category) => {
+				if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
+					if(category.show === false)
+					notShow = true;
+				} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
+					if(category.show === false)
+					notShow = true;
+				}
+			});
+			if(notShow === true){
+				route.splice(y, 1);
+				y--;
+				break;	
+			}
+		}
+	}	
 	if (route.length != 0) {
 		var lenTemp = route[0].length;
 		routeHash.push(lenTemp - 1);
@@ -938,20 +1064,19 @@ function nodeListChange(e) {
 	maxLevelSlider();
 	data_filter_and();
 	data_filter(kwTemp);
-	event_setOption_function(false);
+	event_setOption_function();
 	sidebar_level_render();
 }
-function checkedAll() {
-	var checkboxs = document.getElementsByName('node_list');
-	for (var i = 0; i < checkboxs.length; i++) {
-		checkboxs[i].checked = true;
+
+$('#kModel').change(function() {
+	var Sinner = '';
+	if (this.value === 'node') {
+		Sinner += '<option value="and" selected>AND</option>';
+		Sinner += '<option value="or">OR</option>';
+		Sinner += '<option value="not">NOT</option>';
+	} else if (this.value === 'line') {
+		Sinner += '<option value="and" selected>AND</option>';
+		Sinner += '<option value="not">NOT</option>';
 	}
-	routeFloor = 'All';
-	if (routeBackup.length !== 0) route = JSON.parse(JSON.stringify(routeBackup));
-	notKeyword = [];
-	maxLevelSlider();
-	data_filter_and();
-	data_filter(kwTemp);
-	event_setOption_function(false);
-	sidebar_level_render();
-}
+	$('#kClass').html(Sinner);
+});

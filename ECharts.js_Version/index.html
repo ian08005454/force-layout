@@ -98,11 +98,16 @@
             <div class="keyword_search" id ="ksearch">
                 <label>"/" = 無相關,  & = 有相關</label>
                 <!-- <button id="addmore_btn" type="submit">+</button> -->
+                <select class="keywordModel" id = "kModel">
+                    <option value="node" selected>人物</option>
+                    <option value="line">關係</option>
+                   </select>
                 <select class="keywordClass" id = "kClass">
                     <option value="and" selected>AND</option>
                     <option value="or">OR</option>
+                    <option value="not">NOT</option>
                    </select>
-                <input type="text" placeholder="搜尋節點" id="keyword_search_field" style="width:60px;">
+                <input type="text" placeholder="搜尋節點" id="keyword_search_field" style="width:100px;">
                 <button id="keyword_search_button" type="submit">搜尋</button>
                 <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
@@ -111,11 +116,10 @@
             </div> 
             <div class="nodeSelect">
                 <br>
+                <br>
             <label>選擇你要的node:</label>
             <div class="nodeSelected">
             </div>
-            <br>
-            <button id="nodeSelectedAll" type="button" onclick="checkedAll()">全選</button>
         </div>
             <!-- <div id="choose_color"></div> -->
         </div>
