@@ -52873,7 +52873,7 @@
         var key = n1.id + '-' + n2.id;
         // PENDING
         if (edgesMap[key]) {
-            return;
+            // return; //實現顯示同一來源多條線
         }
 
         var edge = new Edge(n1, n2, dataIndex);

@@ -117,9 +117,14 @@ function keyword_search(e) {
 			keyword_search_name_s = [];
 			if (keyword_search_name.includes('&')) keyword_search_name_s = keyword_search_name.split('&');
 			else keyword_search_name_s.push(keyword_search_name);
-			keyword_search_name_s.forEach(element =>{
-				element = element.trim();
+			a = data.all_category.map(function(item, index, array) {
+				return item.name;
 			});
+			for(let i = 0,len = keyword_search_name_s.length;i<len;i++){
+				keyword_search_name_s[i] = keyword_search_name_s[i].trim();
+				if(!a.includes(keyword_search_name_s[i]))
+					return alert("沒有此線段再搜尋一次")
+			}
 			lineAppend(keyword_search_name_s, keywordSearchType, keyword_search_name);
 			lineCtrl();
 			if (keyword.length !== 0) reRunKeyword();
@@ -247,10 +252,10 @@ function keywordFliter() {
 	keywordCollection.forEach((item) => {
 		for (var i = 0, keywordLen = item.length; i < keywordLen; i++) {
 			item[i] = item[i].trim();
-			keywords.push(item[i]);
 			if (!data.all_nodes.includes(item[i]) || item[i].length === 0) {
 				return keyword_search_verify_fail(keyword_search_name);
 			}
+			keywords.push(item[i]);
 		}
 		item = Array.from(new Set(item));
 		if (item.length > 1) search_AND(item);
@@ -742,6 +747,7 @@ Chart.on('legendselectchanged', (category_select) => {
 });
 function resetChart() {
 	let collect = [];
+	// console.log("reset");
 	//刪除完全數清空或是砍了第一層
 	option.series[0].categories = data.all_category.filter((category) => {
 		// return the category that show property is true
@@ -764,7 +770,7 @@ function resetChart() {
 }
 // max_level
 function max_Level(ui_value) {
-	if (ui_value === -1) routeFloor = 'All';
+	if (ui_value === routeHash.length) routeFloor = 'All';
 	else routeFloor = routeHash[ui_value];
 	option.series[0].categories = [];
 	option.series[0].links = [];
@@ -851,6 +857,7 @@ $(() => {
 			}
 		}
 	});
+	nodeList();
 });
 function change_width(width_value) {
 	data.links.forEach((link) => {
@@ -979,7 +986,7 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = true) {
 	Chart.setOption(option, rander);
-	if (keyword.length !== 0) nodeList();
+	nodeList();
 }
 
 Chart.on('click', (e) => {
@@ -1078,10 +1085,10 @@ function nodeList() {
 }
 function maxLevelSlider() {
 	$(`.slider_item > #max_level`).slider({
-		min: -1,
-		max: routeHash.length - 1, //最大階層數
+		min: 0,
+		max: routeHash.length, //最大階層數
 		step: 1,
-		value: -1, //current option setting value
+		value: routeHash.length, //current option setting value
 		disable: false,
 		range: 'min'
 	});
@@ -1092,7 +1099,8 @@ function nodeListChange(e) {
 	var arr = [];
 	arr.push(e.value);
 	keywordNot(arr, e.value);
-	reRunKeyword();
+	if (keyword.length !== 0 ) reRunKeyword();
+	else lineInit();
 	keyword_item_delete();
 }
 function reRunKeyword() {
