@@ -246,7 +246,6 @@ function data_format(data, LODtype=0) {
                         }
                     });
                 }
-
                 // second : push all category into buf.category array, ignore duplicate problem
                 if (kg2_element.type[0] == ' ' || kg2_element.type[0] == '') {
                     var black = 'black';
@@ -302,7 +301,28 @@ function data_format(data, LODtype=0) {
     // push the object that not duplicate in buf.all_category array into buf.category
     // buf.category = buf.all_category.filter(item => !set.has(item.name) ? set.add(item.name) : false);
     // set.clear();
+        /**
+    * 生成边曲度优先使用列表
+    * @return  [0.2, -0.2, 0.4, -0.4, 0.6, -0.6, 0.8, -0.8, 1, -1, 0.1, -0.1, 0.3, -0.3, 0.5, -0.5, 0.7, -0.7, 0.9, -0.9]
+    */
+   const CURVENESS_LIST = [0.4, -0.6, 0.2, -0.4, 0.6, -0.2, 0.8, -0.8, 1, -1, 0.1, -0.1, 0.3, -0.3, 0.5, -0.5, 0.7, -0.7, 0.9, -0.9];
+    // Array.from({ length: 20 })
+//    .map((_, i) => (((i < 10 ? i + 2 : i - 9) - (i % 2)) / 10) * (i % 2 ? -1 : 1))
 
+   // 2. 预期生成的优化曲度后的列表
+   const echartLinks = [];
+   buf.all_category.forEach(link => {
+       // 3. 查询已优化的列表中，已存在的两个顶点相同的边
+       const sameLink = echartLinks.filter(
+           item =>
+               item.source === link.source &&
+               item.target === link.target
+       )
+       // 4. 优化曲度
+       link.lineStyle.normal.curveness = CURVENESS_LIST[sameLink.length] || Math.random();
+
+       echartLinks.push(link);
+   })
     buf.category = buf.all_category;
     // console.log(buf.nodes);
     return buf;

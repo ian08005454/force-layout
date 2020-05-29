@@ -88,6 +88,7 @@ let lineStack = [];
 lineStack[0] = new Array();
 lineStack[1] = new Array();
 lineStack[2] = new Array();
+lineStack[3] = new Array();
 window.onresize = () => {
 	Chart.resize();
 };
@@ -382,7 +383,7 @@ function search_AND(keyword_search_name_s) {
 		} while (1);
 	}
 	console.log('YA!!!!!');
-	// console.log(routeTemp.length);
+	console.log(routeTemp.length);
 	console.log(routeTemp);
 	for (var i = 0; i < routeTemp.length; i++) {
 		var count = 0;
@@ -570,10 +571,10 @@ function data_filter_and() {
 		nodeCollection = nodeCollection.concat(route[y]);
 		nodeCollection = Array.from(new Set(nodeCollection));
 		categories = categories.concat(temp);
-		$('#road').append(`<div class="road_item" id="${y}" onmouseover="highlightRoad(id);"
-		onmouseout="recoveryRoad();">
-        <p class="road_name" >${route[y]}</p>
-		</div>`);
+		// $('#road').append(`<div class="road_item" id="${y}" onmouseover="highlightRoad(id);"
+		// onmouseout="recoveryRoad();">
+        // <p class="road_name" >${route[y]}</p>
+		// </div>`);
 		if (y + 1 === route.length) break;
 		if (routeFloor !== 'All' && route[y].length !== route[y + 1].length) break;
 	}
@@ -863,14 +864,13 @@ function change_width(width_value) {
 	data.links.forEach((link) => {
 		link.lineStyle.normal.width = link.lineStyle.normal.oldwidth * width_value;
 	});
-	Chart.setOption(option);
+	event_setOption_function(false);
 }
 function change_node_size(node_size_value) {
 	data.nodes.forEach((node) => {
 		node.symbolSize = node.old_symbolSize * node_size_value;
 	});
-	Chart.setOption(option);
-	event_setOption_function();
+	event_setOption_function(false);
 }
 function word_strength(value) {
 	var value_filter = [];
@@ -890,9 +890,8 @@ function word_strength(value) {
 			return category;
 		}
 	});
-	Chart.setOption(option);
 	sidebar_level_render();
-	event_setOption_function();
+	event_setOption_function(false);
 }
 function common_value(value) {
 	var value_filter = [];
@@ -913,7 +912,7 @@ function common_value(value) {
 			return value_filter.includes(node.name);
 		});
 		console.log(option);
-		Chart.setOption(option);
+		event_setOption_function(false);
 	} else {
 		option.series[0].categories = data.all_category.filter((category) => {
 			return category.orign_v >= value;
@@ -932,7 +931,7 @@ function common_value(value) {
 		});
 	}
 	// sidebar_level_render();
-	event_setOption_function();
+	event_setOption_function(false);
 }
 
 none_orign_idf_node(csType.css_link[0].borderType, csType.css_link[0].borderColor, csType.css_link[0].borderWidth); //可以改變idf=0的樣式
