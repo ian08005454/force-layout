@@ -197,50 +197,78 @@ function data_filter(keyCollect) {
 	else{
 		ui_user = routeFloor;
 	} 
-	var categories, links, nodes;
+	var categories = [], links, nodes;
 	let union_collect = [];
 	let collect = [];
 	let category_collect = [];
 	let bench = [];
-	var a = option.series[0].nodes.map(function(item, index, array) {
-		return item.name;
-	});
-	console.log(a);
-	categories = data.category.filter((category) => {
-		if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
-			if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-				if (category.show === true) {
-					if(keyCollect.lineName.length != 0){
-						keyCollect.lineName.forEach(item=>{
-						if (item.includes(category.name)){
-							if(item.length>1){
-								bench.push(category.target,category.source);
-								for(let i = 1; i<item.length;i++)
-									var bench = bench.filter(function(element, index, arr){
-									return arr.indexOf(element) !== index;
-								});
-								if(bench.includes(category.target) && bench.includes(category.source)){
-									union_collect.push(category.target, category.source);
-									return category;
+	console.log(keyCollect);
+		if(keyCollect.lineName.length !== 0){
+			keyCollect.lineName.forEach(item=>{
+			let bench = [];
+		 data.category.filter((category) => {
+			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if (category.show === true) {
+							if (item.includes(category.name)){
+								console.log(item);
+								if(item.length>1){
+									console.log(category);
+									bench.push(category.target, category.source);
+									console.log(bench);
 								}
-							}
-							else{
-								union_collect.push(category.target, category.source);
-								return category;
-							}
-						} 
-						
-					});
+								else{
+									union_collect.push(category.target, category.source);
+									console.log(category);
+									categories.push(category);
+								}
+							} 
+							
+					}
 				}
-				else{
-					union_collect.push(category.target, category.source);
-								return category;
-				}
-				}
-			
 			}
+		});
+		if(item.length>1){
+			for(let i = 1; i<item.length;i++)
+			bench = bench.filter(function(element, index, arr){
+				return arr.indexOf(element) !== index;
+			});
+			console.log(bench);
+		data.category.filter((category) => {
+			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if (category.show === true) {
+							if (item.includes(category.name)){
+									if(bench.includes(category.target) && bench.includes(category.source)){
+										union_collect.push(category.target, category.source);
+										console.log(category);
+										categories.push(category);
+									}
+								
+							} 
+							
+					}
+				}
+			}
+		});
 		}
+		
 	});
+	}
+	else{
+		console.log(keyCollect.lineName.length);
+		categories = data.category.filter((category) => {
+			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if (category.show === true) {
+						union_collect.push(category.target, category.source);
+						console.log(union_collect);
+						return category;
+					}
+				}
+			}
+		});
+	}
 	// console.log(union_collect);
 	console.log(notKeyword);
 	let minus = union_collect.filter((item) => {
@@ -249,40 +277,70 @@ function data_filter(keyCollect) {
 	minus = Array.from(new Set(minus));
 	var layer = 0;
 	for (let i = 1; i < ui_user; i++) {
-		categories = data.category.filter((category) => {
+		categories = [];
+		if(keyCollect.lineName.length !== 0){
+			keyCollect.lineName.forEach(item=>{
+				bench = [];
+		 data.category.filter((category) => {
 			if (minus.includes(category.target) || minus.includes(category.source)) {
 				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 					if (category.show === true) {
-						if(keyCollect.lineName.length !== 0){
-							keyCollect.lineName.forEach(item=>{
+						if (item.includes(category.name)){
+							console.log(item);
+							if(item.length>1){
+								console.log(category);
+								bench.push(category.target, category.source);
+								console.log(bench);
+							}
+							else{
+								union_collect.push(category.target, category.source);
+								console.log(category);
+								categories.push(category);
+							}
+						} 
+						
+				}
+				}
+			}
+		});
+		if(item.length>1){
+			for(let i = 1; i<item.length;i++)
+			bench = bench.filter(function(element, index, arr){
+				return arr.indexOf(element) !== index;
+			});
+			console.log(bench);
+		data.category.filter((category) => {
+			if (minus.includes(category.target) || minus.includes(category.source)) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if (category.show === true) {
 							if (item.includes(category.name)){
-								if(item.length>1){
-									bench.push(category.target,category.source);
-									for(let i = 1; i<item.length;i++)
-									var bench = bench.filter(function(element, index, arr){
-										return arr.indexOf(element) !== index;
-									});
-									if(bench.includes(category.target) && bench.includes(category.source)){
-										union_collect.push(category.target, category.source);
-										return category;
-									}
-								}
-								else{
+								if(bench.includes(category.target) && bench.includes(category.source)){
 									union_collect.push(category.target, category.source);
-									return category;
+									console.log(category);
+									categories.push(category);
 								}
 							} 
 							
-						});
-					}
-					else{
-						union_collect.push(category.target, category.source);
-									return category;
-					}
 					}
 				}
 			}
 		});
+	}
+	});
+	}
+	else{
+		categories = data.category.filter((category) => {
+			if (minus.includes(category.target) || minus.includes(category.source)) {
+				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+					if (category.show === true) {
+						union_collect.push(category.target, category.source);
+						return category;
+					}
+				}
+			}
+		});
+	}
+		console.log(categories);
 		category_collect = Array.from(new Set(union_collect));
 		console.log(categories);
 		console.log(category_collect);
@@ -329,8 +387,8 @@ function lineAppend(keyCollect) {
 	CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
 	CountTemp = keywordCount;
 	PointTemp = keywordPoint;
-	linename = keyCollect.name;
-	console.log(linename);
+	lineName = keyCollect.name;
+	console.log(lineName);
 	if (keyCollect.type === 'not') {	
 			if (lineName.includes('/')) lineName = lineName.split('/');
 			lineName.forEach((item) => {
@@ -351,7 +409,7 @@ function lineAppend(keyCollect) {
 			lineStack.push(item);
 		}
 	} 
-	if(keyword.length == 0 || keyCollect.type === 'or'){
+	if(keywordCollection.length === 0 || keyCollect.type === 'or'){
 		if(lineName.includes('/')){
 			lineName = lineName.split('/');
 			lineName.forEach(item =>{
@@ -370,17 +428,18 @@ function lineAppend(keyCollect) {
 	}
 	else{
 		var len = keywordCollection[keywordCollection.length -1].lineName.length
+		console.log(len);
+		console.log(lineName);
 		if(lineName.includes('/')){
 			lineName = lineName.split('/');
-			if(lineName.length > 1){
 				for(i = 1;i<lineName.length;i++){
 					for (let y = 0; y < len; y++) {
-						keywordCollection[keywordCollection.length -1].lineName.push(keywordCollection[keywordCollection.length -1].lineName[y])
+						keywordCollection[keywordCollection.length -1].lineName.push(JSON.parse(JSON.stringify(keywordCollection[keywordCollection.length -1].lineName[y])));
 						console.log(keywordCollection[keywordCollection.length -1].lineName);
 					}
 				}
-			}
 			for (let index = 0; index < lineName.length; index++) {
+				console.log(lineName[index]);
 				if(lineName[index].includes('&')){
 					lineName[index] = lineName[index].split('&');
 					for(i = len*index;i<len*(index+1);i++)
@@ -390,15 +449,26 @@ function lineAppend(keyCollect) {
 					});
 				}
 				else{
+					if(len == 0){
+						lineName[index] = [lineName[index]];
+						keywordCollection[keywordCollection.length -1].lineName.push(lineName[index]);
+						console.log(keywordCollection[keywordCollection.length -1].lineName);	
+					}
+					else{
+						console.log(len);
 					for(i = len*index;i<len*(index+1);i++)
 						keywordCollection[keywordCollection.length -1].lineName[i].push(lineName[index]);
 						console.log(keywordCollection[keywordCollection.length -1].lineName);
+					}
 				}
 			}	
 		}
 		else{
+			console.log('right');
 			if(lineName.includes('&')){
 				lineName = lineName.split('&');
+				if(len == 0)
+				keywordCollection[keywordCollection.length -1].lineName.push([]);
 				keywordCollection[keywordCollection.length -1].lineName.forEach(item =>{
 					lineName.forEach(items =>{
 						item.push(items);
@@ -406,8 +476,16 @@ function lineAppend(keyCollect) {
 				});
 			}
 			else{
-				for(i = len*index;i<len*(index+1);i++)
-					keywordCollection[keywordCollection.length -1].lineName[i].push(lineName[index]);
+				if(len == 0){
+					lineName = [lineName];
+					keywordCollection[keywordCollection.length -1].lineName.push(lineName);
+					console.log(keywordCollection[keywordCollection.length -1].lineName);	
+				}
+				else{
+					for(i = 0;i<len;i++)
+					keywordCollection[keywordCollection.length -1].lineName[i].push(lineName);
+					console.log(keywordCollection[keywordCollection.length -1].lineName);
+				}
 			}
 		}
 		console.log(keywordCollection[keywordCollection.length -1].lineName);
@@ -415,7 +493,7 @@ function lineAppend(keyCollect) {
 	console.log(keywordCollection[keywordCollection.length -1].lineName);
 }
 
-function lineCtrl(keyCollect) {
+function lineCtrl() {
 	data.all_category = data.all_category.filter((category) => {
 		category.show = true;
 		return category;
@@ -464,11 +542,7 @@ function keyword_search(e) {
 		}
 		if (keywordModel === 'line') {
 			keyword_item_append(keyword_search_name, keywordSearchType);
-			try {
 				lineAppend(keyword[keyword.length - 1]);
-			} catch (error) {
-				if (error === 'UnknowSearchName') return alert('沒有此線段再搜尋一次');
-			}
 			keywordFliter();
 		} else {
 			if (keywordSearchType === 'not') {
