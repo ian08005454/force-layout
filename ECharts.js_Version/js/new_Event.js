@@ -19,11 +19,6 @@ var keywordCollection = [];
    */
 var route = [];
 /**
-   * 儲存整理後是需要跑or搜尋的項目
-   * @type {array}
-   */
-var kwTemp = [];
-/**
    * 儲存max_level slider的現值
    * @type {string}
    */
@@ -92,10 +87,242 @@ window.onresize = () => {
 class searchTarget {
 	constructor(nodeName, lineName, lineName2) {
 		this.nodeName = nodeName;
-		this.lineName= lineName;
+		this.lineName = lineName;
 		this.lineName2 = lineName2;
 	}
-	
+	data_filter() {
+		if (routeFloor === 'All') {
+			var ui_user = 100;
+		} else {
+			ui_user = routeFloor;
+		}
+		var categories = [],
+			links,
+			nodes;
+		let union_collect = [];
+		let collect = [];
+		let category_collect = [];
+		let bench = [];
+		console.log(this);
+		if (this.lineName.length !== 0) {
+			this.lineName.forEach((item) => {
+				let bench = [];
+				data.category.filter((category) => {
+					if (this.nodeName.includes(category.target) || this.nodeName.includes(category.source)) {
+						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+							if (category.show === true) {
+								if (item.includes(category.name)) {
+									console.log(item);
+									if (item.length > 1) {
+										console.log(category);
+										bench.push(category.target, category.source);
+										console.log(bench);
+									} else {
+										union_collect.push(category.target, category.source);
+										console.log(category);
+										categories.push(category);
+									}
+								}
+							}
+						}
+					}
+				});
+				if (item.length > 1) {
+					for (let i = 1; i < item.length; i++)
+						bench = bench.filter(function(element, index, arr) {
+							return arr.indexOf(element) !== index;
+						});
+					console.log(bench);
+					data.category.filter((category) => {
+						if (this.nodeName.includes(category.target) || this.nodeName.includes(category.source)) {
+							if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+								if (category.show === true) {
+									if (item.includes(category.name)) {
+										if (bench.includes(category.target) && bench.includes(category.source)) {
+											union_collect.push(category.target, category.source);
+											console.log(category);
+											categories.push(category);
+										}
+									}
+								}
+							}
+						}
+					});
+				}
+			});
+		} else {
+			console.log(this.lineName.length);
+			categories = data.category.filter((category) => {
+				if (this.nodeName.includes(category.target) || this.nodeName.includes(category.source)) {
+					if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+						if (category.show === true) {
+							union_collect.push(category.target, category.source);
+							console.log(union_collect);
+							return category;
+						}
+					}
+				}
+			});
+		}
+		// console.log(union_collect);
+		console.log(notKeyword);
+		let minus = union_collect.filter((item) => {
+			return !item.includes(this.nodeName);
+		});
+		minus = Array.from(new Set(minus));
+		var layer = 0;
+		for (let i = 1; i < ui_user; i++) {
+			categories = [];
+			if (this.lineName.length !== 0) {
+				this.lineName.forEach((item) => {
+					bench = [];
+					data.category.filter((category) => {
+						if (minus.includes(category.target) || minus.includes(category.source)) {
+							if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+								if (category.show === true) {
+									if (item.includes(category.name)) {
+										console.log(item);
+										if (item.length > 1) {
+											console.log(category);
+											bench.push(category.target, category.source);
+											console.log(bench);
+										} else {
+											union_collect.push(category.target, category.source);
+											console.log(category);
+											categories.push(category);
+										}
+									}
+								}
+							}
+						}
+					});
+					if (item.length > 1) {
+						for (let i = 1; i < item.length; i++)
+							bench = bench.filter(function(element, index, arr) {
+								return arr.indexOf(element) !== index;
+							});
+						console.log(bench);
+						data.category.filter((category) => {
+							if (minus.includes(category.target) || minus.includes(category.source)) {
+								if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+									if (category.show === true) {
+										if (item.includes(category.name)) {
+											if (bench.includes(category.target) && bench.includes(category.source)) {
+												union_collect.push(category.target, category.source);
+												console.log(category);
+												categories.push(category);
+											}
+										}
+									}
+								}
+							}
+						});
+					}
+				});
+			} else {
+				categories = data.category.filter((category) => {
+					if (minus.includes(category.target) || minus.includes(category.source)) {
+						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+							if (category.show === true) {
+								union_collect.push(category.target, category.source);
+								return category;
+							}
+						}
+					}
+				});
+			}
+			console.log(categories);
+			category_collect = Array.from(new Set(union_collect));
+			console.log(categories);
+			console.log(category_collect);
+			minus = category_collect.filter((item) => {
+				return !item.includes(this.nodeName);
+			});
+			console.log(minus);
+			if (categories.length === layer) {
+				let maxlevel = i;
+				for (var x = 1; x <= maxlevel; x++) {
+					if (!routeHash.includes(x)) routeHash.push(x);
+				}
+				routeHash.sort(function(a, b) {
+					return a - b;
+				});
+				console.log(routeHash);
+				maxLevelSlider();
+				break;
+			} else layer = categories.length;
+		}
+		links = categories.filter((category) => {
+			if (category.show == true) {
+				collect.push(category.source, category.target);
+				return category;
+			}
+		});
+		collect = Array.from(new Set(collect));
+		nodes = data.nodes.filter((node) => {
+			keywords.includes(node.name)
+				? (node.itemStyle.normal.color = 'red')
+				: (node.itemStyle.normal.color = user_colors[node.gp]);
+			return collect.includes(node.name);
+		});
+		console.log('try');
+		dataAppendOr(categories, links, nodes);
+	}
+	lineOr() {
+		let categories = [],
+			links,
+			nodes;
+		let collect = [];
+		if (this.lineName.length !== 0) {
+			this.lineName.forEach((item) => {
+				let bench = [];
+				data.category.filter((category) => {
+					if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+						if (category.show === true) {
+							if (item.includes(category.name)) {
+								console.log(item);
+								if (item.length > 1) {
+									console.log(category);
+									bench.push(category.target, category.source);
+									console.log(bench);
+								} else {
+									collect.push(category.target, category.source);
+									console.log(category);
+									categories.push(category);
+								}
+							}
+						}
+					}
+				});
+				if (item.length > 1) {
+					for (let i = 1; i < item.length; i++)
+						bench = bench.filter(function(element, index, arr) {
+							return arr.indexOf(element) !== index;
+						});
+					console.log(bench);
+					data.category.filter((category) => {
+						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
+							if (category.show === true) {
+								if (item.includes(category.name)) {
+									if (bench.includes(category.target) && bench.includes(category.source)) {
+										collect.push(category.target, category.source);
+										console.log(category);
+										categories.push(category);
+									}
+								}
+							}
+						}
+					});
+				}
+			});
+		}
+		links = categories;
+		collect = Array.from(new Set(collect));
+		nodes = data.nodes.filter((node) => {
+			return collect.includes(node.name);
+		});
+		dataAppendOr(categories, links, nodes);
+	}
 }
 /**
  * @class store search
@@ -115,16 +342,16 @@ class searchWord {
 		CountTemp = keywordCount;
 		PointTemp = keywordPoint;
 		if (this.type === 'and') {
-			if (this.name.includes('/')) {
-				keyword_search_name_s = this.name.split('/');
+			if (this.name.includes('|')) {
+				keyword_search_name_s = this.name.split('|');
 				if (keywordCount === 0) {
 					for (var i = 0; i < keyword_search_name_s.length; i++)
 						keywordCollection.push(new searchTarget([], [], []));
-						keywordCount = 1;
+					keywordCount = 1;
 				} else {
 					for (var x = 1; x < keyword_search_name_s.length; x++) {
 						for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
-							keywordCollection.push(...keywordCollection[i]);
+							keywordCollection.push(JSON.parse(JSON.stringify(keywordCollection[i])));
 						}
 					}
 				}
@@ -165,8 +392,8 @@ class searchWord {
 		} else {
 			keywordPoint = keywordCollection.length - 1;
 			keywordCount = 0;
-			if (this.name.includes('/')) {
-				keyword_search_name_s = this.name.split('/');
+			if (this.name.includes('|')) {
+				keyword_search_name_s = this.name.split('|');
 				keywordCount += keyword_search_name_s.length;
 				keyword_search_name_s.forEach(function(item, index, array) {
 					if (item.includes('&')) item = this.name.split('&');
@@ -181,8 +408,99 @@ class searchWord {
 			}
 		}
 		console.log(keywordCollection);
+		console.log(keywordCount);
+		console.log(keywordPoint);
 	}
-	
+	/**
+ * 依使用者打的資訊進行判斷和處理
+ * @param {event} e  傳入的事件物件
+ */
+	lineAppend() {
+		console.log(this);
+		console.log(this.name);
+		CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
+		CountTemp = keywordCount;
+		PointTemp = keywordPoint;
+		let lineName = this.name;
+		console.log(lineName);
+		if (keywordCollection.length === 0 || this.type === 'or') {
+			keywordCount = 1;
+			if (lineName.includes('|')) {
+				lineName = lineName.split('|');
+				lineName.forEach((item) => {
+					if (item.includes('&')) item.split('&');
+					else item = Array(item);
+				});
+			} else {
+				if (lineName.includes('&')) lineName = lineName.split('&');
+				else lineName = Array(lineName);
+				lineName = [ lineName ];
+			}
+			keywordCollection.push(new searchTarget([], lineName, []));
+			console.log(keywordCollection[keywordCollection.length - 1].lineName);
+			keywordPoint = keywordCollection.length - 1;
+		} else {
+			var len = keywordCollection[keywordPoint].lineName.length;
+			console.log(len);
+			console.log(lineName);
+			if (lineName.includes('|')) {
+				lineName = lineName.split('|');
+				for (i = 1; i < lineName.length; i++) {
+					for (let y = 0; y < len; y++) {
+						keywordCollection[keywordPoint].lineName.push(
+							JSON.parse(JSON.stringify(keywordCollection[keywordPoint].lineName[y]))
+						);
+						console.log(keywordCollection[keywordPoint].lineName);
+					}
+				}
+				for (let index = 0; index < lineName.length; index++) {
+					console.log(lineName[index]);
+					if (lineName[index].includes('&')) {
+						lineName[index] = lineName[index].split('&');
+						for (i = len * index; i < len * (index + 1); i++)
+							lineName[index].forEach((item) => {
+								keywordCollection[keywordPoint].lineName[i].push(item);
+								console.log(keywordCollection[keywordPoint].lineName);
+							});
+					} else {
+						if (len == 0) {
+							lineName[index] = [ lineName[index] ];
+							keywordCollection[keywordPoint].lineName.push(lineName[index]);
+							console.log(keywordCollection[keywordPoint].lineName);
+						} else {
+							console.log(len);
+							for (i = len * index; i < len * (index + 1); i++)
+								keywordCollection[keywordPoint].lineName[i].push(lineName[index]);
+							console.log(keywordCollection[keywordPoint].lineName);
+						}
+					}
+				}
+			} else {
+				if (lineName.includes('&')) {
+					lineName = lineName.split('&');
+					if (len == 0) keywordCollection[keywordPoint].lineName.push([]);
+					keywordCollection[keywordPoint].lineName.forEach((item) => {
+						lineName.forEach((items) => {
+							item.push(items);
+						});
+					});
+				} else {
+					if (len == 0) {
+						lineName = [ lineName ];
+						keywordCollection[keywordPoint].lineName.push(lineName);
+						console.log(keywordCollection[keywordPoint].lineName);
+					} else {
+						for (let i = 0; i < len; i++) keywordCollection[keywordPoint].lineName[i].push(lineName);
+						console.log(keywordCollection[keywordPoint].lineName);
+					}
+				}
+			}
+			for (let i = keywordPoint + 1; i < keywordPoint + keywordCount; i++) {
+				keywordCollection[i].lineName = JSON.parse(JSON.stringify(keywordCollection[keywordPoint].lineName));
+			}
+		}
+		console.log(keywordCollection[keywordPoint].lineName);
+	}
 }
 // EventListener
 $('#keyword_search_field').keyup((e) => {
@@ -190,335 +508,29 @@ $('#keyword_search_field').keyup((e) => {
 });
 $('#keyword_search_button').on('click', keyword_search);
 keyword.length == 0 ? $('.max_level').hide() : $('.max_level').show();
-function data_filter(keyCollect) {
-	if (routeFloor === 'All') {
-		var ui_user = 100;
-	}
-	else{
-		ui_user = routeFloor;
-	} 
-	var categories = [], links, nodes;
-	let union_collect = [];
-	let collect = [];
-	let category_collect = [];
-	let bench = [];
-	console.log(keyCollect);
-		if(keyCollect.lineName.length !== 0){
-			keyCollect.lineName.forEach(item=>{
-			let bench = [];
-		 data.category.filter((category) => {
-			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-							if (item.includes(category.name)){
-								console.log(item);
-								if(item.length>1){
-									console.log(category);
-									bench.push(category.target, category.source);
-									console.log(bench);
-								}
-								else{
-									union_collect.push(category.target, category.source);
-									console.log(category);
-									categories.push(category);
-								}
-							} 
-							
-					}
-				}
-			}
-		});
-		if(item.length>1){
-			for(let i = 1; i<item.length;i++)
-			bench = bench.filter(function(element, index, arr){
-				return arr.indexOf(element) !== index;
-			});
-			console.log(bench);
-		data.category.filter((category) => {
-			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-							if (item.includes(category.name)){
-									if(bench.includes(category.target) && bench.includes(category.source)){
-										union_collect.push(category.target, category.source);
-										console.log(category);
-										categories.push(category);
-									}
-								
-							} 
-							
-					}
-				}
-			}
-		});
-		}
-		
-	});
-	}
-	else{
-		console.log(keyCollect.lineName.length);
-		categories = data.category.filter((category) => {
-			if (keyCollect.nodeName.includes(category.target) || keyCollect.nodeName.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-						union_collect.push(category.target, category.source);
-						console.log(union_collect);
-						return category;
-					}
-				}
-			}
-		});
-	}
-	// console.log(union_collect);
-	console.log(notKeyword);
-	let minus = union_collect.filter((item) => {
-		return !item.includes(keyCollect.nodeName);
-	});
-	minus = Array.from(new Set(minus));
-	var layer = 0;
-	for (let i = 1; i < ui_user; i++) {
-		categories = [];
-		if(keyCollect.lineName.length !== 0){
-			keyCollect.lineName.forEach(item=>{
-				bench = [];
-		 data.category.filter((category) => {
-			if (minus.includes(category.target) || minus.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-						if (item.includes(category.name)){
-							console.log(item);
-							if(item.length>1){
-								console.log(category);
-								bench.push(category.target, category.source);
-								console.log(bench);
-							}
-							else{
-								union_collect.push(category.target, category.source);
-								console.log(category);
-								categories.push(category);
-							}
-						} 
-						
-				}
-				}
-			}
-		});
-		if(item.length>1){
-			for(let i = 1; i<item.length;i++)
-			bench = bench.filter(function(element, index, arr){
-				return arr.indexOf(element) !== index;
-			});
-			console.log(bench);
-		data.category.filter((category) => {
-			if (minus.includes(category.target) || minus.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-							if (item.includes(category.name)){
-								if(bench.includes(category.target) && bench.includes(category.source)){
-									union_collect.push(category.target, category.source);
-									console.log(category);
-									categories.push(category);
-								}
-							} 
-							
-					}
-				}
-			}
-		});
-	}
-	});
-	}
-	else{
-		categories = data.category.filter((category) => {
-			if (minus.includes(category.target) || minus.includes(category.source)) {
-				if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-					if (category.show === true) {
-						union_collect.push(category.target, category.source);
-						return category;
-					}
-				}
-			}
-		});
-	}
-		console.log(categories);
-		category_collect = Array.from(new Set(union_collect));
-		console.log(categories);
-		console.log(category_collect);
-		minus = category_collect.filter((item) => {
-			return !item.includes(keyCollect.nodeName);
-		});
-		console.log(minus);
-		if (categories.length === layer) {
-			let maxlevel = i;
-			for (var x = 1; x <= maxlevel; x++) {
-				if (!routeHash.includes(x)) routeHash.push(x);
-			}
-			routeHash.sort(function(a, b) {
-				return a - b;
-			});
-			console.log(routeHash);
-			maxLevelSlider();
-			break;
-		} else layer = categories.length;
-	}
-	links = categories.filter((category) => {
-		if (category.show == true) {
-			collect.push(category.source, category.target);
-			return category;
-		}
-	});
-	collect = Array.from(new Set(collect));
-	nodes = data.nodes.filter((node) => {
-		keywords.includes(node.name)
-			? (node.itemStyle.normal.color = 'red')
-			: (node.itemStyle.normal.color = user_colors[node.gp]);
-		return collect.includes(node.name);
-	});
-	console.log("try");
-	dataAppendOr(categories, links, nodes);
-}
-/**
- * 依使用者打的資訊進行判斷和處理
- * @param {event} e  傳入的事件物件
- */
-function lineAppend(keyCollect) {
-	console.log(keyCollect);
-	console.log(keyCollect.name);
-	CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
-	CountTemp = keywordCount;
-	PointTemp = keywordPoint;
-	lineName = keyCollect.name;
-	console.log(lineName);
-	if (keyCollect.type === 'not') {	
-			if (lineName.includes('/')) lineName = lineName.split('/');
-			lineName.forEach((item) => {
-			if (item.includes('&')) item = item.split('&')
-		});
-		for (let i = 0, len = lineName.length; i < len; i++) {
-			if(Array.isArray(lineName[i])){
-				lineName.forEach((item) => {
-					item = item.trim();
-				if (!a.includes(item)) throw 'UnknowSearchName';
-				})
-			}
-			else{
-				lineName[i] = lineName[i].trim();
-			if (!a.includes(lineName[i])) 
-			throw 'UnknowSearchName';
-			}
-			lineStack.push(item);
-		}
-	} 
-	if(keywordCollection.length === 0 || keyCollect.type === 'or'){
-		if(lineName.includes('/')){
-			lineName = lineName.split('/');
-			lineName.forEach(item =>{
-				if(item.includes('&'))
-				item.split('&')
-				else item = Array(item);
-			});
-		}
-		else{
-			if(lineName.includes('&'))
-				lineName = lineName.split('&');
-			
-		}
-		keywordCollection.push(new searchTarget([], lineName, []));
-		console.log(keywordCollection[keywordCollection.length -1].lineName);
-	}
-	else{
-		var len = keywordCollection[keywordCollection.length -1].lineName.length
-		console.log(len);
-		console.log(lineName);
-		if(lineName.includes('/')){
-			lineName = lineName.split('/');
-				for(i = 1;i<lineName.length;i++){
-					for (let y = 0; y < len; y++) {
-						keywordCollection[keywordCollection.length -1].lineName.push(JSON.parse(JSON.stringify(keywordCollection[keywordCollection.length -1].lineName[y])));
-						console.log(keywordCollection[keywordCollection.length -1].lineName);
-					}
-				}
-			for (let index = 0; index < lineName.length; index++) {
-				console.log(lineName[index]);
-				if(lineName[index].includes('&')){
-					lineName[index] = lineName[index].split('&');
-					for(i = len*index;i<len*(index+1);i++)
-					lineName[index].forEach(item =>{
-						keywordCollection[keywordCollection.length -1].lineName[i].push(item);
-						console.log(keywordCollection[keywordCollection.length -1].lineName);
-					});
-				}
-				else{
-					if(len == 0){
-						lineName[index] = [lineName[index]];
-						keywordCollection[keywordCollection.length -1].lineName.push(lineName[index]);
-						console.log(keywordCollection[keywordCollection.length -1].lineName);	
-					}
-					else{
-						console.log(len);
-					for(i = len*index;i<len*(index+1);i++)
-						keywordCollection[keywordCollection.length -1].lineName[i].push(lineName[index]);
-						console.log(keywordCollection[keywordCollection.length -1].lineName);
-					}
-				}
-			}	
-		}
-		else{
-			console.log('right');
-			if(lineName.includes('&')){
-				lineName = lineName.split('&');
-				if(len == 0)
-				keywordCollection[keywordCollection.length -1].lineName.push([]);
-				keywordCollection[keywordCollection.length -1].lineName.forEach(item =>{
-					lineName.forEach(items =>{
-						item.push(items);
-					})
-				});
-			}
-			else{
-				if(len == 0){
-					lineName = [lineName];
-					keywordCollection[keywordCollection.length -1].lineName.push(lineName);
-					console.log(keywordCollection[keywordCollection.length -1].lineName);	
-				}
-				else{
-					for(i = 0;i<len;i++)
-					keywordCollection[keywordCollection.length -1].lineName[i].push(lineName);
-					console.log(keywordCollection[keywordCollection.length -1].lineName);
-				}
-			}
-		}
-		console.log(keywordCollection[keywordCollection.length -1].lineName);
-	}
-	console.log(keywordCollection[keywordCollection.length -1].lineName);
-}
-
 function lineCtrl() {
 	data.all_category = data.all_category.filter((category) => {
 		category.show = true;
 		return category;
 	});
-	if (lineStack.length !== 0){
-		lineStack.forEach(item =>{
+	if (lineStack.length !== 0) {
+		lineStack.forEach((item) => {
 			let bench = [];
-			if(Array.isArray(item)){
+			if (Array.isArray(item)) {
 				data.all_category.filter((category) => {
-					if (item.includes(category.name)) 
-						bench.push(category.target,category.source);
+					if (item.includes(category.name)) bench.push(category.target, category.source);
 				});
-				for(let i = 1; i<item.length;i++)
-				 bench = bench.filter(function(element, index, arr){
-					return arr.indexOf(element) !== index;
-				});
+				for (let i = 1; i < item.length; i++)
+					bench = bench.filter(function(element, index, arr) {
+						return arr.indexOf(element) !== index;
+					});
 				data.all_category = data.all_category.filter((category) => {
-					if (item.includes(category.name)){
-						if (bench.includes(category.target) && bench.includes(category.source)) 
-							category.show = false;
+					if (item.includes(category.name)) {
+						if (bench.includes(category.target) && bench.includes(category.source)) category.show = false;
 					}
 					return category;
 				});
-			}
-			else{
+			} else {
 				data.all_category = data.all_category.filter((category) => {
 					if (item.includes(category.name)) category.show = false;
 					return category;
@@ -526,13 +538,15 @@ function lineCtrl() {
 			}
 		});
 	}
-		
 }
 function keyword_search(e) {
 	// get the search name
 	if (e.which === 13 || e.type === 'click') {
 		//點搜尋或按ENTER
 		keyword_search_name = $('#keyword_search_field').val();
+		keyword_search_name = keyword_search_name.toLowerCase();
+		keyword_search_name = keyword_search_name.replace(' and ', '&')
+		keyword_search_name = keyword_search_name.replace(' or ', '|')
 		var keywordSearchType = $('#kClass').val();
 		var keywordModel = $('#kModel').val();
 		if (keyword.includes(keyword_search_name)) {
@@ -540,34 +554,56 @@ function keyword_search(e) {
 			$('#keyword_search_field').val('');
 			return;
 		}
-		if (keywordModel === 'line') {
-			keyword_item_append(keyword_search_name, keywordSearchType);
-				lineAppend(keyword[keyword.length - 1]);
-			keywordFliter();
-		} else {
-			if (keywordSearchType === 'not') {
-				keyword_search_name_s = [];
-				if (keyword_search_name.includes('&')) keyword_search_name_s = keyword_search_name.split('&');
+		if (keywordSearchType === 'not') {
+			keyword_search_name_s = [];
+			if (keywordModel === 'line') {
+				if (keyword_search_name.includes('|')) keyword_search_name_s = keyword_search_name_s.split('|');
+				keyword_search_name_s.forEach((item) => {
+					if (item.includes('&')) item = item.split('&');
+				});
+				if(keyword_search_name.includes('&')) keyword_search_name_s.push(keyword_search_name.split('&'));
+				else keyword_search_name_s.push(keyword_search_name);
+				for (let i = 0, len = keyword_search_name_s.length; i < len; i++) {
+					if (Array.isArray(keyword_search_name_s[i])) {
+						keyword_search_name_s[i].forEach((item) => {
+							item = item.trim();
+							if (!allLine.includes(item)) throw alert(`${item}是無效的線段名稱`);
+						});
+					} else {
+						keyword_search_name_s[i] = keyword_search_name_s[i].trim();
+						if (!allLine.includes(keyword_search_name_s[i])) throw alert(`${keyword_search_name_s[i]}是無效的線段名稱`);
+					}
+				}
+				keywordNot(keyword_search_name_s, keyword_search_name, keywordModel);
+				keywordCount = 0;
+				if(keywordPoint > 0)
+				keywordPoint = keywordCollection.length - 1;
+				lineCtrl();
+			} else {
+				if (keyword_search_name.includes('|')) keyword_search_name_s = keyword_search_name.split('|');
 				else keyword_search_name_s.push(keyword_search_name);
 				keyword_search_name_s.forEach((item) => {
 					item = item.trim();
 					if (!data.all_nodes.includes(item)) {
-						return alert(`Error : Can't find keyWord : ${keyword_search_name}`);
+						throw alert(`Error : Can't find keyWord : ${keyword_search_name}`);
 					}
 				});
-				keywordNot(keyword_search_name_s, keyword_search_name);
-				if (keyword.length !== 0) reRunKeyword();
-				else lineInit();
-				keyword_item_delete();
-			} else {
-				keyword_item_append(keyword_search_name, keywordSearchType);
-				keyword[keyword.length - 1].keywordCleanUp(keyword_search_name, keywordSearchType);
-				try {
-					keywordFliter();
-				} catch (error) {
-					if (error === 'UnknowSearchName') return keyword_search_verify_fail(keyword_search_name);
-				}
+				keywordNot(keyword_search_name_s, keyword_search_name, keywordModel);
+				keywordCount = 0;
+				if(keywordPoint > 0)
+				keywordPoint = keywordCollection.length - 1;
 			}
+			if (keyword.length !== 0) reRunKeyword();
+			else resetChart();
+			keyword_item_delete();
+		} else if (keywordModel === 'line') {
+			keyword_item_append(keyword_search_name, keywordSearchType, keywordModel);
+			keyword[keyword.length - 1].lineAppend();
+			keywordFliter();
+		} else {
+			keyword_item_append(keyword_search_name, keywordSearchType, keywordModel);
+			keyword[keyword.length - 1].keywordCleanUp(keyword_search_name, keywordSearchType);
+			keywordFliter();
 		}
 	}
 }
@@ -576,15 +612,26 @@ function keyword_search(e) {
  * @param {array} keyword_search_name_s  處理過的陣列
  * @param {string} keyword_search_name  使用者輸入的內容
  */
-function keywordNot(keyword_search_name_s, keyword_search_name) {
-	keyword_search_name_s.forEach((item) => {
-		notKeyword.push(item);
-	});
+function keywordNot(keyword_search_name_s, keyword_search_name, keywordModel) {
+	if (keywordModel === 'line'){
+		keyword_search_name_s.forEach((item) => {
+			lineStack.push(item);
+		});
+		keywordModel = '線'
+	}
+		
+	else{
+		keyword_search_name_s.forEach((item) => {
+			notKeyword.push(item);
+		});
+		keywordModel = '點'
+	}
 	$('#keyword_search_field').val(''); // clear the keyword search field
 	$('.keyword').append(`<div class="keyword_item" data-item="${keyword_search_name}">
-        <p class="keyword_name" >Node: not ${keyword_search_name}</p>
+        <p class="keyword_name" >${keywordModel}: not ${keyword_search_name}</p>
         <button class="keyword_delete" data-name='not ${keyword_search_name}'>delete</button>
-    </div>`);
+	</div>`);
+	keyword_item_delete();
 }
 
 /**
@@ -596,33 +643,27 @@ function keywordFliter() {
 	routeHash = [];
 	routeBackup = [];
 	option.series[0].categories = [];
-	kwTemp = [];
 	option.series[0].links = [];
 	option.series[0].nodes = [];
-	keywordCollection.forEach((item,index) => {
+	keywordCollection.forEach((item, index) => {
 		for (var i = 0, keywordLen = item.nodeName.length; i < keywordLen; i++) {
 			item.nodeName[i] = item.nodeName[i].trim();
 			if (!data.all_nodes.includes(item.nodeName[i]) || item.nodeName[i].length === 0) {
-				throw 'UnknowSearchName';
+				throw keyword_search_verify_fail(keyword_search_name);;
 			}
 			keywords.push(item.nodeName[i]);
 		}
 		item.nodeName = Array.from(new Set(item.nodeName));
-		if (item.nodeName.length > 1) search_AND(item.nodeName);
-		else if (item.nodeName.length === 1) 
-		{
-			kwTemp.push(index);
-			data_filter(item);
-		}
+		if (item.nodeName.length > 1) search_AND(item);
+		else if (item.nodeName.length === 1) item.data_filter();
+		else if (item.nodeName.length === 0) item.lineOr();
 	});
+	if (route.length !== 0) data_filter_and();
 	keywords = Array.from(new Set(keywords));
-	if (route.length === 0 && kwTemp.length === 0) return andSearchNoRoute(keyword_search_name);
-	console.log(kwTemp);
 	$('#road').children().remove();
 	$('.common_show_value').hide();
 	$('.word_strength').hide();
 	$('.max_level').show();
-	// reRunKeyword();
 	event_setOption_function();
 	sidebar_level_render();
 	keyword_item_delete();
@@ -632,10 +673,10 @@ function keywordFliter() {
  * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
  * @param {array} keyword_search_name_s 處理過的使用者輸入陣列
  */
-function search_AND(keyword_search_name_s) {
+function search_AND(keyCollect) {
 	let first = [];
 	let routeTemp = [];
-	keyword_search_name_s.forEach((item) => {
+	keyCollect.nodeName.forEach((item) => {
 		minus = [];
 		minus.push(item);
 		let category_collect = [];
@@ -655,10 +696,10 @@ function search_AND(keyword_search_name_s) {
 			console.log(minus);
 			count++;
 			var countdown = 0;
-			keyword_search_name_s.forEach((item) => {
+			keyCollect.nodeName.forEach((item) => {
 				if (minus.includes(item)) countdown++;
 			});
-			if (countdown === keyword_search_name_s.length - 1) {
+			if (countdown === keyCollect.nodeName.length - 1) {
 				break;
 			}
 		} while (1);
@@ -673,24 +714,65 @@ function search_AND(keyword_search_name_s) {
 			topVal = item;
 		}
 	});
-	for (let z = 1; z < keyword_search_name_s.length; z++) {
+	for (let z = 1; z < keyCollect.nodeName.length; z++) {
 		let primaryStack = new Array();
 		let secondaryStack = new Array();
 		let temp2 = new Array();
 		let Finish = true;
-		let keywordTemp = keyword_search_name_s[top];
+		let keywordTemp = keyCollect.nodeName[top];
 		let nodeCollection;
 		let secondaryStackCount = -1;
-		goal = keyword_search_name_s[z];
+		goal = keyCollect.nodeName[z];
 		do {
 			temp2 = [];
 			nodeCollection = [];
 			primaryStack.push(keywordTemp);
-			let temp = data.category.filter((category) => {
-				return keywordTemp.includes(category.target) || keywordTemp.includes(category.source);
-			});
+			let temp = [];
+			if (keyCollect.lineName.length !== 0) {
+				keyCollect.lineName.forEach((item) => {
+					bench = [];
+					data.category.filter((category) => {
+						if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) {
+							if (item.includes(category.name)) {
+								console.log(item);
+								if (item.length > 1) {
+									console.log(category);
+									bench.push(category.target, category.source);
+									console.log(bench);
+								} else {
+									union_collect.push(category.target, category.source);
+									console.log(category);
+									temp.push(category);
+								}
+							}
+						}
+					});
+					if (item.length > 1) {
+						for (let i = 1; i < item.length; i++)
+							bench = bench.filter(function(element, index, arr) {
+								return arr.indexOf(element) !== index;
+							});
+						console.log(bench);
+						data.category.filter((category) => {
+							if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) {
+								if (item.includes(category.name)) {
+									if (bench.includes(category.target) && bench.includes(category.source)) {
+										union_collect.push(category.target, category.source);
+										console.log(category);
+										temp.push(category);
+									}
+								}
+							}
+						});
+					}
+				});
+			} else {
+				temp = data.category.filter((category) => {
+					if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) return category;
+				});
+			}
 			// console.log(temp);
-			let linkstemp = temp.filter((category) => {
+			temp.filter((category) => {
 				nodeCollection.push(category.target, category.source);
 			});
 			nodeCollection = Array.from(new Set(nodeCollection));
@@ -742,10 +824,10 @@ function search_AND(keyword_search_name_s) {
 	console.log(routeTemp);
 	for (var i = 0; i < routeTemp.length; i++) {
 		var count = 0;
-		keyword_search_name_s.forEach((item) => {
+		keyCollect.nodeName.forEach((item) => {
 			if (routeTemp[i].includes(item)) count++;
 		});
-		if (count != keyword_search_name_s.length) {
+		if (count != keyCollect.nodeName.length) {
 			routeTemp.splice(i, 1);
 			i--;
 		}
@@ -768,7 +850,10 @@ function search_AND(keyword_search_name_s) {
 }
 ////搜尋兩個AND --end --
 function keywordRemove(kwd_search_name) {
-	index = keyword.indexOf(kwd_search_name);
+	let mapping = keyword.map(function(item, index, array) {
+		return item.name;
+	});
+	index = mapping.indexOf(kwd_search_name);
 	keyword.splice(index, 1);
 	$(`div[data-item="${kwd_search_name}"]`).remove();
 	// $('#road').remove();
@@ -791,13 +876,24 @@ function andSearchNoRoute(keyword_search_name) {
 }
 // append keyword div in keyword field
 //下方新增delete鍵
-function keyword_item_append(kwd_search_name, keywordSearchType) {
-	keyword.push(new searchWord(keywordSearchType, kwd_search_name));
+function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
+	keyword.push(new searchWord(keywordSearchType, kwd_search_name, keywordModel));
+	if(keywordModel === 'line')
+	keywordModel = '線'
+	else
+	keywordModel = '點'
 	$('#keyword_search_field').val(''); // clear the keyword search field
-	$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >Node: ${keywordSearchType} ${kwd_search_name}</p>
+	if(keyword.length ===1 && lineStack.length === 0 && notKeyword.length === 0)
+		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+        <p class="keyword_name" >${keywordModel}:${kwd_search_name}</p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
-    </div>`);
+	</div>`);
+	else
+	$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+        <p class="keyword_name" >${keywordModel}: ${keywordSearchType} ${kwd_search_name}</p>
+        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
+	</div>`);
+	keyword_item_delete();
 }
 // bind the keyword delete button click event
 function keyword_item_delete() {
@@ -810,36 +906,31 @@ function keyword_item_delete() {
 			name = name.slice(4);
 			console.log(name);
 			$(`div[data-item="${name}"]`).remove();
-			if (name.includes('&')) {
-				name = name.split('&');
+			if (name.includes('|')) {
+				name = name.split('|');
 				name.forEach((element) => {
+					if(element.includes('&')){
+						element = element.split('&');
+						element = element.trim();
+					}
+					else
 					element = element.trim();
 					notKeyword.splice(notKeyword.indexOf(element), 1);
+					lineStack.splice(lineStack.indexOf(element), 1);
 				});
-			} else notKeyword.splice(notKeyword.indexOf(name), 1);
-			if (keyword.length !== 0) reRunKeyword();
-			else lineInit();
-		} else if (name.includes('line ')) {
-			name = name.slice(5);
-			$(`div[data-item="${name}"]`).remove();
-			if (name.includes('&')) {
-				name = name.split('&');
-				name.forEach((element) => {
-					element = element.trim();
-					lineStack.forEach((item) => {
-						item.splice(item.indexOf(element), 1);
-					});
-				});
-			} else {
-				lineStack.forEach((item) => {
-					item.splice(item.indexOf(name), 1);
-				});
+			} else{
+				lineStack.splice(lineStack.indexOf(name), 1);
+				notKeyword.splice(notKeyword.indexOf(name), 1);
 			}
 			lineCtrl();
 			if (keyword.length !== 0) reRunKeyword();
-			else lineInit();
-		} else {
-			index = keyword.indexOf(e.currentTarget.dataset.name);
+			else resetChart();
+		}
+		else {
+			let mapping = keyword.map(function(item, index, array) {
+				return item.name;
+			});
+			index = mapping.indexOf(e.currentTarget.dataset.name);
 			keywordRemove(e.currentTarget.dataset.name);
 			$('.max_level').hide();
 			$('#road').children().remove();
@@ -862,19 +953,9 @@ function keyword_item_delete() {
 		}
 	});
 }
-function lineInit() {
-	if (lineStack[0].length !== 0) {
-		option.series[0].categories = [];
-		option.series[0].links = [];
-		option.series[0].nodes = [];
-		lineOr();
-		event_setOption_function();
-		sidebar_level_render();
-	} else resetChart();
-}
 function keyword_search_reset() {
 	if (keyword.length === 0) {
-		lineInit();
+		resetChart();
 	} else {
 		//刪除完還有剩
 		keyword.forEach(function(item, index, array) {
@@ -943,7 +1024,7 @@ function data_filter_and() {
 	dataAppendOr(categories, links, nodes);
 }
 function dataAppendOr(categories, links, nodes) {
-	console.log("122");
+	console.log('122');
 	a = option.series[0].categories.map(function(item, index, array) {
 		return item.id;
 	});
@@ -974,12 +1055,12 @@ function dataAppendOr(categories, links, nodes) {
 
 Chart.on('legendselectchanged', (category_select) => {
 	console.log(category_select.name);
-	var arr = [];
+	let arr = [];
 	arr.push(category_select.name);
-	lineAppend('not', category_select.name);
+	keywordNot(arr, category_select.name, 'line')
 	lineCtrl();
 	if (keyword.length !== 0) reRunKeyword();
-	else lineInit();
+	else resetChart();
 });
 function resetChart() {
 	let collect = [];
@@ -1012,11 +1093,7 @@ function max_Level(ui_value) {
 	option.series[0].links = [];
 	option.series[0].nodes = [];
 	$(`.slider_item > input[id=max_level]`).val(routeFloor);
-	data_filter_and();
-	data_filter(kwTemp);
-	lineOr();
-	event_setOption_function(false);
-	sidebar_level_render();
+	reRunKeyword();
 }
 
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
@@ -1219,7 +1296,7 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 }
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = true) {
-	Chart.setOption(option, rander);
+	Chart.setOption(option, true);
 	nodeList();
 }
 
@@ -1332,9 +1409,9 @@ function maxLevelSlider() {
 function nodeListChange(e) {
 	var arr = [];
 	arr.push(e.value);
-	keywordNot(arr, e.value);
+	keywordNot(arr, e.value, 'node');
 	if (keyword.length !== 0) reRunKeyword();
-	else lineInit();
+	else resetChart();
 	keyword_item_delete();
 }
 function reRunKeyword() {
@@ -1383,27 +1460,10 @@ function reRunKeyword() {
 	}
 	maxLevelSlider();
 	data_filter_and();
-	data_filter(kwTemp);
-	lineOr();
+	keywordCollection.forEach((item) => {
+		if (item.nodeName.length === 0) item.lineOr();
+		else if (item.nodeName.length === 1) item.data_filter();
+	});
 	event_setOption_function();
 	sidebar_level_render();
-}
-function lineOr() {
-	if (lineStack[0].length === 0) return;
-	let categories, links, nodes;
-	let collect = [];
-	categories = data.all_category.filter((category) => {
-		if (lineStack[0].includes(category.name)) {
-			if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
-				collect.push(category.source, category.target);
-				return category;
-			}
-		}
-	});
-	links = categories;
-	collect = Array.from(new Set(collect));
-	nodes = data.nodes.filter((node) => {
-		return collect.includes(node.name);
-	});
-	dataAppendOr(categories, links, nodes);
 }
