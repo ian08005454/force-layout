@@ -236,8 +236,8 @@ var jquery_slider_setting = [{
 ];
 
 function sidebar_level_render() {
-    $('.current_relation').html(`呈現 / 總關係線段 : ${option.series[0].links.length} / ${data.links.length}`);
-    $('.current_node').html(`呈現 / 總節點數 : ${option.series[0].nodes.length} / ${data.nodes.length}`);
+    $('.current_relation').html(`呈現 / 總線數 : ${option.series[0].links.length} / ${data.links.length}`);
+    $('.current_node').html(`呈現 / 總點數 : ${option.series[0].nodes.length} / ${data.nodes.length}`);
 };
 function save_width() {
     data.links.forEach(link => {

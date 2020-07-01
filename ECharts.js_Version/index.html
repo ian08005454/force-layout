@@ -22,8 +22,8 @@
     <div class="wrap">
         <div class="sidebar">
             <div class="sidebar_level">
-                <p class="current_relation">呈現 / 總關係線段 : </p>
-                <p class="current_node">呈現 / 總節點數 : </p>
+                <p class="current_relation">呈現 / 總線數 : </p>
+                <p class="current_node">呈現 / 總點數 : </p>
             </div>
             <div class="slider">
                 
@@ -43,38 +43,38 @@
                     <div class="slider_slider" id="group_label_distance"></div>
                 </div> -->
                 <details>
-                    <summary>線段調整</summary>
+                    <summary>線的調整</summary>
                     <div class="slider_item">
-                        <label class="slider_describe" for="relation_distance">關係線段距離長度 : </label>
+                        <label class="slider_describe" for="relation_distance">線的距離長度 : </label>
                         <input type="text" value="" id="relation_distance">
                         <div class="slider_slider" id="relation_distance"></div>
                     </div>
                     <div class="slider_item">
-                        <label class="slider_describe" for="relation_link_width">關係線段粗細 : </label>
+                        <label class="slider_describe" for="relation_link_width">線的粗細 : </label>
                         <input type="text" value="" id="relation_link_width">
                         <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
                         <div class="slider_slider" id="relation_link_width"></div>
                     </div>
                     <div class="slider_item">
-                        <label class="slider_describe" for="relation_font_size">關係線段字體大小 : </label>
+                        <label class="slider_describe" for="relation_font_size">線的字體大小 : </label>
                         <input type="text" value="" id="relation_font_size">
                         <div class="slider_slider" id="relation_font_size"></div>
                     </div>
                 </details>
                 <details>
-                    <summary>圖形調整</summary>
+                    <summary>整體圖形調整</summary>
                     <div class="slider_item">
-                        <label class="slider_describe" for="main_screen_room">整體圖形縮放 : </label>
+                        <label class="slider_describe" for="main_screen_room">圖形縮放 : </label>
                         <input type="text" value="" id="main_screen_room">
                         <div class="slider_slider" id="main_screen_room"></div>
                     </div>
                     <div class="slider_item">
-                        <label class="slider_describe" for="node_size">圓圈大小 : </label>
+                        <label class="slider_describe" for="node_size">點的背景大小 : </label>
                         <input type="text" value="" id="node_size">
                         <div class="slider_slider" id="node_size"></div>
                     </div>
                     <div class="slider_item">
-                        <label class="slider_describe" for="subject_font_size">節點字體大小 : </label>
+                        <label class="slider_describe" for="subject_font_size">點的字體大小 : </label>
                         <input type="text" value="" id="subject_font_size">
                         <div class="slider_slider" id="subject_font_size"></div>
                     </div>
@@ -96,16 +96,15 @@
                 </div>
             </div>
             <div class="keyword_search" id ="ksearch">
-                <label>| = OR,  & = AND, - = NOT</label>
                 <!-- <button id="addmore_btn" type="submit">+</button> -->
                 <select class="keywordModel" id = "kModel">
                     <option value="node" selected>點</option>
                     <option value="line">線</option>
                    </select>
                 <select class="keywordClass" id = "kClass">
-                    <option value="and" selected>AND</option>
-                    <option value="or">OR</option>
-                    <option value="not">NOT</option>
+                    <option value="and" selected>and</option>
+                    <option value="or">or</option>
+                    <option value="not">not</option>
                    </select>
                 <input type="text" placeholder="搜尋節點" id="keyword_search_field" style="width:100px;">
                 <button id="keyword_search_button" type="submit">搜尋</button>
@@ -117,7 +116,7 @@
             <div class="nodeSelect">
                 <br>
                 <br>
-            <label>選擇你不要的node:</label>
+            <label>選擇不要的點:</label>
             <div class="nodeSelected">
             </div>
         </div>
@@ -137,12 +136,12 @@
 
     <!-- resource -->
     <!-- english data -->
-    <!-- <script src="./source/2-paragraph.js"></script> -->
+    <script src="./source/2-paragraph.js"></script>
     <!-- <script src="./source/paragraph copy.js"></script> -->
     <!-- <script src="./source/book.js"></script> -->
     <!-- <script src="./source/multi-paragraph.js"></script> -->
     <!-- <script src="./source/p_test.js"></script> -->
-    <script src="./source/p_test1.js"></script>
+    <!-- <script src="./source/p_test1.js"></script> -->
     <!-- <script src="./source/book 2.js"></script> -->
 
 
