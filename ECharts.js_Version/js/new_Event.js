@@ -271,7 +271,7 @@ class searchTarget {
 					return a - b;
 				});
 				console.log(routeHash);
-				maxLevelSlider();
+				maxLevelSlider(routeHash.length);
 				break;
 			} else layer = categories.length;
 		}
@@ -852,8 +852,8 @@ function keywordNot(keyword_search_name_s, keyword_search_name, keywordModel) {
 	kwd_en = kwd_en.replace('|', ' or ');
 	$('#keyword_search_field').val(''); // clear the keyword search field
 	$('.keyword').append(`<div class="keyword_item" data-item="${keyword_search_name}">
-        <p class="keyword_name" >${keywordModel}: not ${kwd_en}</p>
-        <button class="keyword_delete" data-name='not ${keyword_search_name}'>delete</button>
+        <p class="keyword_name" >not ${keywordModel}:${kwd_en}</p>
+        <button class="keyword_delete" data-name='not ${keyword_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
 }
@@ -862,7 +862,7 @@ function keywordNot(keyword_search_name_s, keyword_search_name, keywordModel) {
  * 做搜尋的init並檢查node是否有在data內，並執行搜尋程式
  */
 function keywordFliter() {
-	routeFloor = 'All';
+	// routeFloor = 'All';
 	route = [];
 	routeHash = [];
 	routeBackup = [];
@@ -928,12 +928,12 @@ function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
 	if (keyword.length === 1 && lineStack.length === 0 && notKeyword.length === 0)
 		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
         <p class="keyword_name" >${keywordModel}:${kwd_en}</p>
-        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
+        <button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
 	</div>`);
 	else
 		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >${keywordModel}: ${keywordSearchType} ${kwd_en}</p>
-        <button class="keyword_delete" data-name='${kwd_search_name}'>delete</button>
+        <p class="keyword_name" >${keywordSearchType} ${keywordModel}:${kwd_en}</p>
+        <button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
 }
@@ -1325,6 +1325,7 @@ function common_value(value) {
 	}
 	// sidebar_level_render();
 	event_setOption_function(false);
+	sidebar_level_render();
 }
 
 none_orign_idf_node(csType.css_link[0].borderType, csType.css_link[0].borderColor, csType.css_link[0].borderWidth); //可以改變idf=0的樣式
@@ -1475,12 +1476,12 @@ function nodeList() {
 		}
 	});
 }
-function maxLevelSlider() {
+function maxLevelSlider(value) {
 	$(`.slider_item > #max_level`).slider({
 		min: 0,
 		max: routeHash.length, //最大階層數
 		step: 1,
-		value: routeHash.length, //current option setting value
+		value: value, //current option setting value
 		disable: false,
 		range: 'min'
 	});
@@ -1500,6 +1501,7 @@ function reRunKeyword() {
 	option.series[0].categories = [];
 	option.series[0].links = [];
 	option.series[0].nodes = [];
+	let floorBackup = routeFloor;
 	routeFloor = 'All';
 	if (routeBackup.length !== 0) route = JSON.parse(JSON.stringify(routeBackup));
 	for (var i = 0; i < route.length; i++) {
@@ -1539,12 +1541,16 @@ function reRunKeyword() {
 			}
 		});
 	}
-	maxLevelSlider();
+	maxLevelSlider(routeHash.length);
 	data_filter_and();
 	keywordCollection.forEach((item) => {
 		if (item.nodeName.length === 0) item.lineOr();
 		else if (item.nodeName.length === 1) item.data_filter();
 	});
+	if(routeHash.includes(floorBackup) && floorBackup !== 'All'){
+		maxLevelSlider(routeHash.indexOf(floorBackup));
+		max_Level(routeHash.indexOf(floorBackup));
+	}
 	event_setOption_function();
 	sidebar_level_render();
 }

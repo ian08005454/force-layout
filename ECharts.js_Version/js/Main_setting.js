@@ -113,11 +113,12 @@ var option = {
             rotateLabel: false
         },
         force: {
-            repulsion: 1000,
+            repulsion: 100,
             // todo : fix the jquery slider
             // edgeLength: [50, 180], 
             // gravity : 1,
-            edgeLength: 290,
+            gravity : 0.02,
+            edgeLength: 300,
             layoutAnimation: true//開始的晃動動畫
         },
         edgeSymbol: ['arrow'],

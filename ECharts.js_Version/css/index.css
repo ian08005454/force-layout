@@ -76,7 +76,7 @@
 }
 .keyword {
     margin-top: 10px;
-    width: 174px;
+    width: 200px;
     height: 80px;
     background-color: rgb(231, 229, 229);
     overflow-x: hidden;
@@ -96,10 +96,10 @@
 }
 .keyword_name {
     display: inline;
-    margin-right: 20px;
+    margin-right: 5px;
 }
 .keyword_delete {
-    width: 50px;
+    width: 45px;
 }
 .choose_color{
     margin-top:10px;
