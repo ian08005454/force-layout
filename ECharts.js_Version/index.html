@@ -80,12 +80,12 @@
                     <div class="slider_slider" id="main_screen_room"></div>
                 </div>
                 <div class="slider_item word_strength">
-                    <label class="slider_describe" for="word_strength">詞頻強度 ≥ </label>
+                    <label class="slider_describe" for="word_strength">單點出現次數   ≥</label>
                     <input type="text" value="" id="word_strength">
                     <div class="slider_slider" id="word_strength"></div>
                 </div>
                 <div class="slider_item common_show_value">
-                    <label class="slider_describe" for="common_show_value">共現次數 ≥ </label>
+                    <label class="slider_describe" for="common_show_value">兩點共現次數  ≥</label>
                     <input type="text" value="" id="common_show_value" name="cs_value" width="100px">
                     <div class="slider_slider" id="common_show_value"></div>
                 </div>
@@ -106,7 +106,7 @@
                     <option value="node" selected>點</option>
                     <option value="line">線</option>
                    </select>
-                <input type="text" placeholder="搜尋節點" id="keyword_search_field" style="width:100px;">
+                <input type="text" placeholder="" id="keyword_search_field" style="width:100px;">
                 <button id="keyword_search_button" type="submit">搜尋</button>
                 <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
@@ -114,12 +114,17 @@
                 </div>
             </div> 
             <div class="nodeSelect">
-                <br>
-                <br>
             <label>顯示的點:</label>
             <div class="nodeSelected">
             </div>
         </div>
+        <div class="lineSelect">
+        <label>顯示的線:</label>
+        <br>
+        <div class="lineSelected">
+        </div>
+    </div>
+        
             <!-- <div id="choose_color"></div> -->
         </div>
         <div id="road"></div>

@@ -43,7 +43,7 @@
     border: 0px;
 }
 .slider_slider {
-    margin: 15px;
+    margin: 10px;
 }
 .ui-slider .ui-slider-handle {
     width: 0.9em;
@@ -58,10 +58,10 @@
 
 /* keyword_search */
 .keyword_search {
-    width: 176px;
+    width: 160px;
     height: 100px;
     margin-top : 10px; 
-    margin-bottom: 30px;
+    margin-bottom: 65px;
 }
 #keyword_search_field {
     width : 100px;
@@ -77,21 +77,29 @@
 .keyword {
     margin-top: 10px;
     width: 200px;
-    height: 80px;
+    height: 100px;
     background-color: rgb(231, 229, 229);
     overflow-x: hidden;
     overflow-y: scroll;
 }
 .nodeSelected {
     margin-top: 10px;
-    width: 174px;
+    width: 200px;
+    height: 80px;
+    background-color: rgb(231, 229, 229);
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.lineSelected {
+    margin-top: 10px;
+    width: 200px;
     height: 80px;
     background-color: rgb(231, 229, 229);
     overflow-x: hidden;
     overflow-y: scroll;
 }
 .keyword_item {
-    margin: 5px 0px;
+    margin: 0px 0px;
     padding-left: 5px;
 }
 .keyword_name {
@@ -106,4 +114,16 @@
 }
 .radio{
     margin-top:15px;
+}
+.current_relation{
+    margin-top:3px;
+    margin-bottom:3px;
+}
+.current_node{
+    margin-top:3px;
+    margin-bottom:3px;
+}
+label{
+    margin-top: 0px;
+    margin-bottom: 0px;
 }

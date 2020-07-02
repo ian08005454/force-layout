@@ -66,19 +66,19 @@ var option = {
             // }
         }
     },
-    legend: {
-        type: 'scroll',
-        data: data.category,
-        tooltip: {
-            show: true,
-        },
-        orient: 'vertical',
-        pageButtonPosition: 'start',
-        selectedMode: 'true',
-        width: 100,
-        height: 140,
-        right: 50
-    },
+    // legend: {
+    //     type: 'scroll',
+    //     data: data.category,
+    //     tooltip: {
+    //         show: false,
+    //     },
+    //     orient: 'vertical',
+    //     pageButtonPosition: 'start',
+    //     selectedMode: 'true',
+    //     width: 100,
+    //     height: 140,
+    //     right: 50
+    // },
     series: [{
         type: 'graph',
         layout: 'force',

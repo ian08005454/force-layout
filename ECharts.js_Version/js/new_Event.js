@@ -49,21 +49,6 @@ var keywordPoint = 0;
    */
 var keyword_search_name;
 /**
-   * a cpoy of keywordCollection
-   * @type {array}
-   */
-var CollectionTemp;
-/**
-  * a cpoy of keywordCount
-  * @type {number}
-  */
-var CountTemp;
-/**
-  * a cpoy of keywordPoint
-  * @type {number}
-  */
-var PointTemp;
-/**
    * 儲存所有搜尋項目
    * @type {array}
    */
@@ -558,14 +543,40 @@ class searchWord {
 		this.type = type;
 		this.model = model;
 	}
+	keywordCheck(){
+		let name_s = [];
+		let name_ss = [];
+		if(this.name.includes('|'))
+			name_s = this.name.split('|');
+		else
+			name_s.push(this.name);
+		name_s.forEach(item =>{
+			if(item.includes('&')){
+				item = name_s.split('&');
+				item.forEach(t =>{
+					name_ss.push(t);
+				});
+			}
+			else
+				name_ss.push(item);
+		});
+		console.log(name_ss);
+		if(this.model === 'node')
+		name_ss.forEach(item =>{
+			if(!data.all_nodes.includes(item))
+			throw keyword_search_verify_fail(this.name);
+		});	
+		else
+		name_ss.forEach(item =>{
+			if(!allLine.includes(item))
+			throw keyword_search_verify_fail(this.name);
+		});	
+	}
 	/**
  * 組合並整理使用者傳入的內容
  */
 	keywordCleanUp() {
 		let keyword_search_name_s = [];
-		CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
-		CountTemp = keywordCount;
-		PointTemp = keywordPoint;
 		if (this.type === 'and') {
 			if (this.name.includes('|')) {
 				keyword_search_name_s = this.name.split('|');
@@ -643,9 +654,6 @@ class searchWord {
 	lineAppend() {
 		console.log(this);
 		console.log(this.name);
-		CollectionTemp = JSON.parse(JSON.stringify(keywordCollection));
-		CountTemp = keywordCount;
-		PointTemp = keywordPoint;
 		let lineName = this.name;
 		console.log(lineName);
 		if (keywordCollection.length === 0 || this.type === 'or') {
@@ -810,7 +818,7 @@ function keyword_search(e) {
 				keyword_search_name_s.forEach((item) => {
 					item = item.trim();
 					if (!data.all_nodes.includes(item)) {
-						throw alert(`Error : Can't find keyWord : ${keyword_search_name}`);
+						throw alert(`Error : 找不到關鍵字: ${keyword_search_name}`);
 					}
 				});
 				keywordNot(keyword_search_name_s, keyword_search_name, keywordModel);
@@ -822,11 +830,13 @@ function keyword_search(e) {
 			keyword_item_delete();
 		} else if (keywordModel === 'line') {
 			keyword_item_append(keyword_search_name, keywordSearchType, keywordModel);
+			keyword[keyword.length - 1].keywordCheck();
 			keyword[keyword.length - 1].lineAppend();
 			keywordFliter();
 		} else {
 			keyword_item_append(keyword_search_name, keywordSearchType, keywordModel);
-			keyword[keyword.length - 1].keywordCleanUp(keyword_search_name, keywordSearchType);
+			keyword[keyword.length - 1].keywordCheck();
+			keyword[keyword.length - 1].keywordCleanUp();
 			keywordFliter();
 		}
 	}
@@ -856,6 +866,7 @@ function keywordNot(keyword_search_name_s, keyword_search_name, keywordModel) {
         <button class="keyword_delete" data-name='not ${keyword_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
+	$(".keyword").scrollTop(function() { return this.scrollHeight; });
 }
 
 /**
@@ -872,9 +883,6 @@ function keywordFliter() {
 	keywordCollection.forEach((item, index) => {
 		for (var i = 0, keywordLen = item.nodeName.length; i < keywordLen; i++) {
 			item.nodeName[i] = item.nodeName[i].trim();
-			if (!data.all_nodes.includes(item.nodeName[i]) || item.nodeName[i].length === 0) {
-				throw keyword_search_verify_fail(keyword_search_name);
-			}
 			keywords.push(item.nodeName[i]);
 		}
 		item.nodeName = Array.from(new Set(item.nodeName));
@@ -902,18 +910,12 @@ function keywordRemove(kwd_search_name) {
 }
 function keyword_search_verify_fail(kwd_search_name) {
 	//一個 name
-	alert(`Error : Cannot find keyWord : ${kwd_search_name}`);
-	keywordCollection = CollectionTemp;
-	keywordCount = CountTemp;
-	keywordPoint = PointTemp;
-	console.log(CollectionTemp);
+	alert(`Error1 : 找不到關鍵字:${kwd_search_name}`)
+	console.log(keywordCollection);
 	keywordRemove(kwd_search_name);
 }
 function andSearchNoRoute(keyword_search_name) {
-	keywordCollection = CollectionTemp;
-	keywordCount = CountTemp;
-	keywordPoint = PointTemp;
-	alert(`Error2 : Cannot find their route : ${keyword_search_name}`);
+	alert(`Error2 : 搜尋不到路徑 : ${keyword_search_name}`);
 	keywordRemove(keyword_search_name);
 }
 // append keyword div in keyword field
@@ -927,15 +929,17 @@ function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
 	$('#keyword_search_field').val(''); // clear the keyword search field
 	if (keyword.length === 1 && lineStack.length === 0 && notKeyword.length === 0)
 		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >${keywordModel}:${kwd_en}</p>
+        <p class="keyword_name" >${keywordModel}:<font color="red">${kwd_en}</font></p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
 	</div>`);
 	else
 		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
-        <p class="keyword_name" >${keywordSearchType} ${keywordModel}:${kwd_en}</p>
+        <p class="keyword_name" >${keywordSearchType} ${keywordModel}:<font color="red">${kwd_en}</font></p>
         <button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
+	$(".keyword").scrollTop(function() { return this.scrollHeight; });
+
 }
 // bind the keyword delete button click event
 function keyword_item_delete() {
@@ -1128,15 +1132,51 @@ function dataAppendOr(categories, links, nodes) {
 
 // todo : improve the performance
 
-Chart.on('legendselectchanged', (category_select) => {
-	console.log(category_select.name);
+// Chart.on('legendselectchanged', (category_select) => {
+	
+// });
+function lineList(){
+	$('.lineSelected').children().remove();
+	let list = [];
+	let passLine = [];
+	if (route.length !== 0) {
+	option.series[0].nodes.forEach(item =>{
+		var routeCount = 0;
+		route.forEach((element) => {
+			if(!passLine.includes(element[0]))
+				passLine.push(element[0]);
+			if(!passLine.includes(element[element.length -1]))
+				passLine.includes(element[element.length -1]);
+			if (element.includes(item.name)) routeCount++;
+		});
+		if (route.length === routeCount)
+			passLine.push(item.name);
+	});
+	}
+	option.series[0].categories.forEach((item) => {
+		if (!list.includes(item.name)) {
+			list.push(item.name);
+			if(passLine.includes(item.source) && passLine.includes(item.target))
+			$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label>
+			</div>`);
+			else
+				$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div>`);
+		}
+	});
+	$(".lineSelected").scrollTop(function() { return this.scrollHeight; });
+
+}
+function lineListChange(e){
+	console.log(e.value);
 	let arr = [];
-	arr.push(category_select.name);
-	keywordNot(arr, category_select.name, 'line');
+	arr.push(e.value);
+	keywordNot(arr, e.value, 'line');
 	lineCtrl();
 	if (keyword.length !== 0) reRunKeyword();
 	else resetChart();
-});
+}
 function resetChart() {
 	let collect = [];
 	// console.log("reset");
@@ -1252,6 +1292,7 @@ $(() => {
 		}
 	});
 	nodeList();
+	lineList();
 });
 function change_width(width_value) {
 	data.links.forEach((link) => {
@@ -1329,7 +1370,7 @@ function common_value(value) {
 }
 
 none_orign_idf_node(csType.css_link[0].borderType, csType.css_link[0].borderColor, csType.css_link[0].borderWidth); //可以改變idf=0的樣式
-function none_orign_idf_node(bType = 'solid', bColor = 'orange', bWidth = 5) {
+function none_orign_idf_node(bType = 'solid', bColor = '#808080', bWidth = 3) {
 	//idf==0的點有border
 	var temp;
 	temp = data.nodes.filter((node) => {
@@ -1338,7 +1379,7 @@ function none_orign_idf_node(bType = 'solid', bColor = 'orange', bWidth = 5) {
 	temp.forEach((t) => {
 		var ttemp = t.itemStyle.normal;
 		ttemp.borderType = bType;
-		ttemp.borderColor = bColor;
+		ttemp.borderColor = '#fcbf08';
 		ttemp.borderWidth = bWidth;
 	});
 	// console.log(temp);
@@ -1380,6 +1421,7 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 function event_setOption_function(rander = true) {
 	Chart.setOption(option, true);
 	nodeList();
+	lineList();
 }
 
 Chart.on('click', (e) => {
@@ -1465,7 +1507,7 @@ function nodeList() {
 				});
 				if (route.length === routeCount)
 					$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-					<label><font color="red"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</front></label>
+					<label><font color="blue"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name} (必要)</front></label>
 					</div>`);
 				else
 					$('.nodeSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
@@ -1475,6 +1517,8 @@ function nodeList() {
 			<label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label></div>`);
 		}
 	});
+	$(".nodeSelected").scrollTop(function() { return this.scrollHeight; });
+
 }
 function maxLevelSlider(value) {
 	$(`.slider_item > #max_level`).slider({

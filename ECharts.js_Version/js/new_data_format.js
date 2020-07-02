@@ -39,7 +39,7 @@ function data_format(data, LODtype=0) {
             // push k1 into nodes array
             all_gp.push(data_element.gp);
             push_element1(csType.css1[0].symbol, csType.css1[0].normal.borderType, csType.css1[0].normal.borderColor, csType.css1[0].normal.borderWidth, csType.css1[0].normal.color);
-            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'orange', bWidth = 0, color = 'blue') {
+            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'gray', bWidth = 0, color = 'blue') {
                 user_colors[1] = color;//刪除搜尋之後會顯現的顏色
 
                 buf.nodes.push({
@@ -189,7 +189,7 @@ function data_format(data, LODtype=0) {
             }
             all_gp.push(data_element.gp);
             push_element1(csType.css1[0].symbol, csType.css1[0].normal.borderType, csType.css1[0].normal.borderColor, csType.css1[0].normal.borderWidth, csType.css1[0].normal.color);
-            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'orange', bWidth = 0, color = 'blue') {
+            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'gray', bWidth = 0, color = 'blue') {
                 user_colors[1] = color;//刪除搜尋之後會顯現的顏色
 
                 buf.nodes.push({
