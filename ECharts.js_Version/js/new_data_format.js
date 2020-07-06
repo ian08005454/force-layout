@@ -119,13 +119,6 @@ function data_format(data, LODtype=0) {
                 // second : push all category into buf.category array, ignore duplicate problem
 
                 all_values.push(kg2_element.v);
-                if (kg2_element.type[0] == ' ' || kg2_element.type[0] == '') {
-                    var black = 'black';
-                    var linkcolor;
-                    linkcolor = black;
-                } else {
-                    linkcolor = random_color;
-                }
                 if (kg2_element.v == 0) {
                     var ttype;
                     var dash = 'dashed';
@@ -136,6 +129,18 @@ function data_format(data, LODtype=0) {
                 } else {
                     orignal_v = kg2_element.v;
                     ttype = linksolid;
+                }
+                if (kg2_element.type[0] == '未定義') {
+                    var black = 'black';
+                    var linkcolor;
+                    linkcolor = black;
+                    var shadowColor = 'orange';
+                    var shadowBlur = 10;
+                    ttype = 'doted';
+                } else {
+                    linkcolor = random_color;
+                    var shadowColor = 'orange';
+                    var shadowBlur = 0;
                 }
                 buf.all_category.push({
                     id: id++,
@@ -159,7 +164,9 @@ function data_format(data, LODtype=0) {
                             color: linkcolor,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
                             width: Math.sqrt(kg2_element.v, 2),
-                            type: ttype //kg2_element.css[0].linetype  //'dashed'
+                            type: ttype, //kg2_element.css[0].linetype  //'dashed'
+                            shadowColor : shadowColor,
+                            shadowBlur : shadowBlur
                         }
                     },
                 });
@@ -251,6 +258,7 @@ function data_format(data, LODtype=0) {
                     var black = 'black';
                     var linkcolor;
                     linkcolor = black;
+                    type =  "dashed"
                 } else {
                     linkcolor = random_color;
                 }

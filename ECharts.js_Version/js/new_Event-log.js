@@ -61,7 +61,6 @@ var notKeyword = [];
 let allLine = data.all_category.map(function(item, index, array) {
 	return item.name;
 });
-var mustLine = [];
 let lineStack = [];
 let afterOr = false;
 window.onresize = () => {
@@ -88,6 +87,7 @@ class searchTarget {
 		let union_collect = [];
 		let collect = [];
 		let category_collect = [];
+		console.log(this);
 		if (this.lineName.length !== 0) {
 			this.lineName.forEach((item) => {
 				let bench = [];
@@ -97,10 +97,14 @@ class searchTarget {
 						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 							if (category.show === true) {
 								if (item.includes(category.name)) {
+									console.log(item);
 									if (item.length > 1) {
+										console.log(category);
 										bench.push(category.target, category.source);
+										console.log(bench);
 									} else {
 										union_collect.push(category.target, category.source);
+										console.log(category);
 										categories.push(category);
 									}
 								}
@@ -120,6 +124,7 @@ class searchTarget {
 								if (category.show === true) {
 									if (item.includes(category.name)) {
 										if (bench.includes(category.target) && bench.includes(category.source)) {
+											console.log(category);
 											count.push(category);
 										}
 									}
@@ -142,17 +147,21 @@ class searchTarget {
 				}
 			});
 		} else {
+			console.log(this.lineName.length);
 			categories = data.category.filter((category) => {
 				if (this.nodeName.includes(category.target) || this.nodeName.includes(category.source)) {
 					if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 						if (category.show === true) {
 							union_collect.push(category.target, category.source);
+							console.log(union_collect);
 							return category;
 						}
 					}
 				}
 			});
 		}
+		// console.log(union_collect);
+		console.log(notKeyword);
 		let minus = union_collect.filter((item) => {
 			return !item.includes(this.nodeName);
 		});
@@ -169,10 +178,14 @@ class searchTarget {
 							if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 								if (category.show === true) {
 									if (item.includes(category.name)) {
+										console.log(item);
 										if (item.length > 1) {
+											console.log(category);
 											bench.push(category.target, category.source);
+											console.log(bench);
 										} else {
 											union_collect.push(category.target, category.source);
+											console.log(category);
 											categories.push(category);
 										}
 									}
@@ -192,6 +205,7 @@ class searchTarget {
 									if (category.show === true) {
 										if (item.includes(category.name)) {
 											if (bench.includes(category.target) && bench.includes(category.source)) {
+												console.log(category);
 												count.push(category);
 											}
 										}
@@ -225,11 +239,14 @@ class searchTarget {
 					}
 				});
 			}
+			console.log(categories);
 			category_collect = Array.from(new Set(union_collect));
 			console.log(categories);
+			console.log(category_collect);
 			minus = category_collect.filter((item) => {
 				return !item.includes(this.nodeName);
 			});
+			console.log(minus);
 			if (categories.length === layer) {
 				let maxlevel = i;
 				for (var x = 1; x <= maxlevel; x++) {
@@ -238,6 +255,7 @@ class searchTarget {
 				routeHash.sort(function(a, b) {
 					return a - b;
 				});
+				console.log(routeHash);
 				maxLevelSlider(routeHash.length);
 				break;
 			} else layer = categories.length;
@@ -255,6 +273,7 @@ class searchTarget {
 				: (node.itemStyle.normal.color = user_colors[node.gp]);
 			return collect.includes(node.name);
 		});
+		console.log('try');
 		dataAppendOr(categories, links, nodes);
 	}
 	lineOr() {
@@ -275,6 +294,7 @@ class searchTarget {
 									bench.push(category.target, category.source);
 								} else {
 									collect.push(category.target, category.source);
+									console.log(category);
 									categories.push(category);
 								}
 							}
@@ -292,6 +312,7 @@ class searchTarget {
 							if (category.show === true) {
 								if (item.includes(category.name)) {
 									if (bench.includes(category.target) && bench.includes(category.source)) {
+										console.log(category);
 										count.push(category);
 									}
 								}
@@ -345,6 +366,7 @@ search_AND() {
 			minus = category_collect.filter((items) => {
 				return !items.includes(item);
 			});
+			console.log(minus);
 			count++;
 			var countdown = 0;
 			this.nodeName.forEach((item) => {
@@ -386,10 +408,14 @@ search_AND() {
 					data.category.filter((category) => {
 						if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) {
 							if (item.includes(category.name)) {
+								console.log(item);
 								if (item.length > 1) {
+									console.log(category);
 									bench.push(category.target, category.source);
+									console.log(bench);
 								} else {
 									union_collect.push(category.target, category.source);
+									console.log(category);
 									temp.push(category);
 								}
 							}
@@ -443,6 +469,8 @@ search_AND() {
 			secondaryStackCount++;
 			if (primaryStack[primaryStack.length - 1] == goal) {
 				routeTemp.push(Array.from(primaryStack));
+				// console.log(primaryStack);
+				// console.log(routeTemp);
 				for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
 					if (secondaryStack[i].length != 0) {
 						Finish = false;
@@ -470,6 +498,9 @@ search_AND() {
 			if (keywordTemp == undefined) {
 				break;
 			}
+			// console.log(keywordTemp);
+			// console.log(primaryStack);
+			// console.log(secondaryStack);
 		} while (1);
 	}
 	console.log('YA!!!!!');
@@ -571,21 +602,26 @@ class searchWord {
 						i++
 					) {
 						for (var z = 0, keywordLen = item.length; z < keywordLen; z++) {
+							console.log(i);
 							keywordCollection[i].nodeName.push(item[z]);
+							console.log(keywordCollection[i].nodeName);
 						}
 					}
 				});
 				keywordCount *= keyword_search_name_s.length;
 			} else {
+				// console.log(keywordCount);
 				if (this.name.includes('&')) keyword_search_name_s = this.name.split('&');
 				else keyword_search_name_s = Array(this.name);
 				if (keywordCount === 0) {
 					keywordCollection.push(new searchTarget([], [], []));
 					keywordCount++;
 				}
+				// console.log(keywordCount);
 				for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
 					for (var z = 0, keywordLen = keyword_search_name_s.length; z < keywordLen; z++) {
 						keywordCollection[i].nodeName.push(keyword_search_name_s[z]);
+						console.log(keywordCollection[i].nodeName);
 					}
 				}
 			}
@@ -616,7 +652,10 @@ class searchWord {
  * @param {event} e  傳入的事件物件
  */
 	lineAppend() {
+		console.log(this);
+		console.log(this.name);
 		let lineName = this.name;
+		console.log(lineName);
 		if (keywordCollection.length === 0 || this.type === 'or') {
 			keywordCount = 1;
 			if (lineName.includes('|')) {
@@ -631,9 +670,12 @@ class searchWord {
 				lineName = [ lineName ];
 			}
 			keywordCollection.push(new searchTarget([], lineName, []));
+			console.log(keywordCollection[keywordCollection.length - 1].lineName);
 			keywordPoint = keywordCollection.length - 1;
 		} else {
 			var len = keywordCollection[keywordPoint].lineName.length;
+			console.log(len);
+			console.log(lineName);
 			if (lineName.includes('|')) {
 				lineName = lineName.split('|');
 				for (i = 1; i < lineName.length; i++) {
@@ -641,22 +683,28 @@ class searchWord {
 						keywordCollection[keywordPoint].lineName.push(
 							JSON.parse(JSON.stringify(keywordCollection[keywordPoint].lineName[y]))
 						);
+						console.log(keywordCollection[keywordPoint].lineName);
 					}
 				}
 				for (let index = 0; index < lineName.length; index++) {
+					console.log(lineName[index]);
 					if (lineName[index].includes('&')) {
 						lineName[index] = lineName[index].split('&');
 						for (i = len * index; i < len * (index + 1); i++)
 							lineName[index].forEach((item) => {
 								keywordCollection[keywordPoint].lineName[i].push(item);
+								console.log(keywordCollection[keywordPoint].lineName);
 							});
 					} else {
 						if (len == 0) {
 							lineName[index] = [ lineName[index] ];
 							keywordCollection[keywordPoint].lineName.push(lineName[index]);
+							console.log(keywordCollection[keywordPoint].lineName);
 						} else {
+							console.log(len);
 							for (i = len * index; i < len * (index + 1); i++)
 								keywordCollection[keywordPoint].lineName[i].push(lineName[index]);
+							console.log(keywordCollection[keywordPoint].lineName);
 						}
 					}
 				}
@@ -673,8 +721,10 @@ class searchWord {
 					if (len == 0) {
 						lineName = [ lineName ];
 						keywordCollection[keywordPoint].lineName.push(lineName);
+						console.log(keywordCollection[keywordPoint].lineName);
 					} else {
 						for (let i = 0; i < len; i++) keywordCollection[keywordPoint].lineName[i].push(lineName);
+						console.log(keywordCollection[keywordPoint].lineName);
 					}
 				}
 			}
@@ -861,6 +911,7 @@ function keywordRemove(kwd_search_name) {
 function keyword_search_verify_fail(kwd_search_name) {
 	//一個 name
 	alert(`Error1 : 找不到關鍵字:${kwd_search_name}`)
+	console.log(keywordCollection);
 	keywordRemove(kwd_search_name);
 }
 function andSearchNoRoute(keyword_search_name) {
@@ -994,7 +1045,6 @@ function keyword_search_reset() {
 }
 
 function data_filter_and() {
-	mustLine = [];
 	$('#road').children().remove();
 	var categories = [],
 		links = [],
@@ -1016,15 +1066,9 @@ function data_filter_and() {
 			temp = temp.concat(
 				data.category.filter((category) => {
 					if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
-						if (category.show === true){
-							mustLine.push(category.name);
-							return category;
-						} 
+						if (category.show === true) return category;
 					} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
-						if (category.show === true){
-							mustLine.push(category.name);
-							return category;
-						} 
+						if (category.show === true) return category;
 					}
 				})
 			);
@@ -1059,6 +1103,7 @@ function data_filter_and() {
 	dataAppendOr(categories, links, nodes);
 }
 function dataAppendOr(categories, links, nodes) {
+	console.log('122');
 	a = option.series[0].categories.map(function(item, index, array) {
 		return item.id;
 	});
@@ -1093,24 +1138,31 @@ function dataAppendOr(categories, links, nodes) {
 function lineList(){
 	$('.lineSelected').children().remove();
 	let list = [];
+	let passLine = [];
 	if (route.length !== 0) {
-	for (let index = 1; index < route.length; index++) {
-		mustLine = mustLine.filter(function(element, index, arr) {
-			return arr.indexOf(element) !== index;
+	option.series[0].nodes.forEach(item =>{
+		var routeCount = 0;
+		route.forEach((element) => {
+			if(!passLine.includes(element[0]))
+				passLine.push(element[0]);
+			if(!passLine.includes(element[element.length -1]))
+				passLine.includes(element[element.length -1]);
+			if (element.includes(item.name)) routeCount++;
 		});
-	 }
+		if (route.length === routeCount)
+			passLine.push(item.name);
+	});
 	}
 	option.series[0].categories.forEach((item) => {
 		if (!list.includes(item.name)) {
 			list.push(item.name);
-			if(mustLine.includes(item.name)){
-				$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-				<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label>
-				</div>`);
-				}
-			else
+			if(passLine.includes(item.source) && passLine.includes(item.target))
 			$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div>`);	
+			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label>
+			</div>`);
+			else
+				$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
+			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div>`);
 		}
 	});
 	$(".lineSelected").scrollTop(function() { return this.scrollHeight; });
@@ -1189,6 +1241,7 @@ $(() => {
 				} else {
 					$('input[id=' + e.target.id + ']').val(`${ui.value}`);
 				}
+				// console.log(ui.value);
 			} else {
 				$('input[id=' + e.target.id + ']').val(ui.value);
 			}
@@ -1510,37 +1563,9 @@ function reRunKeyword() {
 		for (var i = 0, len = route[y].length; i < len - 1; i++) {
 			data.category.filter((category) => {
 				if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
-					if (category.show === false) {
-						let cCount = 0;
-						data.category.filter(cat =>{
-							if(category.target === cat.target && category.source === cat.source){
-								if (cat.show === true)
-								cCount++;
-							}
-							else if(category.target === cat.source && category.source === cat.target){
-								if (cat.show === true)
-								cCount++;
-							}
-						});
-						if (cCount < 1)
-						notShow = true;
-					}
+					if (category.show === false) notShow = true;
 				} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
-					if (category.show === false) {
-						let cCount = 0;
-						data.category.filter(cat =>{
-							if(category.target === cat.target && category.source === cat.source){
-								if (cat.show === true)
-								cCount++;
-							}
-							else if(category.target === cat.source && category.source === cat.target){
-								if (cat.show === true)
-								cCount++;
-							}
-						});
-						if (cCount < 1)
-						notShow = true;
-					}
+					if (category.show === false) notShow = true;
 				}
 			});
 			if (notShow === true) {
