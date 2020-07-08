@@ -1012,22 +1012,27 @@ function data_filter_and() {
 		}
 	}
 	for (; y < route.length; y++) {
+		let lineTemp = [];
 		for (var i = 0, len = route[y].length; i < len - 1; i++)
 			temp = temp.concat(
 				data.category.filter((category) => {
 					if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
 						if (category.show === true){
-							mustLine.push(category.name);
+							lineTemp.push(category.name);
 							return category;
 						} 
 					} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
 						if (category.show === true){
-							mustLine.push(category.name);
+							lineTemp.push(category.name);
 							return category;
 						} 
 					}
 				})
 			);
+		lineTemp = Array.from(new Set(lineTemp));
+		lineTemp.forEach(item =>{
+			mustLine.push(item);
+		})
 		a = categories.map(function(item, index, array) {
 			return item.id;
 		});
