@@ -1109,13 +1109,13 @@ function lineList(){
 		if (!list.includes(item.name)) {
 			list.push(item.name);
 			if(mustLine.includes(item.name)){
-				$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-				<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label>
-				</div>`);
+				$('.lineSelected').append(`<div class="lineSelected_item" data-item="${item.name}">
+				<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label></div><div class="color-lump" style="background-color: ${item.itemStyle.color}"></div>`);
 				}
 			else
-			$('.lineSelected').append(`<div class="nodeSelected_item" data-item="${item.name}">
-			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div>`);	
+			$('.lineSelected').append(`<div class="lineSelected_item" data-item="${item.name}">
+			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div><div class="color-lump" style="background-color: ${item.itemStyle.color}"></div>`
+			);	
 		}
 	});
 	$(".lineSelected").scrollTop(function() { return this.scrollHeight; });

@@ -98,6 +98,12 @@
     overflow-x: hidden;
     overflow-y: scroll;
 }
+.lineSelected_item{
+    clear:left;
+    float : left;
+    margin: 0px 0px;
+    padding-left: 5px;
+}
 .keyword_item {
     margin: 0px 0px;
     padding-left: 5px;
@@ -127,3 +133,15 @@ label{
     margin-top: 0px;
     margin-bottom: 0px;
 }
+.color-lump{
+    margin-top: 5px;
+    width: 25px;
+    height: 15px;
+    margin-right: 30px;
+    float : right;
+    border: 1.5px;
+    border-color: white;
+    border-style: solid;
+    border-radius: 4px;
+}
+

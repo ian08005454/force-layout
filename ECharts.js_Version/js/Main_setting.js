@@ -11,7 +11,7 @@ var jdata; // ! api.js variable
 var onlyLOD=0;//0 or 1
 
 
-Chart.showLoading();//轉圈圈~~
+Chart.showLoading('default');//轉圈圈~~
 // jQuery ajax data from back-end
 const api_url = API_generator(2207, 56, 54, 1000);//後端給的api不用動
 GetJSON(api_url);//串接後端的東西 不用動

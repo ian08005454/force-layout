@@ -26,7 +26,7 @@ function data_format(data, LODtype=0) {
             if (color.hasOwnProperty(data_element.gp)) {
                 node_color = color[data_element.gp]
             } else {
-                node_color = getRandomRolor();//calculate_color
+                node_color = getRandomColor();//calculate_color
                 color[data_element.gp] = node_color;
             }
             all_idf.push(data_element.idf);
@@ -70,7 +70,7 @@ function data_format(data, LODtype=0) {
                     random_color = color[kg2_element.type[0]]
                 } else {
                     // let name = kg2_element.type[0];
-                    random_color = getRandomRolor();//calculate_color
+                    random_color = getRandomColor();//calculate_color
                     color[kg2_element.type[0]] = random_color;
                     // console.log(kg2_element.type[0]);
 
@@ -79,7 +79,7 @@ function data_format(data, LODtype=0) {
                 if (color.hasOwnProperty(kg2_element.gp)) {
                     node_color = color[kg2_element.gp]
                 } else {
-                    node_color = getRandomRolor();//calculate_color
+                    node_color = getRandomColor();//calculate_color
                     color[kg2_element.gp] = node_color;
                 }
                 all_idf.push(kg2_element.idf);
@@ -130,7 +130,7 @@ function data_format(data, LODtype=0) {
                     orignal_v = kg2_element.v;
                     ttype = linksolid;
                 }
-                if (kg2_element.type[0] == '未定義') {
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == 'undefined') {
                     var black = 'black';
                     var linkcolor;
                     linkcolor = black;
@@ -191,7 +191,7 @@ function data_format(data, LODtype=0) {
             if (color.hasOwnProperty(data_element.gp)) {
                 node_color = color[data_element.gp]
             } else {
-                node_color = getRandomRolor();//calculate_color
+                node_color = getRandomColor();//calculate_color
                 color[data_element.gp] = node_color;
             }
             all_gp.push(data_element.gp);
@@ -222,14 +222,14 @@ function data_format(data, LODtype=0) {
                 if (color.hasOwnProperty(kg2_element.type[0])) {
                     random_color = color[kg2_element.type[0]]
                 } else {
-                    random_color = getRandomRolor();//calculate_color
+                    random_color = getRandomColor();//calculate_color
                     color[kg2_element.type[0]] = random_color;
                 }
 
                 if (color.hasOwnProperty(kg2_element.gp)) {
                     node_color = color[kg2_element.gp]
                 } else {
-                    node_color = getRandomRolor();//calculate_color
+                    node_color = getRandomColor();//calculate_color
                     color[kg2_element.gp] = node_color;
                 }
                 all_gp.push(kg2_element.gp);
@@ -341,7 +341,7 @@ function data_format(data, LODtype=0) {
 //     return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);//<<=左移賦值
 // }
 //https://segmentfault.com/q/1010000010807637/a-1020000010809153
-function getRandomRolor () {
+function getRandomColor () {
 var hslLength = HSL.length; 
     var ret = [];
     ret[0]= Math.floor(Math.random() * 360);
