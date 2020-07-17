@@ -10,7 +10,6 @@ const Chart = echarts.init(document.getElementById('main'), null, {
 var jdata; // ! api.js variable
 var onlyLOD=0;//0 or 1
 
-
 Chart.showLoading('default');//轉圈圈~~
 // jQuery ajax data from back-end
 const api_url = API_generator(2207, 56, 54, 1000);//後端給的api不用動
@@ -50,7 +49,7 @@ var option = {
         feature: {
             saveAsImage: {
                 show: true,
-                title: 'save image',
+                title: '存成圖片',
                 type: 'png'
             },
             // ! dataView still have to fix
@@ -60,10 +59,11 @@ var option = {
             //     readOnly: false,
             //     lang: ['Detail Data Information', 'Close', 'refresh'],
             // }, 
-            // restore: {
-            //     show: true,
-            //     title: 'restore'
-            // }
+            restore: {
+                show: true,
+                title: 'restore'
+            },
+            magicType: {show:true, type: ['force', 'chord']}
         }
     },
     // legend: {
@@ -96,6 +96,7 @@ var option = {
         itemStyle: {
             normal: {
                 label: {
+                    fontFamily: 'sans-serif',
                     show: true,
                     textStyle: {
                         // color: 'white',
@@ -109,21 +110,20 @@ var option = {
         draggable: true,//單獨點的移動
         roam: true,//禁止使用者作放大縮小 只准拖動 true,'move','scale',false
         focusNodeAdjacency: true,
-        circular: {
-            rotateLabel: false
-        },
         force: {
-            repulsion: 100,
+            friction: 0.1,
+            initLayout:'circular',
+            repulsion: 220,
             // todo : fix the jquery slider
-            // edgeLength: [50, 180], 
+            edgeLength: [100, 300], 
             // gravity : 1,
-            gravity : 0.02,
-            edgeLength: 300,
+            gravity : 0.01,
             layoutAnimation: true//開始的晃動動畫
         },
         edgeSymbol: ['arrow'],
         edgeSymbolSize: 10,
         edgeLabel: {
+            fontFamily: 'sans-serif',
             normal: {
                 verticalAlign: 'bottom',
                 show: true,
@@ -169,15 +169,15 @@ var jquery_slider_setting = [{
     value: 0,
     disable: false,
     range: 'min'
-}, {
-    object: 'relation_distance',
-    min: 100, //Warning ! highly recommended do not set relation distance min value lower than 10, the link will go something wrong 
-    max: 800,
+},{
+    object: 'node_distance',
+    min: 1,
+    max: 100,
     step: 1,
-    value: option.series[0].force.edgeLength,
+    value: option.series[0].force.repulsion / 100,
     disable: false,
     range: 'min'
-}, {
+},{
     object: 'relation_link_width',
     min: 1,
     max: 5,

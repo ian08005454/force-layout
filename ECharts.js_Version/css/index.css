@@ -39,7 +39,7 @@
 }
 .slider_item > input {
     background-color: rgb(243, 243, 243);
-    width: 50px;
+    width: 80px;
     border: 0px;
 }
 .slider_slider {
@@ -137,7 +137,7 @@ label{
     margin-top: 5px;
     width: 25px;
     height: 15px;
-    margin-right: 30px;
+    margin-right: 25px;
     float : right;
     border: 1.5px;
     border-color: white;

@@ -1173,7 +1173,15 @@ function max_Level(ui_value) {
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
 $(() => {
 	// const length = [option.series[0].force.edgeLength[0], option.series[0].force.edgeLength[1]]
-
+	$(`.slider_item > #relation_distance`).slider({
+		range: true,
+		min: 50, //Warning ! highly recommended do not set relation distance min value lower than 10, the link will go something wrong 
+		max: 1000,
+		step: 50,
+		values: option.series[0].force.edgeLength,
+		disable: false
+	});
+	$(`.slider_item > input[id=relation_distance]`).val(option.series[0].force.edgeLength);
 	for (jquery_slider_setting_element of jquery_slider_setting) {
 		$(`.slider_item > #${jquery_slider_setting_element.object}`).slider({
 			disabled: jquery_slider_setting_element.disable,
@@ -1208,7 +1216,12 @@ $(() => {
 				case 'group_label_distance':
 					break;
 				case 'relation_distance':
-					option.series[0].force.edgeLength = ui.value;
+					option.series[0].force.edgeLength = ui.values;
+					$(`.slider_item > input[id=relation_distance]`).val(ui.values);
+					event_setOption_function();
+					break;
+				case 'node_distance':
+					option.series[0].force.repulsion = ui.value * 100;
 					event_setOption_function();
 					break;
 				case 'relation_link_width':

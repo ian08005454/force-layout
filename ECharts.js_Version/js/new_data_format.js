@@ -41,7 +41,6 @@ function data_format(data, LODtype=0) {
             push_element1(csType.css1[0].symbol, csType.css1[0].normal.borderType, csType.css1[0].normal.borderColor, csType.css1[0].normal.borderWidth, csType.css1[0].normal.color);
             function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'gray', bWidth = 0, color = 'blue') {
                 user_colors[1] = color;//刪除搜尋之後會顯現的顏色
-
                 buf.nodes.push({
                     name: data_element.k1,
                     gp: data_element.gp,
@@ -61,6 +60,19 @@ function data_format(data, LODtype=0) {
                     }
                 });
             }
+            var largest = data_element.kg2[0].v;
+            data_element.kg2.forEach(kg2Element =>{
+                if(kg2Element.v > largest)
+                largest = kg2Element.v;
+            });
+            if(largest > 4096)
+             var square = 4;
+            else if(largest > 256)
+                var square = 3;
+            else if(largest > 16)
+                var square = 2;
+            else
+                var square = 1;
             // foreach kg2 array
             data_element.kg2.forEach(kg2_element => {
 
@@ -130,40 +142,41 @@ function data_format(data, LODtype=0) {
                     orignal_v = kg2_element.v;
                     ttype = linksolid;
                 }
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == 'undefined') {
-                    var black = 'black';
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
+                    var name ='未定義'; 
                     var linkcolor;
-                    linkcolor = black;
+                    linkcolor = 'black';
                     var shadowColor = 'orange';
                     var shadowBlur = 10;
                     ttype = 'doted';
                 } else {
                     linkcolor = random_color;
+                    var name = kg2_element.type[0];
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
                 }
                 buf.all_category.push({
                     id: id++,
-                    name: kg2_element.type[0],
+                    name: name,
                     itemStyle: {
                         color: linkcolor,
                     },
                     target: data_element.k1,
                     source: kg2_element.k2,
                     value: kg2_element.v,
-                    category: kg2_element.type[0] + `(` + orignal_v + `)`,
+                    category: name + `(` + orignal_v + `)`,
                     show: true,//不知道要做甚麼
                     orign_v: orignal_v,
                     orign_idf: orignal_idf,
                     force: {
-                        edgeLength: 10000000 * kg2_element.v
+                        edgeLength: Math.sqrt(kg2_element.v, square) * 10000000
                     },
                     lineStyle: {
                         normal: {
                             opacity:1,//work
                             color: linkcolor,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
-                            width: Math.sqrt(kg2_element.v, 2),
+                            width: Math.sqrt(kg2_element.v, square),
                             type: ttype, //kg2_element.css[0].linetype  //'dashed'
                             shadowColor : shadowColor,
                             shadowBlur : shadowBlur
@@ -254,25 +267,29 @@ function data_format(data, LODtype=0) {
                     });
                 }
                 // second : push all category into buf.category array, ignore duplicate problem
-                if (kg2_element.type[0] == ' ' || kg2_element.type[0] == '') {
-                    var black = 'black';
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
+                    var name ='未定義'; 
                     var linkcolor;
-                    linkcolor = black;
-                    type =  "dashed"
+                    linkcolor = 'black';
+                    var shadowColor = 'orange';
+                    var shadowBlur = 10;
+                    ttype = 'doted';
                 } else {
                     linkcolor = random_color;
+                    var name = kg2_element.type[0];
+                    var shadowColor = 'orange';
+                    var shadowBlur = 0;
                 }
-                
                 buf.all_category.push({
                     id: id++,
-                    name: kg2_element.type[0],
+                    name: name,
                     itemStyle: {
                         color: linkcolor,
                     },
                     target: data_element.k1,
                     source: kg2_element.k2,
                     // value: kg2_element.v,
-                    category: kg2_element.type[0],
+                    category: name,
                     show: true,//不知道要做甚麼
                     lineStyle: {
                         normal: {
@@ -280,7 +297,9 @@ function data_format(data, LODtype=0) {
                             color: linkcolor,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
                             width: 1,
-                            type: "solid" //kg2_element.css[0].linetype  //'dashed'
+                            type: ttype, //kg2_element.css[0].linetype  //'dashed'
+                            shadowColor : shadowColor,
+                            shadowBlur : shadowBlur
                         }
                     },
                 });

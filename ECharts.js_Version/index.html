@@ -1,5 +1,4 @@
 <!-- version 1.0 -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,8 +13,6 @@
     <!-- <link rel="stylesheet" href="./css/reset.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
     <link rel="stylesheet" href="./css/index.css">
-
-
 </head>
 
 <body>
@@ -41,7 +38,7 @@
                 <details>
                     <summary>線的調整</summary>
                     <div class="slider_item">
-                        <label class="slider_describe" for="relation_distance">線的距離長度 : </label>
+                        <label class="slider_describe" for="relation_distance">線的距離區間 : </label>
                         <input type="text" value="" id="relation_distance">
                         <div class="slider_slider" id="relation_distance"></div>
                     </div>
@@ -59,6 +56,11 @@
                 </details>
                 <details>
                     <summary>點的調整</summary>
+                    <div class="slider_item">
+                        <label class="slider_describe" for="node_distance">點的群聚度 : </label>
+                        <input type="text" value="" id="node_distance">
+                        <div class="slider_slider" id="node_distance"></div>
+                    </div>
                     <div class="slider_item">
                         <label class="slider_describe" for="node_size">點的背景大小 : </label>
                         <input type="text" value="" id="node_size">
@@ -127,7 +129,6 @@
         <div id="main"  style="width:85%;height:900px;"></div>
         </div>
     <!-- CDN JS library  -->
-
     <!-- avoid echarts.js library console.warn, use the download file and common out console.warn @lib/echarts 4.2.0-rc.2.js line 72314 which is warning about Legend data should be same with series name or data name-->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.0-rc.2/echarts.js"></script> -->
     <script src="./lib/echarts 4.2.0-rc.2.js"></script>
@@ -138,13 +139,15 @@
     <!-- resource -->
     <!-- english data -->
     <!-- <script src="./source/2-paragraph.js"></script> -->
-    <script src="./source/Dream of the Red Chamber.js"></script>
+    <!-- <script src="./source/Dream of the Red Chamber.js"></script> -->
+    <!-- <script src="./source/台灣文獻叢刊_人對人.js"></script> -->
+    <!-- <script src="./source/台灣文獻叢刊_人對地.js"></script> -->
     <!-- <script src="./source/paragraph copy.js"></script> -->
     <!-- <script src="./source/book.js"></script> -->
     <!-- <script src="./source/multi-paragraph.js"></script> -->
     <!-- <script src="./source/p_test.js"></script> -->
     <!-- <script src="./source/example.js"></script> -->
-    <!-- <script  src="./source/p_test1.js"></script> -->
+    <script  src="./source/p_test1.js"></script>
     <!-- <script src="./source/book 2.js"></script> -->
 
 
