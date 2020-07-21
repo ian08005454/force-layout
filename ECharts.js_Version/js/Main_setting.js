@@ -47,6 +47,7 @@ var option = {
         left: 'right',
         show: true,
         feature: {
+            magicType: { show: true, type: ['force', 'chord'] },
             saveAsImage: {
                 show: true,
                 title: '存成圖片',
@@ -121,6 +122,7 @@ var option = {
             layoutAnimation: true//開始的晃動動畫
         },
         edgeSymbol: ['arrow'],
+        symbolRotate :0.6,
         edgeSymbolSize: 10,
         edgeLabel: {
             fontFamily: 'sans-serif',
@@ -145,6 +147,33 @@ var option = {
         },
         zoom: 1
     }]
+}
+var releation = false;
+data.all_category.forEach(categories =>{
+    if(categories.name !== '未定義')
+        releation = true;
+});
+if(releation === false){
+    option.series[0].edgeLabel.normal.show = false;
+    option.series[0].edgeSymbol = [];
+    option.series[0].force.repulsion = 10000;
+    option.series[0].force.edgeLength = [150, 400];
+}
+else{
+    data.all_category.forEach(categories =>{
+        if(categories.name === '未定義'){
+            categories.lineStyle.normal.color = 'black';
+            categories.lineStyle.normal.type = 'doted'
+            categories.lineStyle.normal.shadowBlur = 10;
+        }
+    });
+    option.series[0].categories.forEach(category =>{
+        if(category.name === '未定義'){
+            category.lineStyle.normal.color = 'black';
+            category.lineStyle.normal.type = 'doted'
+            category.lineStyle.normal.shadowBlur = 10;
+        }
+    }); 
 }
 console.log(option);
 // ! setup all option
@@ -179,7 +208,7 @@ var jquery_slider_setting = [{
     range: 'min'
 },{
     object: 'relation_link_width',
-    min: 1,
+    min: 0.5,
     max: 5,
     step: 0.5,
     value: 1,

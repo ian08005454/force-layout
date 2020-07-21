@@ -142,19 +142,13 @@ function data_format(data, LODtype=0) {
                     orignal_v = kg2_element.v;
                     ttype = linksolid;
                 }
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
                     var name ='未定義'; 
-                    var linkcolor;
-                    linkcolor = 'black';
-                    var shadowColor = 'orange';
-                    var shadowBlur = 10;
-                    ttype = 'doted';
-                } else {
+                 else 
+                    var name = kg2_element.type[0];                    
                     linkcolor = random_color;
-                    var name = kg2_element.type[0];
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
-                }
                 buf.all_category.push({
                     id: id++,
                     name: name,
@@ -267,19 +261,14 @@ function data_format(data, LODtype=0) {
                     });
                 }
                 // second : push all category into buf.category array, ignore duplicate problem
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
                     var name ='未定義'; 
-                    var linkcolor;
-                    linkcolor = 'black';
-                    var shadowColor = 'orange';
-                    var shadowBlur = 10;
-                    ttype = 'doted';
-                } else {
-                    linkcolor = random_color;
+                else 
+                    
                     var name = kg2_element.type[0];
+                    linkcolor = random_color;
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
-                }
                 buf.all_category.push({
                     id: id++,
                     name: name,

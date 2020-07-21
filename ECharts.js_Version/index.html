@@ -19,7 +19,9 @@
     <div class="wrap">
         <div class="sidebar">
             <div class="slider">
-                
+                <label class="switch switch-left-right">
+                    <input class="switch-input" type="checkbox"  onclick="switchType()"/>
+                    <span class="switch-label" data-on="顯示網絡圖" data-off="顯示環狀圖"></span> <span class="switch-handle"></span> </label>
                 <!-- <div class="slider_item">
                     <label class="slider_describe" for="relation_strength">關係強度 : </label>
                     <input type="text" value="" id="relation_strength">
@@ -126,12 +128,12 @@
             <!-- <div id="choose_color"></div> -->
         </div>
         <div id="road"></div>
-        <div id="main"  style="width:85%;height:900px;"></div>
+        <div id="main"  style="width:95%;height:900px;"></div>
         </div>
     <!-- CDN JS library  -->
     <!-- avoid echarts.js library console.warn, use the download file and common out console.warn @lib/echarts 4.2.0-rc.2.js line 72314 which is warning about Legend data should be same with series name or data name-->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.0-rc.2/echarts.js"></script> -->
-    <script src="./lib/echarts 4.2.0-rc.2.js"></script>
+    <script src="./lib/echarts.js"></script>
     <!-- <script src="./lib/echarts-graph-modularity.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>

@@ -325,183 +325,184 @@ class searchTarget {
  * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
  * @param {array} keyword_search_name_s 處理過的使用者輸入陣列
  */
-search_AND() {
-	let first = [];
-	let routeTemp = [];
-	this.nodeName.forEach((item) => {
-		 let minus = [];
-		minus.push(item);
-		let category_collect = [];
-		count = 0;
-		do {
-			data.category.filter((category) => {
-				if (minus.includes(category.target) || minus.includes(category.source)) {
-					category_collect.push(category.target, category.source);
-					return category;
+	search_AND() {
+		let first = [];
+		let routeTemp = [];
+		this.nodeName.forEach((item) => {
+			let minus = [];
+			minus.push(item);
+			let category_collect = [];
+			count = 0;
+			do {
+				data.category.filter((category) => {
+					if (minus.includes(category.target) || minus.includes(category.source)) {
+						category_collect.push(category.target, category.source);
+						return category;
+					}
+				});
+				category_collect = Array.from(new Set(category_collect));
+				// console.log(category_collect);
+				minus = category_collect.filter((items) => {
+					return !items.includes(item);
+				});
+				count++;
+				var countdown = 0;
+				this.nodeName.forEach((item) => {
+					if (minus.includes(item)) countdown++;
+				});
+				if (countdown === this.nodeName.length - 1) {
+					break;
 				}
-			});
-			category_collect = Array.from(new Set(category_collect));
-			// console.log(category_collect);
-			minus = category_collect.filter((items) => {
-				return !items.includes(item);
-			});
-			count++;
-			var countdown = 0;
-			this.nodeName.forEach((item) => {
-				if (minus.includes(item)) countdown++;
-			});
-			if (countdown === this.nodeName.length - 1) {
-				break;
+			} while (1);
+			first.push(count);
+		});
+		console.log(first);
+		var top = 0,
+			topVal = 0;
+		first.forEach(function(item, index, array) {
+			if (item > topVal) {
+				top = index;
+				topVal = item;
 			}
-		} while (1);
-		first.push(count);
-	});
-	console.log(first);
-	var top = 0,
-		topVal = 0;
-	first.forEach(function(item, index, array) {
-		if (item > topVal) {
-			top = index;
-			topVal = item;
-		}
-	});
-	for (let z = 1; z < this.nodeName.length; z++) {
-		let primaryStack = new Array();
-		let secondaryStack = new Array();
-		let temp2 = new Array();
-		let Finish = true;
-		let keywordTemp = this.nodeName[top];
-		let nodeCollection;
-		let secondaryStackCount = -1;
-		let goal = this.nodeName[z];
-		do {
-			temp2 = [];
-			nodeCollection = [];
-			primaryStack.push(keywordTemp);
-			let temp = [];
-			if (this.lineName.length !== 0) {
-				this.lineName.forEach((item) => {
-					bench = [];
-					count = [];
-					data.category.filter((category) => {
-						if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) {
-							if (item.includes(category.name)) {
-								if (item.length > 1) {
-									bench.push(category.target, category.source);
-								} else {
-									union_collect.push(category.target, category.source);
-									temp.push(category);
-								}
-							}
-						}
-					});
-					if (item.length > 1) {
-						for (let i = 1; i < item.length; i++)
-							bench = bench.filter(function(element, index, arr) {
-								return arr.indexOf(element) !== index;
-							});
-						console.log(bench);
+		});
+		for (let z = 1; z < this.nodeName.length; z++) {
+			let primaryStack = new Array();
+			let secondaryStack = new Array();
+			let temp2 = new Array();
+			let Finish = true;
+			let keywordTemp = this.nodeName[top];
+			let nodeCollection;
+			let secondaryStackCount = -1;
+			let goal = this.nodeName[z];
+			do {
+				temp2 = [];
+				nodeCollection = [];
+				primaryStack.push(keywordTemp);
+				let temp = [];
+				if (this.lineName.length !== 0) {
+					this.lineName.forEach((item) => {
+						bench = [];
+						count = [];
 						data.category.filter((category) => {
-							if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) {
+							if (keywordTemp === category.target || keywordTemp === category.source) {
 								if (item.includes(category.name)) {
-									if (bench.includes(category.target) && bench.includes(category.source)) {
-										count.push(category);
+									if (item.length > 1) {
+										bench.push(category.target, category.source);
+									} else {
+										union_collect.push(category.target, category.source);
+										temp.push(category);
 									}
 								}
 							}
 						});
-						count.forEach((element) => {
-							let a = count.filter((category) => {
-								if (element.target === category.target && element.source === category.source)
-									return category;
-								else if (element.target === category.source && element.source === category.target)
-									return category;
+						if (item.length > 1) {
+							for (let i = 1; i < item.length; i++)
+								bench = bench.filter(function(element, index, arr) {
+									return arr.indexOf(element) !== index;
+								});
+							console.log(bench);
+							data.category.filter((category) => {
+								if (keywordTemp === category.target || keywordTemp === category.source) {
+									if (item.includes(category.name)) {
+										if (bench.includes(category.target) && bench.includes(category.source)) {
+											count.push(category);
+										}
+									}
+								}
 							});
-							if (a.length === item.length) {
-								categories.push(element);
-								union_collect.push(element.target, element.source);
-							}
-						});
-					}
-				});
-			} else {
-				temp = data.category.filter((category) => {
-					if (keywordTemp.includes(category.target) || keywordTemp.includes(category.source)) return category;
-				});
-			}
-			// console.log(temp);
-			temp.filter((category) => {
-				nodeCollection.push(category.target, category.source);
-			});
-			nodeCollection = Array.from(new Set(nodeCollection));
-			for (let i = 0, uLen = nodeCollection.length; i < uLen; i++) {
-				if (!primaryStack.includes(nodeCollection[i])) {
-					temp2.push(nodeCollection[i]);
-				}
-			}
-			secondaryStack.push(temp2);
-			secondaryStackCount++;
-			if (primaryStack[primaryStack.length - 1] == goal) {
-				routeTemp.push(Array.from(primaryStack));
-				for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
-					if (secondaryStack[i].length != 0) {
-						Finish = false;
-						break;
-					}
-				}
-				if (Finish == true) {
-					break;
+							count.forEach((element) => {
+								let a = count.filter((category) => {
+									if (element.target === category.target && element.source === category.source)
+										return category;
+									else if (element.target === category.source && element.source === category.target)
+										return category;
+								});
+								if (a.length === item.length) {
+									categories.push(element);
+									union_collect.push(element.target, element.source);
+								}
+							});
+						}
+					});
 				} else {
-					Finish = false;
+					temp = data.category.filter((category) => {
+						if (keywordTemp === category.target || keywordTemp === category.source)
+							return category;
+					});
 				}
-			}
-			if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name);
-			do {
-				while (secondaryStack[secondaryStackCount].length == 0) {
-					if (secondaryStackCount == 0) {
-						break;
+				// console.log(temp);
+				temp.filter((category) => {
+					nodeCollection.push(category.target, category.source);
+				});
+				nodeCollection = Array.from(new Set(nodeCollection));
+				for (let i = 0, uLen = nodeCollection.length; i < uLen; i++) {
+					if (!primaryStack.includes(nodeCollection[i])) {
+						temp2.push(nodeCollection[i]);
 					}
-					primaryStack.pop();
-					secondaryStack.pop();
-					secondaryStackCount--;
 				}
-				keywordTemp = secondaryStack[secondaryStackCount].pop();
-			} while (primaryStack.includes(keywordTemp));
-			if (keywordTemp == undefined) {
-				break;
+				secondaryStack.push(temp2);
+				secondaryStackCount++;
+				if (primaryStack[primaryStack.length - 1] == goal) {
+					routeTemp.push(Array.from(primaryStack));
+					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
+						if (secondaryStack[i].length != 0) {
+							Finish = false;
+							break;
+						}
+					}
+					if (Finish == true) {
+						break;
+					} else {
+						Finish = false;
+					}
+				}
+				if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name);
+				do {
+					while (secondaryStack[secondaryStackCount].length == 0) {
+						if (secondaryStackCount == 0) {
+							break;
+						}
+						primaryStack.pop();
+						secondaryStack.pop();
+						secondaryStackCount--;
+					}
+					keywordTemp = secondaryStack[secondaryStackCount].pop();
+				} while (primaryStack.includes(keywordTemp));
+				if (keywordTemp == undefined) {
+					break;
+				}
+			} while (1);
+		}
+		console.log('YA!!!!!');
+		console.log(routeTemp.length);
+		console.log(routeTemp);
+		for (var i = 0; i < routeTemp.length; i++) {
+			var count = 0;
+			this.nodeName.forEach((item) => {
+				if (routeTemp[i].includes(item)) count++;
+			});
+			if (count != this.nodeName.length) {
+				routeTemp.splice(i, 1);
+				i--;
 			}
-		} while (1);
-	}
-	console.log('YA!!!!!');
-	console.log(routeTemp.length);
-	console.log(routeTemp);
-	for (var i = 0; i < routeTemp.length; i++) {
-		var count = 0;
-		this.nodeName.forEach((item) => {
-			if (routeTemp[i].includes(item)) count++;
+		}
+		// if (routeTemp.length === 0)
+		// 	return andSearchNoRoute(keyword_search_name);
+		routeTemp.forEach((item) => {
+			route.push(item);
 		});
-		if (count != this.nodeName.length) {
-			routeTemp.splice(i, 1);
-			i--;
-		}
+		route.sort(function(a, b) {
+			if (a.length > b.length) {
+				return 1;
+			}
+			if (a.length < b.length) {
+				return -1;
+			}
+			return 0;
+		});
+		routeBackup = JSON.parse(JSON.stringify(route));
 	}
-	// if (routeTemp.length === 0)
-	// 	return andSearchNoRoute(keyword_search_name);
-	routeTemp.forEach((item) => {
-		route.push(item);
-	});
-	route.sort(function(a, b) {
-		if (a.length > b.length) {
-			return 1;
-		}
-		if (a.length < b.length) {
-			return -1;
-		}
-		return 0;
-	});
-	routeBackup = JSON.parse(JSON.stringify(route));
-}
-////搜尋兩個AND --end --
+	////搜尋兩個AND --end --
 }
 /**
  * @class store search
@@ -512,34 +513,28 @@ class searchWord {
 		this.type = type;
 		this.model = model;
 	}
-	keywordCheck(){
+	keywordCheck() {
 		let name_s = [];
 		let name_ss = [];
-		if(this.name.includes('|'))
-			name_s = this.name.split('|');
-		else
-			name_s.push(this.name);
-		name_s.forEach(item =>{
-			if(item.includes('&')){
+		if (this.name.includes('|')) name_s = this.name.split('|');
+		else name_s.push(this.name);
+		name_s.forEach((item) => {
+			if (item.includes('&')) {
 				item = item.split('&');
-				item.forEach(t =>{
+				item.forEach((t) => {
 					name_ss.push(t);
 				});
-			}
-			else
-				name_ss.push(item);
+			} else name_ss.push(item);
 		});
 		console.log(name_ss);
-		if(this.model === 'node')
-		name_ss.forEach(item =>{
-			if(!data.all_nodes.includes(item))
-			throw keyword_search_verify_fail(this.name);
-		});	
+		if (this.model === 'node')
+			name_ss.forEach((item) => {
+				if (!data.all_nodes.includes(item)) throw keyword_search_verify_fail(this.name);
+			});
 		else
-		name_ss.forEach(item =>{
-			if(!allLine.includes(item))
-			throw keyword_search_verify_fail(this.name);
-		});	
+			name_ss.forEach((item) => {
+				if (!allLine.includes(item)) throw keyword_search_verify_fail(this.name);
+			});
 	}
 	/**
  * 組合並整理使用者傳入的內容
@@ -731,7 +726,10 @@ function keyword_search(e) {
 		keyword_search_name = keyword_search_name.replace(' and ', '&');
 		keyword_search_name = keyword_search_name.replace(' or ', '|');
 		var keywordSearchType = $('#kClass').val();
-		var keywordModel = $('#kModel').val();
+		if(releation = false)
+			var keywordModel = 'node'
+		else
+			var keywordModel = $('#kModel').val();
 		if (keyword.includes(keyword_search_name)) {
 			alert(`Error :  same keyword can not search more than twice`);
 			$('#keyword_search_field').val('');
@@ -816,7 +814,9 @@ function keywordNot(keyword_search_name_s, keyword_search_name, keywordModel) {
         <button class="keyword_delete" data-name='not ${keyword_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
-	$(".keyword").scrollTop(function() { return this.scrollHeight; });
+	$('.keyword').scrollTop(function() {
+		return this.scrollHeight;
+	});
 }
 
 /**
@@ -860,7 +860,7 @@ function keywordRemove(kwd_search_name) {
 }
 function keyword_search_verify_fail(kwd_search_name) {
 	//一個 name
-	alert(`Error1 : 找不到關鍵字:${kwd_search_name}`)
+	alert(`Error1 : 找不到關鍵字:${kwd_search_name}`);
 	keywordRemove(kwd_search_name);
 }
 function andSearchNoRoute(keyword_search_name) {
@@ -887,8 +887,9 @@ function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
         <button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
-	$(".keyword").scrollTop(function() { return this.scrollHeight; });
-
+	$('.keyword').scrollTop(function() {
+		return this.scrollHeight;
+	});
 }
 // bind the keyword delete button click event
 function keyword_item_delete() {
@@ -909,38 +910,35 @@ function keyword_item_delete() {
 						element = element.trim();
 					} else element = element.trim();
 					console.log(element);
-					if(Array.isArray(element)){
-						lineStack.forEach((item,index) =>{
-							if(Array.isArray(item)){
+					if (Array.isArray(element)) {
+						lineStack.forEach((item, index) => {
+							if (Array.isArray(item)) {
 								let account = 0;
-								element.forEach(items => {
-								if(item.includes(items)){
-									account++;
-								}	
+								element.forEach((items) => {
+									if (item.includes(items)) {
+										account++;
+									}
 								});
-								if(account === element.length)
-								lineStack.splice(index, 1);
+								if (account === element.length) lineStack.splice(index, 1);
 							}
 						});
-					}
-					else{
+					} else {
 						if (lineStack.indexOf(element) != -1) notKeyword.splice(notKeyword.indexOf(element), 1);
 						if (notKeyword.indexOf(element) != -1) lineStack.splice(lineStack.indexOf(element), 1);
 					}
 				});
 			} else {
-				if(name.includes('&')){
+				if (name.includes('&')) {
 					name = name.split('&');
-					lineStack.forEach((item,index) =>{
-						if(Array.isArray(item)){
+					lineStack.forEach((item, index) => {
+						if (Array.isArray(item)) {
 							let account = 0;
-							name.forEach(element => {
-							if(item.includes(element)){
-								account++;
-							}	
+							name.forEach((element) => {
+								if (item.includes(element)) {
+									account++;
+								}
 							});
-							if(account === name.length)
-							lineStack.splice(index, 1);
+							if (account === name.length) lineStack.splice(index, 1);
 						}
 					});
 				}
@@ -1017,22 +1015,22 @@ function data_filter_and() {
 			temp = temp.concat(
 				data.category.filter((category) => {
 					if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
-						if (category.show === true){
+						if (category.show === true) {
 							lineTemp.push(category.name);
 							return category;
-						} 
+						}
 					} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
-						if (category.show === true){
+						if (category.show === true) {
 							lineTemp.push(category.name);
 							return category;
-						} 
+						}
 					}
 				})
 			);
 		lineTemp = Array.from(new Set(lineTemp));
-		lineTemp.forEach(item =>{
+		lineTemp.forEach((item) => {
 			mustLine.push(item);
-		})
+		});
 		a = categories.map(function(item, index, array) {
 			return item.id;
 		});
@@ -1093,35 +1091,45 @@ function dataAppendOr(categories, links, nodes) {
 // todo : improve the performance
 
 // Chart.on('legendselectchanged', (category_select) => {
-	
+
 // });
-function lineList(){
+function lineList() {
 	$('.lineSelected').children().remove();
 	let list = [];
 	if (route.length !== 0) {
-	for (let index = 1; index < route.length; index++) {
-		mustLine = mustLine.filter(function(element, index, arr) {
-			return arr.indexOf(element) !== index;
-		});
-	 }
+		for (let index = 1; index < route.length; index++) {
+			mustLine = mustLine.filter(function(element, index, arr) {
+				return arr.indexOf(element) !== index;
+			});
+		}
 	}
 	option.series[0].categories.forEach((item) => {
 		if (!list.includes(item.name)) {
 			list.push(item.name);
-			if(mustLine.includes(item.name)){
+			if (mustLine.includes(item.name)) {
 				$('.lineSelected').append(`<div class="lineSelected_item" data-item="${item.name}">
-				<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label></div><div class="color-lump" style="background-color: ${item.itemStyle.color}"></div>`);
-				}
-			else
-			$('.lineSelected').append(`<div class="lineSelected_item" data-item="${item.name}">
-			<label><font color="${item.itemStyle.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div><div class="color-lump" style="background-color: ${item.itemStyle.color}"></div>`
-			);	
+				<label><font color="${item.itemStyle
+					.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name} (必要)</front></label></div><div class="color-lump" style="background-color: ${item
+					.itemStyle.color}"></div>`);
+			} else
+				$('.lineSelected').append(`<div class="lineSelected_item" data-item="${item.name}">
+			<label><font color="${item.itemStyle
+				.color}"><input type="checkbox" name="node_list" value="${item.name}" checked onclick="lineListChange(this)">${item.name}</front></label></div><div class="color-lump" style="background-color: ${item
+					.itemStyle.color}"></div>`);
 		}
 	});
-	$(".lineSelected").scrollTop(function() { return this.scrollHeight; });
-
+	$('.lineSelected').scrollTop(function() {
+		return this.scrollHeight;
+	});
 }
-function lineListChange(e){
+function switchType(){
+	if(option.series[0].layout === 'circular')
+	option.series[0].layout = 'force';
+	else
+	option.series[0].layout = 'circular';
+	event_setOption_function();
+}
+function lineListChange(e) {
 	console.log(e.value);
 	let arr = [];
 	arr.push(e.value);
@@ -1172,10 +1180,15 @@ function max_Level(ui_value) {
 
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
 $(() => {
+	if(releation === false){
+		$('.lineSelected').hide();
+		$('#kModel').hide();
+		$('.current_relation').hide();
+	}
 	// const length = [option.series[0].force.edgeLength[0], option.series[0].force.edgeLength[1]]
 	$(`.slider_item > #relation_distance`).slider({
 		range: true,
-		min: 50, //Warning ! highly recommended do not set relation distance min value lower than 10, the link will go something wrong 
+		min: 50, //Warning ! highly recommended do not set relation distance min value lower than 10, the link will go something wrong
 		max: 1000,
 		step: 50,
 		values: option.series[0].force.edgeLength,
@@ -1357,7 +1370,6 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 	var concat; //target source合併之後的點
 	var Result; //要變成咖啡色的點
 	user_colors[3] = color;
-
 	data.category.forEach((c) => {
 		result_t.push(c.target);
 		result_s.push(c.source);
@@ -1482,8 +1494,9 @@ function nodeList() {
 			<label><input type="checkbox" name="node_list" value="${item.name}" checked onclick="nodeListChange(this)">${item.name}</label></div>`);
 		}
 	});
-	$(".nodeSelected").scrollTop(function() { return this.scrollHeight; });
-
+	$('.nodeSelected').scrollTop(function() {
+		return this.scrollHeight;
+	});
 }
 function maxLevelSlider(value) {
 	$(`.slider_item > #max_level`).slider({
@@ -1530,34 +1543,26 @@ function reRunKeyword() {
 				if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
 					if (category.show === false) {
 						let cCount = 0;
-						data.category.filter(cat =>{
-							if(category.target === cat.target && category.source === cat.source){
-								if (cat.show === true)
-								cCount++;
-							}
-							else if(category.target === cat.source && category.source === cat.target){
-								if (cat.show === true)
-								cCount++;
+						data.category.filter((cat) => {
+							if (category.target === cat.target && category.source === cat.source) {
+								if (cat.show === true) cCount++;
+							} else if (category.target === cat.source && category.source === cat.target) {
+								if (cat.show === true) cCount++;
 							}
 						});
-						if (cCount < 1)
-						notShow = true;
+						if (cCount < 1) notShow = true;
 					}
 				} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
 					if (category.show === false) {
 						let cCount = 0;
-						data.category.filter(cat =>{
-							if(category.target === cat.target && category.source === cat.source){
-								if (cat.show === true)
-								cCount++;
-							}
-							else if(category.target === cat.source && category.source === cat.target){
-								if (cat.show === true)
-								cCount++;
+						data.category.filter((cat) => {
+							if (category.target === cat.target && category.source === cat.source) {
+								if (cat.show === true) cCount++;
+							} else if (category.target === cat.source && category.source === cat.target) {
+								if (cat.show === true) cCount++;
 							}
 						});
-						if (cCount < 1)
-						notShow = true;
+						if (cCount < 1) notShow = true;
 					}
 				}
 			});
@@ -1584,7 +1589,7 @@ function reRunKeyword() {
 		if (item.nodeName.length === 0) item.lineOr();
 		else if (item.nodeName.length === 1) item.data_filter();
 	});
-	if(routeHash.includes(floorBackup) && floorBackup !== 'All'){
+	if (routeHash.includes(floorBackup) && floorBackup !== 'All') {
 		maxLevelSlider(routeHash.indexOf(floorBackup));
 		max_Level(routeHash.indexOf(floorBackup));
 	}
