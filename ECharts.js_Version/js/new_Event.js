@@ -72,36 +72,44 @@ window.onresize = () => {
  */
 class searchTarget {
 	constructor(nodeName, lineName, lineName2) {
-		this.nodeName = nodeName;
-		this.lineName = lineName;
-		this.lineName2 = lineName2;
+		this.nodeName = nodeName; //搜尋的節點
+		this.lineName = lineName; //線段限制
+		this.lineName2 = lineName2; // 保留
 	}
+	/**
+ * @function 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給dataAppendOr()
+ */
 	data_filter() {
 		if (routeFloor === 'All') {
+			// 確認最大階層數，如果是All就跑到100層
 			var ui_user = 100;
 		} else {
 			ui_user = routeFloor;
 		}
-		var categories = [],
-			links,
-			nodes;
-		let union_collect = [];
-		let collect = [];
-		let category_collect = [];
+		var categories = [], // 要加入option.series[0].categories的陣列
+			links, // 要加入option.series[0].links的陣列
+			nodes; // 要加入option.series[0].nodes的陣列
+		let union_collect = []; // 暫存node
+		let collect = []; // 暫存node
+		let category_collect = []; // 暫存node
 		if (this.lineName.length !== 0) {
+			//看看有沒有個別線的條件
 			this.lineName.forEach((item) => {
-				let bench = [];
-				let count = [];
+				let bench = []; //用來計算點出現的次數
+				let count = []; //用bench二次篩選節點
 				data.category.filter((category) => {
 					if (this.nodeName.includes(category.target) || this.nodeName.includes(category.source)) {
 						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 							if (category.show === true) {
+								//沒有被not掉的線
 								if (item.includes(category.name)) {
+									//看看這條線有沒有在條件內
 									if (item.length > 1) {
-										bench.push(category.target, category.source);
+										//如果條件為多種關係組合
+										bench.push(category.target, category.source); //放入bench裡
 									} else {
 										union_collect.push(category.target, category.source);
-										categories.push(category);
+										categories.push(category); //準備要加入圖中
 									}
 								}
 							}
@@ -357,7 +365,7 @@ class searchTarget {
 			first.push(count);
 		});
 		first.sort(function(a, b) {
-			return b-a;
+			return b - a;
 		});
 		console.log(first);
 		let goalCount = new Array();
@@ -379,14 +387,12 @@ class searchTarget {
 				if (secondaryStack.includes(category.target) || secondaryStack.includes(category.source)) {
 					if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 						if (category.show === true) {
-							if(category.target === goal || category.source === goal)
-								goalCount.push(c);
-							else if(!nodeStack[0].includes(category.target)){
+							if (category.target === goal || category.source === goal) goalCount.push(c);
+							else if (!nodeStack[0].includes(category.target)) {
 								union_collect.push(category.target);
 								nodeStack[0].push(category.target);
 								nodeStack[1].push(c);
-							}
-							else if(!nodeStack[0].includes(category.source)){
+							} else if (!nodeStack[0].includes(category.source)) {
 								union_collect.push(category.source);
 								nodeStack[0].push(category.source);
 								nodeStack[1].push(c);
@@ -399,33 +405,26 @@ class searchTarget {
 			union_collect = Array.from(new Set(union_collect));
 			console.log(categories);
 			secondaryStack = union_collect.filter((item) => {
-				if(item !== goal)
-				return item;
+				if (item !== goal) return item;
 			});
-			if (secondaryStack.length === 0) 
-				break;
+			if (secondaryStack.length === 0) break;
 		} while (1);
 		console.log('YA!!!!!');
 		console.log(nodeStack);
 		console.log(goalCount);
 		goalCount.sort(function(a, b) {
-			return b-a;
+			return b - a;
 		});
 		let largest = goalCount[0];
-		goalCount.forEach(item=>{
+		goalCount.forEach((item) => {
 			if (!routeHash.includes(item)) routeHash.push(item);
 		});
 		maxLevelSlider(routeHash.length);
 		routeHash.sort(function(a, b) {
 			return a - b;
 		});
-		if(routeFloor !== 'All' && !goalCount.includes(routeFloor))
-		{
-			return;
-		}
-		else if(routeFloor < largest) largest = routeFloor;
-		nodeStack[1].forEach(function(item, index, array){
-			if(item >= largest){
+		nodeStack[1].forEach(function(item, index, array) {
+			if (item >= largest) {
 				nodeStack[1].splice(index, 1);
 				nodeStack[0].splice(index, 1);
 			}
@@ -439,20 +438,19 @@ class searchTarget {
 				}
 			}
 		});
-		do{
-			nodeStack[0].forEach(function(item, index, array){
-				if(item !== goal){
-					let temp = categories.filter(category =>{
-						if(category.target === item){
-							if(nodeStack[1][nodeStack[0].indexOf(category.source)] >= nodeStack[1][index])
-							return category;
-						}
-						else if(category.source === item){
-							if(nodeStack[1][nodeStack[0].indexOf(category.target)] >= nodeStack[1][index])
-							return category;
+		do {
+			nodeStack[0].forEach(function(item, index, array) {
+				if (item !== goal) {
+					let temp = categories.filter((category) => {
+						if (category.target === item) {
+							if (nodeStack[1][nodeStack[0].indexOf(category.source)] >= nodeStack[1][index])
+								return category;
+						} else if (category.source === item) {
+							if (nodeStack[1][nodeStack[0].indexOf(category.target)] >= nodeStack[1][index])
+								return category;
 						}
 					});
-					if(temp.length === 0){
+					if (temp.length === 0) {
 						nodeStack[1].splice(index, 1);
 						nodeStack[0].splice(index, 1);
 					}
@@ -460,13 +458,12 @@ class searchTarget {
 			});
 			let last = categories.length;
 			categories = categories.filter((category) => {
-				if (nodeStack[0].includes(category.target) && nodeStack[0].includes(category.source)){
+				if (nodeStack[0].includes(category.target) && nodeStack[0].includes(category.source)) {
 					return category;
 				}
 			});
-			if(categories.length === last)
-				break;
-		}while(1)
+			if (categories.length === last) break;
+		} while (1);
 		for (let z = 1; z < this.nodeName.length; z++) {
 			let primaryStack = new Array();
 			let secondaryStack = new Array();
@@ -528,8 +525,7 @@ class searchTarget {
 					});
 				} else {
 					temp = categories.filter((category) => {
-						if (keywordTemp === category.target || keywordTemp === category.source)
-							return category;
+						if (keywordTemp === category.target || keywordTemp === category.source) return category;
 					});
 				}
 				// console.log(temp);
@@ -811,10 +807,17 @@ function lineCtrl() {
 					return category;
 				});
 			} else {
-				data.all_category = data.all_category.filter((category) => {
-					if (item.includes(category.name)) category.show = false;
-					return category;
-				});
+				if (item === '無共現') {
+					data.all_category = data.all_category.filter((category) => {
+						if (category.orign_v === 0) category.show = false;
+						return category;
+					});
+				} else {
+					data.all_category = data.all_category.filter((category) => {
+						if (item === category.name) category.show = false;
+						return category;
+					});
+				}
 			}
 		});
 	}
@@ -828,10 +831,8 @@ function keyword_search(e) {
 		keyword_search_name = keyword_search_name.replace(' and ', '&');
 		keyword_search_name = keyword_search_name.replace(' or ', '|');
 		var keywordSearchType = $('#kClass').val();
-		if(releation = false)
-			var keywordModel = 'node'
-		else
-			var keywordModel = $('#kModel').val();
+		if ((releation = false)) var keywordModel = 'node';
+		else var keywordModel = $('#kModel').val();
 		if (keyword.includes(keyword_search_name)) {
 			alert(`Error :  same keyword can not search more than twice`);
 			$('#keyword_search_field').val('');
@@ -1206,6 +1207,15 @@ function lineList() {
 		}
 	}
 	option.series[0].categories.forEach((item) => {
+		if (item.orign_v === 0) {
+			if (!list.includes('無共現')) {
+				list.push('無共現');
+				$('.lineSelected').append(`<div class="lineSelected_item" data-item="無共現">
+			<label><font color="gray"><input type="checkbox" name="node_list" value="無共現" checked onclick="lineListChange(this)">無共現(0)</front></label></div><div class="color-lump" style="background-color:"gray"></div>`);
+			}
+		}
+	});
+	option.series[0].categories.forEach((item) => {
 		if (!list.includes(item.name)) {
 			list.push(item.name);
 			if (mustLine.includes(item.name)) {
@@ -1224,11 +1234,9 @@ function lineList() {
 		return this.scrollHeight;
 	});
 }
-function switchType(){
-	if(option.series[0].layout === 'circular')
-	option.series[0].layout = 'force';
-	else
-	option.series[0].layout = 'circular';
+function switchType() {
+	if (option.series[0].layout === 'circular') option.series[0].layout = 'force';
+	else option.series[0].layout = 'circular';
 	event_setOption_function();
 }
 function lineListChange(e) {
@@ -1282,7 +1290,7 @@ function max_Level(ui_value) {
 
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
 $(() => {
-	if(releation === false){
+	if (releation === false) {
 		$('.lineSelected').hide();
 		$('#kModel').hide();
 		$('.current_relation').hide();
@@ -1694,6 +1702,9 @@ function reRunKeyword() {
 	if (routeHash.includes(floorBackup) && floorBackup !== 'All') {
 		maxLevelSlider(routeHash.indexOf(floorBackup));
 		max_Level(routeHash.indexOf(floorBackup));
+	} else if (floorBackup === 'All' && routeHash[routeHash.length - 1] >= 9) {
+		maxLevelSlider(0);
+		max_Level(0);
 	}
 	event_setOption_function();
 	sidebar_level_render();

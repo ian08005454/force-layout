@@ -116,7 +116,7 @@ var option = {
             initLayout:'circular',
             repulsion: 220,
             // todo : fix the jquery slider
-            edgeLength: [100, 300], 
+            edgeLength: [200, 400], 
             // gravity : 1,
             gravity : 0.01,
             layoutAnimation: true//開始的晃動動畫
