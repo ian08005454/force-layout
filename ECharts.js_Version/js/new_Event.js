@@ -69,6 +69,9 @@ window.onresize = () => {
 };
 /**
  * @class 處理過的 search object
+ * @member nodeName 放置處理後的搜尋節點名稱
+ * @member lineName 存放處理後的搜尋線段名稱
+ * @member lineName2 保留
  */
 class searchTarget {
 	constructor(nodeName, lineName, lineName2) {
@@ -77,7 +80,7 @@ class searchTarget {
 		this.lineName2 = lineName2; // 保留
 	}
 	/**
- * @function 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給dataAppendOr()
+ * @method 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給dataAppendOr()
  */
 	data_filter() {
 		if (routeFloor === 'All') {
@@ -208,7 +211,7 @@ class searchTarget {
 		dataAppendOr(categories, links, nodes); //將資料顯示在畫面上
 	}
 	/**
-	 * @function 將只有線段條件的搜尋進行線段的or搜尋
+	 * @method 將只有線段條件的搜尋進行線段的or搜尋
 	 */
 	lineOr() {
 		let categories = [], //存要傳給dataAppendOr()顯示在畫面上的資料
@@ -274,7 +277,7 @@ class searchTarget {
 		dataAppendOr(categories, links, nodes);
 	}
 	/**
- * @function 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
+ * @method 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
  * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
  */
 	search_AND() {
@@ -315,7 +318,7 @@ class searchTarget {
 			return b - a;
 		});
 		console.log(first);
-		//類floodind演算法
+		//類flooding演算法
 		let goalCount = new Array(); //儲存到目標的路徑長度
 		let nodeStack = new Array(); //存搜到的點[節點名稱,距離]
 		let secondaryStack = new Array(); //存當次要搜尋的節點
@@ -559,10 +562,13 @@ class searchTarget {
 /**
  * @class store search
  * 專門給搜尋的資料儲存的格式
+ * @member name  搜尋的內容
+ * @member type  看是and or not 哪一種
+ * @member model 看試點或是線
  */
 class searchWord {
 	constructor(type, name, model) {
-		this.name = name;	//搜尋的節點名稱
+		this.name = name;	//搜尋的內容
 		this.type = type;	//and or not
 		this.model = model;	//看是點或是線
 	}
@@ -572,9 +578,9 @@ class searchWord {
 	keywordCheck() {
 		let name_s = [];
 		let name_ss = [];
-		if (this.name.includes('|')) name_s = this.name.split('|');
+		if (this.name.includes('|')) name_s = this.name.split('|');	//拆解or
 		else name_s.push(this.name);
-		name_s.forEach((item) => {
+		name_s.forEach((item) => {	//拆到剩下單一名詞的陣列
 			if (item.includes('&')) {
 				item = item.split('&');
 				item.forEach((t) => {
@@ -584,11 +590,11 @@ class searchWord {
 		});
 		console.log(name_ss);
 		if (this.model === 'node')
-			name_ss.forEach((item) => {
+			name_ss.forEach((item) => { //檢查點
 				if (!data.all_nodes.includes(item)) throw keyword_search_verify_fail(this.name);
 			});
 		else
-			name_ss.forEach((item) => {
+			name_ss.forEach((item) => {	//檢查線
 				if (!allLine.includes(item)) throw keyword_search_verify_fail(this.name);
 			});
 	}
@@ -614,36 +620,39 @@ class searchWord {
 				// console.log(keywordCollection);
 				keyword_search_name_s.forEach(function(item, index, array) { //處理完or接著看有沒有and
 					item = item.trim();
-					if (item.includes('&')) item = this.name.split('&');
-					else item = Array(item);
-					for (
-						var i = keywordPoint + index * keywordCount;
+					if (item.includes('&')) item = this.name.split('&'); // 遇到and就直接切成陣列
+					else item = Array(item);	//沒有也包成陣列
+					for (//從i開始複製
+						var i = keywordPoint + index * keywordCount; 
 						i < keywordPoint + (index + 1) * keywordCount;
 						i++
 					) {
+						//將整理好的資料存這陣列裡
 						for (var z = 0, keywordLen = item.length; z < keywordLen; z++) {
 							keywordCollection[i].nodeName.push(item[z]);
 						}
 					}
 				});
 				keywordCount *= keyword_search_name_s.length;
+				//要連動的數量是現在的數量*輸入進來的資料
 			} else {
-				if (this.name.includes('&')) keyword_search_name_s = this.name.split('&');
+				if (this.name.includes('&')) keyword_search_name_s = this.name.split('&'); //將and切開
 				else keyword_search_name_s = Array(this.name);
-				if (keywordCount === 0) {
+				if (keywordCount === 0) {	//如果先前沒有值就加入空物件
 					keywordCollection.push(new searchTarget([], [], []));
 					keywordCount++;
 				}
-				for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
+				//push項目從keywordPoint 到 keywordPoint+keywordCount
+				for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) { 
 					for (var z = 0, keywordLen = keyword_search_name_s.length; z < keywordLen; z++) {
 						keywordCollection[i].nodeName.push(keyword_search_name_s[z]);
 					}
 				}
 			}
-		} else {
+		} else {//傳進來的是or
 			keywordPoint = keywordCollection.length - 1;
 			keywordCount = 0;
-			if (this.name.includes('|')) {
+			if (this.name.includes('|')) { 
 				keyword_search_name_s = this.name.split('|');
 				keywordCount += keyword_search_name_s.length;
 				keyword_search_name_s.forEach(function(item, index, array) {
@@ -817,8 +826,6 @@ function keyword_search(e) {
 					}
 				}
 				keywordNot(keyword_search_name_s, keyword_search_name, keywordModel);
-				keywordCount = 0;
-				if (keywordPoint > 0) keywordPoint = keywordCollection.length - 1;
 				lineCtrl();
 			} else {
 				if (keyword_search_name.includes('|')) keyword_search_name_s = keyword_search_name.split('|');
@@ -830,8 +837,6 @@ function keyword_search(e) {
 					}
 				});
 				keywordNot(keyword_search_name_s, keyword_search_name, keywordModel);
-				keywordCount = 0;
-				if (keywordPoint > 0) keywordPoint = keywordCollection.length - 1;
 			}
 			if (keyword.length !== 0) reRunKeyword();
 			else resetChart();
