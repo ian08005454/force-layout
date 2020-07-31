@@ -75,7 +75,8 @@ function data_format(data, LODtype=0) {
                 var square = 1;
             // foreach kg2 array
             data_element.kg2.forEach(kg2_element => {
-
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
+                     kg2_element.type[0]  ='未定義'; 
                 // random a new color without duplicate, this color will according with category color to pair link color
                 if (color.hasOwnProperty(kg2_element.type[0])) {
                     // console.log(kg2_element.type[0]);
@@ -141,24 +142,20 @@ function data_format(data, LODtype=0) {
                 } else {
                     orignal_v = kg2_element.v;
                     ttype = linksolid;
-                }
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
-                    var name ='未定義'; 
-                 else 
-                    var name = kg2_element.type[0];                    
+                }                  
                     linkcolor = random_color;
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
                 buf.all_category.push({
                     id: id++,
-                    name: name,
+                    name: kg2_element.type[0],
                     itemStyle: {
                         color: linkcolor,
                     },
                     target: data_element.k1,
                     source: kg2_element.k2,
                     value: kg2_element.v,
-                    category: name + `(` + orignal_v + `)`,
+                    category: kg2_element.type[0] + `(` + orignal_v + `)`,
                     show: true,//不知道要做甚麼
                     orign_v: orignal_v,
                     orign_idf: orignal_idf,
@@ -225,6 +222,8 @@ function data_format(data, LODtype=0) {
 
             // foreach kg2 array
             data_element.kg2.forEach(kg2_element => {
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
+                     kg2_element.type[0]  ='未定義'; 
                 // random a new color without duplicate, this color will according with category color to pair link color
                 if (color.hasOwnProperty(kg2_element.type[0])) {
                     random_color = color[kg2_element.type[0]]
@@ -261,24 +260,19 @@ function data_format(data, LODtype=0) {
                     });
                 }
                 // second : push all category into buf.category array, ignore duplicate problem
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
-                    var name ='未定義'; 
-                else 
-                    
-                    var name = kg2_element.type[0];
                     linkcolor = random_color;
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
                 buf.all_category.push({
                     id: id++,
-                    name: name,
+                    name: kg2_element.type[0],
                     itemStyle: {
                         color: linkcolor,
                     },
                     target: data_element.k1,
                     source: kg2_element.k2,
                     // value: kg2_element.v,
-                    category: name,
+                    category: kg2_element.type[0],
                     show: true,//不知道要做甚麼
                     lineStyle: {
                         normal: {

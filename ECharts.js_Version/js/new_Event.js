@@ -61,26 +61,30 @@ var notKeyword = [];
 let allLine = data.all_category.map(function(item, index, array) {
 	return item.name;
 });
+var directedBetweenness;
 var mustLine = [];
 let lineStack = [];
 let afterOr = false;
 window.onresize = () => {
 	Chart.resize();
 };
-/**
- * @class 處理過的 search object
- * @member nodeName 放置處理後的搜尋節點名稱
- * @member lineName 存放處理後的搜尋線段名稱
- * @member lineName2 保留
- */
 class searchTarget {
+	/**
+	 * @constructor searchTarget
+	 * @description 存經過searchWord method 處理過的 search object 並執行搜尋
+	 * @param {Array} nodeName - 搜尋的節點
+	 * @param {Array} lineName  - 線段限制
+	 * @param {Array} lineName2  - 保留
+	 */
 	constructor(nodeName, lineName, lineName2) {
 		this.nodeName = nodeName; //搜尋的節點
 		this.lineName = lineName; //線段限制
 		this.lineName2 = lineName2; // 保留
 	}
 	/**
- * @method 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給dataAppendOr()
+	 * @memberof searchTarget
+ * @method data_filter
+ * @description 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給dataAppendOr()
  */
 	data_filter() {
 		if (routeFloor === 'All') {
@@ -211,7 +215,9 @@ class searchTarget {
 		dataAppendOr(categories, links, nodes); //將資料顯示在畫面上
 	}
 	/**
-	 * @method 將只有線段條件的搜尋進行線段的or搜尋
+	 * @method lineOr
+	 *  @memberof searchTarget
+	 * @description 將只有線段條件的搜尋進行線段的or搜尋
 	 */
 	lineOr() {
 		let categories = [], //存要傳給dataAppendOr()顯示在畫面上的資料
@@ -277,7 +283,9 @@ class searchTarget {
 		dataAppendOr(categories, links, nodes);
 	}
 	/**
- * @method 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
+ * @method search_AND
+ *  @memberof searchTarget
+ * @description 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
  * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
  */
 	search_AND() {
@@ -366,6 +374,7 @@ class searchTarget {
 		} while (1);
 		console.log('YA!!!!!');
 		console.log(nodeStack);
+		goalCount = Array.from(new Set(goalCount));
 		console.log(goalCount);
 		goalCount.sort(function(a, b) {
 			return b - a;
@@ -395,10 +404,10 @@ class searchTarget {
 				if (item !== goal) {
 					let temp = categories.filter((category) => {
 						if (category.target === item) {
-							if (nodeStack[1][nodeStack[0].indexOf(category.source)] >= nodeStack[1][index])
+							if (nodeStack[1][nodeStack[0].indexOf(category.source)] > nodeStack[1][index])
 								return category;
 						} else if (category.source === item) {
-							if (nodeStack[1][nodeStack[0].indexOf(category.target)] >= nodeStack[1][index])
+							if (nodeStack[1][nodeStack[0].indexOf(category.target)] > nodeStack[1][index])
 								return category;
 						}
 					});
@@ -428,19 +437,22 @@ class searchTarget {
 			let nodeCollection;
 			let secondaryStackCount = -1; //存副堆疊長度
 			let goal = this.nodeName[z];
-			do { //找出與目標有關的線
+			do {
+				//找出與目標有關的線
 				temp2 = [];
 				nodeCollection = [];
 				primaryStack.push(keywordTemp);
 				let temp = [];
-				if (this.lineName.length !== 0) { //篩選掉線段限制，大部分和data_filter()一樣
+				if (this.lineName.length !== 0) {
+					//篩選掉線段限制，大部分和data_filter()一樣
 					this.lineName.forEach((item) => {
 						let bench = [];
 						let count = [];
 						categories.filter((category) => {
 							if (keywordTemp === category.target || keywordTemp === category.source) {
 								if (item.includes(category.name)) {
-									if (item.length > 1) { //
+									if (item.length > 1) {
+										//
 										bench.push(category.target, category.source);
 									} else {
 										union_collect.push(category.target, category.source);
@@ -484,21 +496,25 @@ class searchTarget {
 					});
 				}
 				// console.log(temp);
-				temp.filter((category) => { //將線段的兩端節點存入nodeCollection
+				temp.filter((category) => {
+					//將線段的兩端節點存入nodeCollection
 					nodeCollection.push(category.target, category.source);
 				});
 				nodeCollection = Array.from(new Set(nodeCollection));
-				for (let i = 0, uLen = nodeCollection.length; i < uLen; i++) { //將nodeCollection中走過的路線刪掉
+				for (let i = 0, uLen = nodeCollection.length; i < uLen; i++) {
+					//將nodeCollection中走過的路線刪掉
 					if (!primaryStack.includes(nodeCollection[i])) {
 						temp2.push(nodeCollection[i]);
 					}
 				}
 				secondaryStack.push(temp2); //將結果存入副堆疊
-				secondaryStackCount++;	//副堆疊長度++
-				if (primaryStack[primaryStack.length - 1] == goal) { //如果路線最後一點是目標
+				secondaryStackCount++; //副堆疊長度++
+				if (primaryStack[primaryStack.length - 1] == goal) {
+					//如果路線最後一點是目標
 					routeTemp.push(Array.from(primaryStack)); //存入路線陣列
 					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
-						if (secondaryStack[i].length != 0) { //副堆疊等於0就算是結束了
+						if (secondaryStack[i].length != 0) {
+							//副堆疊等於0就算是結束了
 							Finish = false;
 							break;
 						}
@@ -510,11 +526,14 @@ class searchTarget {
 					}
 				}
 				if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword_search_name); //如果路線和路線陣列的長度都是0就算結束
-				do { //遇到死路的處理:主堆疊pop出去由副堆疊pop出一個值PUSH進去
+				do {
+					//遇到死路的處理:主堆疊pop出去由副堆疊pop出一個值PUSH進去
 					//下一個節點選法:副堆疊pop出一個值PUSH進去
 					//如果下一個節點走過了:主堆疊pop出去由副堆疊pop出一個值PUSH進去
-					while (secondaryStack[secondaryStackCount].length == 0) { //遇到二維陣列的pop值是空的
-						if (secondaryStackCount == 0) { //真的是空的就結束
+					while (secondaryStack[secondaryStackCount].length == 0) {
+						//遇到二維陣列的pop值是空的
+						if (secondaryStackCount == 0) {
+							//真的是空的就結束
 							break;
 						}
 						primaryStack.pop();
@@ -522,8 +541,9 @@ class searchTarget {
 						secondaryStackCount--;
 					}
 					keywordTemp = secondaryStack[secondaryStackCount].pop();
-				} while (primaryStack.includes(keywordTemp));	//一直都有就一直pop
-				if (keywordTemp == undefined) { //到最後都還是空的就出去
+				} while (primaryStack.includes(keywordTemp)); //一直都有就一直pop
+				if (keywordTemp == undefined) {
+					//到最後都還是空的就出去
 					break;
 				}
 			} while (1);
@@ -536,14 +556,16 @@ class searchTarget {
 			this.nodeName.forEach((item) => {
 				if (routeTemp[i].includes(item)) count++;
 			});
-			if (count != this.nodeName.length) { //如果路線沒有所有目標點都經過就必須去掉
+			if (count != this.nodeName.length) {
+				//如果路線沒有所有目標點都經過就必須去掉
 				routeTemp.splice(i, 1);
 				i--;
 			}
 		}
 		// if (routeTemp.length === 0)
 		// 	return andSearchNoRoute(keyword_search_name);
-		routeTemp.forEach((item) => {	//加入路線，並以距離排序
+		routeTemp.forEach((item) => {
+			//加入路線，並以距離排序
 			route.push(item);
 		});
 		route.sort(function(a, b) {
@@ -556,31 +578,36 @@ class searchTarget {
 			return 0;
 		});
 		routeBackup = JSON.parse(JSON.stringify(route)); //備份路線，加快階層的調整
+		console.log('finish');
 	}
 	////搜尋兩個AND --end --
 }
-/**
- * @class store search
- * 專門給搜尋的資料儲存的格式
- * @member name  搜尋的內容
- * @member type  看是and or not 哪一種
- * @member model 看試點或是線
- */
 class searchWord {
+	/**
+	 * @constructs searchWord
+	 * @description 專門給搜尋的資料儲存的格式
+	 * @param {string} type 看是and or not 哪一種
+	 * @param {string} name  搜尋的內容
+	 * @param {string} model  看是點或是線
+	 */
 	constructor(type, name, model) {
-		this.name = name;	//搜尋的內容
-		this.type = type;	//and or not
-		this.model = model;	//看是點或是線
+		this.name = name; //搜尋的內容
+		this.type = type; //and or not
+		this.model = model; //看是點或是線
 	}
 	/**
-	 * @method 檢查搜尋的項目有沒有在資料內(包含點跟線)
+	 * @memberof searchWord
+	 * @method keywordCheck
+	 * @description 檢查搜尋的項目有沒有在資料內(包含點跟線)
 	 */
 	keywordCheck() {
 		let name_s = [];
 		let name_ss = [];
-		if (this.name.includes('|')) name_s = this.name.split('|');	//拆解or
+		if (this.name.includes('|'))
+			name_s = this.name.split('|'); //拆解or
 		else name_s.push(this.name);
-		name_s.forEach((item) => {	//拆到剩下單一名詞的陣列
+		name_s.forEach((item) => {
+			//拆到剩下單一名詞的陣列
 			if (item.includes('&')) {
 				item = item.split('&');
 				item.forEach((t) => {
@@ -590,40 +617,50 @@ class searchWord {
 		});
 		console.log(name_ss);
 		if (this.model === 'node')
-			name_ss.forEach((item) => { //檢查點
+			name_ss.forEach((item) => {
+				//檢查點
 				if (!data.all_nodes.includes(item)) throw keyword_search_verify_fail(this.name);
 			});
 		else
-			name_ss.forEach((item) => {	//檢查線
+			name_ss.forEach((item) => {
+				//檢查線
 				if (!allLine.includes(item)) throw keyword_search_verify_fail(this.name);
 			});
 	}
 	/**
- * @method 組合並整理使用者傳入的節點內容
- */
+	 * @memberof searchWord
+ 	* @method keywordCleanUp
+ 	* @description 組合並整理使用者傳入的節點內容
+ 	*/
 	keywordCleanUp() {
 		let keyword_search_name_s = [];
 		if (this.type === 'and') {
-			if (this.name.includes('|')) { //先切or
+			if (this.name.includes('|')) {
+				//先切or
 				keyword_search_name_s = this.name.split('|');
-				if (keywordCount === 0) { //第一次搜尋
+				if (keywordCount === 0) {
+					//第一次搜尋
 					for (var i = 0; i < keyword_search_name_s.length; i++)
-						keywordCollection.push(new searchTarget([], [], []));//append足夠的空間來存值
+						keywordCollection.push(new searchTarget([], [], [])); //append足夠的空間來存值
 					keywordCount = 1;
-				} else { 
+				} else {
 					for (var x = 1; x < keyword_search_name_s.length; x++) {
-						for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) { //複製前面的值來append
+						for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
+							//複製前面的值來append
 							keywordCollection.push(JSON.parse(JSON.stringify(keywordCollection[i])));
 						}
 					}
 				}
 				// console.log(keywordCollection);
-				keyword_search_name_s.forEach(function(item, index, array) { //處理完or接著看有沒有and
+				keyword_search_name_s.forEach(function(item, index, array) {
+					//處理完or接著看有沒有and
 					item = item.trim();
-					if (item.includes('&')) item = this.name.split('&'); // 遇到and就直接切成陣列
-					else item = Array(item);	//沒有也包成陣列
-					for (//從i開始複製
-						var i = keywordPoint + index * keywordCount; 
+					if (item.includes('&'))
+						item = this.name.split('&'); // 遇到and就直接切成陣列
+					else item = Array(item); //沒有也包成陣列
+					for (
+						//從i開始複製
+						var i = keywordPoint + index * keywordCount;
 						i < keywordPoint + (index + 1) * keywordCount;
 						i++
 					) {
@@ -636,23 +673,26 @@ class searchWord {
 				keywordCount *= keyword_search_name_s.length;
 				//要連動的數量是現在的數量*輸入進來的資料
 			} else {
-				if (this.name.includes('&')) keyword_search_name_s = this.name.split('&'); //將and切開
+				if (this.name.includes('&'))
+					keyword_search_name_s = this.name.split('&'); //將and切開
 				else keyword_search_name_s = Array(this.name);
-				if (keywordCount === 0) {	//如果先前沒有值就加入空物件
+				if (keywordCount === 0) {
+					//如果先前沒有值就加入空物件
 					keywordCollection.push(new searchTarget([], [], []));
 					keywordCount++;
 				}
 				//push項目從keywordPoint 到 keywordPoint+keywordCount
-				for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) { 
+				for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
 					for (var z = 0, keywordLen = keyword_search_name_s.length; z < keywordLen; z++) {
 						keywordCollection[i].nodeName.push(keyword_search_name_s[z]);
 					}
 				}
 			}
-		} else {//傳進來的是or
+		} else {
+			//傳進來的是or
 			keywordPoint = keywordCollection.length - 1;
 			keywordCount = 0;
-			if (this.name.includes('|')) { 
+			if (this.name.includes('|')) {
 				keyword_search_name_s = this.name.split('|');
 				keywordCount += keyword_search_name_s.length;
 				keyword_search_name_s.forEach(function(item, index, array) {
@@ -672,8 +712,10 @@ class searchWord {
 		console.log(keywordPoint);
 	}
 	/**
- * @method 依使用者打的線段項目進行判斷和處理
- */
+	 * @memberof searchWord
+ 	 * @method lineAppend
+	 * @description 依使用者打的線段項目進行判斷和處理
+ 	*/
 	lineAppend() {
 		let lineName = this.name;
 		if (keywordCollection.length === 0 || this.type === 'or') {
@@ -750,6 +792,9 @@ $('#keyword_search_field').keyup((e) => {
 });
 $('#keyword_search_button').on('click', keyword_search);
 keyword.length == 0 ? $('.max_level').hide() : $('.max_level').show();
+/**
+ * 將不要的點和關係從圖中移除，資訊由{@link notKeyword}和{@link lineStack}取得
+ */
 function lineCtrl() {
 	data.all_category = data.all_category.filter((category) => {
 		category.show = true;
@@ -788,6 +833,9 @@ function lineCtrl() {
 		});
 	}
 }
+/**
+ * 搜尋的進入點，由此函式區分這次搜尋要傳到個方法
+ */
 function keyword_search(e) {
 	// get the search name
 	if (e.which === 13 || e.type === 'click') {
@@ -913,7 +961,10 @@ function keywordFliter() {
 	sidebar_level_render();
 	keyword_item_delete();
 }
-
+/**
+ * 刪除搜尋項目的函式
+ * @param {string} kwd_search_name   要刪除的內容
+ */
 function keywordRemove(kwd_search_name) {
 	let mapping = keyword.map(function(item, index, array) {
 		return item.name;
@@ -923,17 +974,29 @@ function keywordRemove(kwd_search_name) {
 	$(`div[data-item="${kwd_search_name}"]`).remove();
 	// $('#road').remove();
 }
+/**
+ * 錯誤回報
+ */
 function keyword_search_verify_fail(kwd_search_name) {
 	//一個 name
 	alert(`Error1 : 找不到關鍵字:${kwd_search_name}`);
 	keywordRemove(kwd_search_name);
 }
+/**
+ * 
+ * @param {string} keyword_search_name 回報找不到路線
+ */
 function andSearchNoRoute(keyword_search_name) {
 	alert(`Error2 : 搜尋不到路徑 : ${keyword_search_name}`);
-	keywordRemove(keyword_search_name);
 }
 // append keyword div in keyword field
 //下方新增delete鍵
+/**
+ * 資訊加入線方的搜尋欄
+ * @param {string} kwd_search_name 搜尋的項目
+ * @param {string} keywordSearchType 搜尋的類型是and or not
+ * @param {string} keywordModel	搜尋的是點或是線
+ */
 function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
 	keyword.push(new searchWord(keywordSearchType, kwd_search_name, keywordModel));
 	if (keywordModel === 'line') keywordModel = '線';
@@ -957,6 +1020,9 @@ function keyword_item_append(kwd_search_name, keywordSearchType, keywordModel) {
 	});
 }
 // bind the keyword delete button click event
+/**
+ * 整理要刪除內容，將會把資訊傳給{@link keywordRemove} 進行刪除，然後交給{@link keyword_search_reset}重跑圖
+ */
 function keyword_item_delete() {
 	// avoid to bind the click(delete) event twice, have to unbind the first click event first.
 	$('.keyword_delete').off('click').click((e) => {
@@ -1043,6 +1109,9 @@ function keyword_item_delete() {
 		}
 	});
 }
+/**
+ * 重新將資訊跑成圖
+ */
 function keyword_search_reset() {
 	if (keyword.length === 0) {
 		resetChart();
@@ -1343,6 +1412,7 @@ $(() => {
 	});
 	nodeList();
 	lineList();
+	countBetweenness();
 });
 function change_width(width_value) {
 	data.links.forEach((link) => {
@@ -1471,8 +1541,8 @@ function event_setOption_function(rander = true) {
 	Chart.setOption(option, true);
 	nodeList();
 	lineList();
+	countBetweenness();
 }
-
 Chart.on('click', (e) => {
 	// console.log(e);
 	console.log(e.data.source, e.data.target, e.data.name);
@@ -1590,7 +1660,32 @@ function nodeListChange(e) {
 	else resetChart();
 	keyword_item_delete();
 }
+function countBetweenness(){
+	var g = createGraph();
+	option.series[0].nodes.forEach(node =>{
+		g.addNode(node.name);
+	})
+	let ccc = 0;
+	option.series[0].categories.forEach(category =>{
+		ccc += category.orign_v;
+		for(let i = 0; i<category.orign_v; i++){
+			g.addLink(category.target, category.source);
+		}
+		// g.addLink(category.target, category.source);
+	});
+	directedBetweenness = betweennes(g);
+	// directedBetweenness = JSON.stringify(directedBetweenness)
+	option.series[0].nodes.forEach(node =>{
+		console.log(node.name)
+		console.log(directedBetweenness[node.name]);
+	});
+	console.log(directedBetweenness);
+	console.log(ccc);
+	console.log(g.getLinksCount());
+	console.log(g);
+}
 function reRunKeyword() {
+	console.log('ha!!!');
 	routeHash = [];
 	option.series[0].categories = [];
 	option.series[0].links = [];

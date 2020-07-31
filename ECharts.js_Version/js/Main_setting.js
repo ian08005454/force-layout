@@ -24,7 +24,6 @@ var max_common_show_value = Math.max(...all_values);
 var min_common_show_value = Math.min(...all_values);
 var max_idf = Math.max(...all_idf);
 var min_idf = Math.min(...all_idf);
-
 var option = {
     title: {
         // text: 'Lorem ipsum', // this field will connect to the book name
@@ -103,6 +102,9 @@ var option = {
                         // color: 'white',
                         fontSize: 17
                     },
+                    formatter:function(param){
+                        return param.name ;
+                    },
                     // position : 'left'
                 },
                 color: 'pink' //預設node顏色
@@ -160,14 +162,16 @@ if(releation === false){
     option.series[0].force.edgeLength = [150, 400];
 }
 else{
-    data.all_category.forEach(categories =>{
+    data.all_category.forEach(function(categories, index){
         if(categories.name === '未定義'){
             categories.lineStyle.normal.color = 'black';
             categories.lineStyle.normal.type = 'doted'
             categories.lineStyle.normal.shadowBlur = 10;
         }
+        if(categories.orign_v === 0)
+        data.all_category.splice(index, 1);
     });
-    option.series[0].categories.forEach(category =>{
+    option.series[0].categories.forEach(function(category, index){
         if(category.name === '未定義'){
             category.lineStyle.normal.color = 'black';
             category.lineStyle.normal.type = 'doted'
