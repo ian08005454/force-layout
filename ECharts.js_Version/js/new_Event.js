@@ -58,13 +58,14 @@ var keywords = [];
    * @type {array}
    */
 var notKeyword = [];
+var central = [];
 let allLine = data.all_category.map(function(item, index, array) {
 	return item.name;
 });
-var directedBetweenness;
 var mustLine = [];
 let lineStack = [];
 let afterOr = false;
+var g;
 window.onresize = () => {
 	Chart.resize();
 };
@@ -512,6 +513,7 @@ class searchTarget {
 				if (primaryStack[primaryStack.length - 1] == goal) {
 					//如果路線最後一點是目標
 					routeTemp.push(Array.from(primaryStack)); //存入路線陣列
+					console.log(primaryStack);
 					for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
 						if (secondaryStack[i].length != 0) {
 							//副堆疊等於0就算是結束了
@@ -1321,6 +1323,7 @@ function max_Level(ui_value) {
 
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
 $(() => {
+	$('.centrality').hide();
 	if (releation === false) {
 		$('.lineSelected').hide();
 		$('#kModel').hide();
@@ -1407,12 +1410,15 @@ $(() => {
 				case 'common_show_value': //共現次數
 					common_value(ui.value);
 					break;
+				case 'centrality': //中心性
+				centralitySlider(ui.value);
+					break;
 			}
 		}
 	});
 	nodeList();
 	lineList();
-	countBetweenness();
+	ngraph();
 });
 function change_width(width_value) {
 	data.links.forEach((link) => {
@@ -1541,7 +1547,7 @@ function event_setOption_function(rander = true) {
 	Chart.setOption(option, true);
 	nodeList();
 	lineList();
-	countBetweenness();
+	ngraph();
 }
 Chart.on('click', (e) => {
 	// console.log(e);
@@ -1660,8 +1666,71 @@ function nodeListChange(e) {
 	else resetChart();
 	keyword_item_delete();
 }
-function countBetweenness(){
-	var g = createGraph();
+function centrality(value){
+	
+	if(value === 'betweenness')
+		countBetweenness();
+	else if(value === 'closeness')
+		countCloseness();
+	else if(value === 'eccentricity')
+		countEccentricity();
+	else if(value === 'degree')
+		countDegree();
+		
+	function countCloseness(){
+		var directedCloseness = closeness(g);
+		central = [];
+		option.series[0].nodes.forEach(node =>{
+			central.push([node.name,directedCloseness[node.name]]);
+		});
+	}
+	function countEccentricity(){
+		directedEccentricity = eccentricity(g);
+		central = [];
+		option.series[0].nodes.forEach(node =>{
+			central.push([node.name,directedEccentricity[node.name]]);
+		});
+	}
+	function countDegree(){
+		directedDgree = degree(g);
+		central = [];
+		option.series[0].nodes.forEach(node =>{
+			central.push([node.name,directedDgree[node.name]]);
+		});
+	}
+	function countBetweenness(){
+		directedBetweenness = betweennes(g);
+		central = [];
+		option.series[0].nodes.forEach(node =>{
+			central.push([node.name,directedBetweenness[node.name]]);
+		});
+	}
+	function centralitySlider(value) {
+		$(`.slider_item > #max_level`).slider({
+			min: 0,
+			max: routeHash.length, //最大階層數
+			step: 1,
+			value: value, //current option setting value
+			disable: false,
+			range: 'min'
+		});
+		$(`.slider_item > input[id=max_level]`).val(routeFloor);
+		$('.max_level').show();
+	}
+	central.sort(function(a,b){
+		if (a[1] > b[1]) {
+			return 1;
+		}
+		else if (a[1] < b[1]) {
+			return -1;
+		}
+		return 0;
+	});
+	console.log(central);
+	$('.centrality').show();
+}
+function ngraph(){
+	g = createGraph();
 	option.series[0].nodes.forEach(node =>{
 		g.addNode(node.name);
 	})
@@ -1673,17 +1742,9 @@ function countBetweenness(){
 		}
 		// g.addLink(category.target, category.source);
 	});
-	directedBetweenness = betweennes(g);
-	// directedBetweenness = JSON.stringify(directedBetweenness)
-	option.series[0].nodes.forEach(node =>{
-		console.log(node.name)
-		console.log(directedBetweenness[node.name]);
-	});
-	console.log(directedBetweenness);
-	console.log(ccc);
-	console.log(g.getLinksCount());
 	console.log(g);
 }
+
 function reRunKeyword() {
 	console.log('ha!!!');
 	routeHash = [];
