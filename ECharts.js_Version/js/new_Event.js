@@ -62,10 +62,13 @@ var central = [];
 let allLine = data.all_category.map(function(item, index, array) {
 	return item.name;
 });
+var filterValue = [0,0,0];
 var mustLine = [];
 let lineStack = [];
 let afterOr = false;
 var g;
+let centralHash = [];
+var lastView = 0;
 window.onresize = () => {
 	Chart.resize();
 };
@@ -955,8 +958,6 @@ function keywordFliter() {
 	});
 	keywords = Array.from(new Set(keywords));
 	$('#road').children().remove();
-	$('.common_show_value').hide();
-	$('.word_strength').hide();
 	$('.max_level').show();
 	reRunKeyword();
 	event_setOption_function();
@@ -1099,15 +1100,15 @@ function keyword_item_delete() {
 			keywordPoint = 0;
 			keywordCount = 0;
 			keyword_search_reset();
-			if (keyword.length == 0) {
-				if (onlyLOD == 1) {
-					$('.common_show_value').hide();
-					$('.word_strength').hide();
-				} else {
-					$('.common_show_value').show();
-					$('.word_strength').show();
-				}
-			}
+			// if (keyword.length == 0) {
+			// 	if (onlyLOD == 1) {
+			// 		$('.common_show_value').hide();
+			// 		$('.word_strength').hide();
+			// 	} else {
+			// 		$('.common_show_value').show();
+			// 		$('.word_strength').show();
+			// 	}
+			// }
 		}
 	});
 }
@@ -1365,6 +1366,7 @@ $(() => {
 			switch (e.target.id) {
 				case 'max_level':
 					max_Level(ui.value);
+					filterControler('maxLevel', ui.value);
 					break;
 				case 'relation_strength':
 					break;
@@ -1405,13 +1407,13 @@ $(() => {
 					change_node_size(ui.value);
 					break;
 				case 'word_strength': //詞頻強度
-					word_strength(ui.value);
+					filterControler('word', ui.value)
 					break;
 				case 'common_show_value': //共現次數
-					common_value(ui.value);
+					filterControler('common', ui.value)
 					break;
 				case 'centrality': //中心性
-				centralitySlider(ui.value);
+				filterControler('centrality', ui.value)
 					break;
 			}
 		}
@@ -1432,66 +1434,74 @@ function change_node_size(node_size_value) {
 	});
 	event_setOption_function(false);
 }
-function word_strength(value) {
-	var value_filter = [];
-	option.series[0].nodes = data.nodes.filter((node) => {
-		if (node.orign_idf >= value) {
-			value_filter.push(node.name);
-			return node;
-		}
-	});
-	option.series[0].categories = data.all_category.filter((category) => {
-		if (value_filter.includes(category.target) && value_filter.includes(category.source)) {
-			return category;
-		}
-	});
-	option.series[0].links = option.series[0].categories.filter((category) => {
-		if (value_filter.includes(category.target) && value_filter.includes(category.source)) {
-			return category;
-		}
-	});
-	sidebar_level_render();
-	event_setOption_function(false);
-}
-function common_value(value) {
-	var value_filter = [];
-	// console.log(value);//normal
-	if (value == min_common_show_value - 1) {
-		option.series[0].categories = data.all_category.filter((category) => {
-			return category.orign_v == 0;
-		});
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			// if (category.show == true) {
-			value_filter.push(category.target, category.source);
-			return category;
-			// }
-		});
-		value_filter = Array.from(new Set(value_filter));
-		option.series[0].nodes = data.nodes.filter((node) => {
-			// console.log(value_filter.includes(node.name));
-			return value_filter.includes(node.name);
-		});
-		console.log(option);
-		event_setOption_function(false);
-	} else {
-		option.series[0].categories = data.all_category.filter((category) => {
-			return category.orign_v >= value;
-		});
+function filterControler(target,value){
+	option.series[0].links = JSON.parse(JSON.stringify(option.series[0].categories));
+	 if(target === 'common')
+	 	filterValue[0] = value;
+	 else if(target === 'word')
+	 	filterValue[1] = value
+	else if(target === 'centrality')
+		filterValue[2] = value;
+	common_value(filterValue[0]);
+	word_strength(filterValue[1]);
+	centralityContrl(filterValue[2]);
 
-		option.series[0].links = option.series[0].categories.filter((category) => {
-			// if (category.show == true) {
-			value_filter.push(category.target, category.source);
-			return category;
-			// }
-		});
-		value_filter = Array.from(new Set(value_filter));
+	function common_value(value) {
+		var value_filter = [];
+		// console.log(value);//normal
+			option.series[0].links = option.series[0].links.filter((category) => {
+				if(value == min_common_show_value - 1 ){
+					if(category.orign_v == 0){
+						value_filter.push(category.target, category.source);
+						return category;
+						}
+				}
+				else if(category.orign_v >= value){
+					value_filter.push(category.target, category.source);
+					return category;
+				}
+			});
+			value_filter = Array.from(new Set(value_filter));
+			option.series[0].nodes = data.nodes.filter((node) => {
+				// console.log(value_filter.includes(node.name));
+				return value_filter.includes(node.name);
+			});
+	}
 
-		option.series[0].nodes = data.nodes.filter((node) => {
-			return value_filter.includes(node.name);
+	function word_strength(value) {
+		var valueFilter = [];
+		option.series[0].nodes =  option.series[0].nodes.filter((node) => {
+			if(node.orign_idf >= value){
+				valueFilter.push(node.name);
+				return node;
+			}
+		});
+		option.series[0].links = option.series[0].links.filter((category) => {
+			if (valueFilter.includes(category.target) && valueFilter.includes(category.source)) {
+				return category;
+			}
 		});
 	}
-	// sidebar_level_render();
-	event_setOption_function(false);
+	
+	function centralityContrl(value){
+		$(`.slider_item > input[id=centrality]`).val(centralHash[value]);
+		temp = [];
+		var temp1 = []; 
+		central.forEach(item =>{
+			if(item[1] < centralHash[value])
+				temp.push(item[0]);
+		});
+		option.series[0].links = option.series[0].links.filter(function(item, index, array){
+			if(!temp.includes(item.target) && !temp.includes(item.source)){
+				temp1.push(item.target, item.source);
+				return item;
+			}
+		});
+		option.series[0].nodes = data.nodes.filter((node) => {
+			return temp1.includes(node.name);
+		});
+	}
+	event_setOption_function();
 	sidebar_level_render();
 }
 
@@ -1543,11 +1553,14 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 	Chart.setOption(option);
 }
 // The function to render the data to canvas after set all option finish
-function event_setOption_function(rander = true) {
-	Chart.setOption(option, true);
-	nodeList();
-	lineList();
-	ngraph();
+function event_setOption_function(rander = false) {
+	Chart.setOption(option, rander);
+	if(lastView !== option.series[0].categories.length){
+		nodeList();
+		lineList();
+		ngraph();
+	}
+	lastView = option.series[0].categories.length;
 }
 Chart.on('click', (e) => {
 	// console.log(e);
@@ -1575,6 +1588,7 @@ Chart.on('click', (e) => {
 		);
 	}
 });
+
 function highlightRoad(e) {
 	var routIndex = e;
 	console.log(e);
@@ -1683,6 +1697,7 @@ function centrality(value){
 		option.series[0].nodes.forEach(node =>{
 			central.push([node.name,directedCloseness[node.name]]);
 		});
+		centralitySlider();
 	}
 	function countEccentricity(){
 		directedEccentricity = eccentricity(g);
@@ -1690,6 +1705,7 @@ function centrality(value){
 		option.series[0].nodes.forEach(node =>{
 			central.push([node.name,directedEccentricity[node.name]]);
 		});
+		centralitySlider();
 	}
 	function countDegree(){
 		directedDgree = degree(g);
@@ -1697,6 +1713,7 @@ function centrality(value){
 		option.series[0].nodes.forEach(node =>{
 			central.push([node.name,directedDgree[node.name]]);
 		});
+		centralitySlider();
 	}
 	function countBetweenness(){
 		directedBetweenness = betweennes(g);
@@ -1704,30 +1721,51 @@ function centrality(value){
 		option.series[0].nodes.forEach(node =>{
 			central.push([node.name,directedBetweenness[node.name]]);
 		});
+		centralitySlider();
 	}
-	function centralitySlider(value) {
-		$(`.slider_item > #max_level`).slider({
+	function centralitySlider() {
+		central.sort(function(a,b){
+			if (a[1] > b[1]) {
+				return 1;
+			}
+			else if (a[1] < b[1]) {
+				return -1;
+			}
+			return 0;
+		});
+		var roundDecimal = function (val, precision) {
+			return Math.round(Math.round(val * Math.pow(10, (precision || 0) + 1)) / 10) / Math.pow(10, (precision || 0));
+		  }
+		  if(central[central.length -1][1] <= 1)
+			 var precision = 5;
+		  else if (central[central.length -1][1] <= 10)
+			  var precision = 3;
+		else if (central[central.length -1][1] <= 100)
+			  var precision = 2;
+		else 
+			var precision = 0;
+		centralHash = [];
+		central.forEach(item =>{
+			item[1] = roundDecimal(item[1], precision);
+			centralHash.push(item[1]);
+		})
+		console.log(centralHash);
+		centralHash = Array.from(new Set(centralHash));
+		console.log(centralHash);
+		$(`.slider_item > #centrality`).slider({
 			min: 0,
-			max: routeHash.length, //最大階層數
+			max: centralHash.length-1, //最大階層數
 			step: 1,
-			value: value, //current option setting value
+			value: 0, //current option setting value
 			disable: false,
 			range: 'min'
 		});
-		$(`.slider_item > input[id=max_level]`).val(routeFloor);
-		$('.max_level').show();
+		$(`.slider_item > input[id=centrality]`).val(centralHash[0]);
+		$('.centrality').show();
 	}
-	central.sort(function(a,b){
-		if (a[1] > b[1]) {
-			return 1;
-		}
-		else if (a[1] < b[1]) {
-			return -1;
-		}
-		return 0;
-	});
 	console.log(central);
 	$('.centrality').show();
+	filterControler('centrality',0);
 }
 function ngraph(){
 	g = createGraph();

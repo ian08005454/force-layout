@@ -168,8 +168,6 @@ else{
             categories.lineStyle.normal.type = 'doted'
             categories.lineStyle.normal.shadowBlur = 10;
         }
-        if(categories.orign_v === 0)
-        data.all_category.splice(index, 1);
     });
     option.series[0].categories.forEach(function(category, index){
         if(category.name === '未定義'){
