@@ -11,6 +11,7 @@
 
     <!-- CSS -->
     <!-- <link rel="stylesheet" href="./css/reset.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
     <link rel="stylesheet" href="./css/index.css">
 </head>
@@ -21,7 +22,7 @@
             <div class="slider">
                 <label class="switch switch-left-right">
                     <input class="switch-input" type="checkbox"  onclick="switchType()"/>
-                    <span class="switch-label" data-on="顯示網絡圖" data-off="顯示環狀圖"></span> <span class="switch-handle"></span> </label>
+                    <span class="switch-label" data-on="切換網絡圖" data-off="切換環狀圖"></span> <span class="switch-handle"></span> </label>
                 <!-- <div class="slider_item">
                     <label class="slider_describe" for="relation_strength">關係強度 : </label>
                     <input type="text" value="" id="relation_strength">
@@ -38,47 +39,52 @@
                     <div class="slider_slider" id="group_label_distance"></div>
                 </div> -->
                 <details>
-                    <summary>線的調整</summary>
+                    <summary>圖形調整</summary>
+                    <details>
+                        <summary>線的調整</summary>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="relation_distance">線的距離區間 : </label>
+                            <input type="text" value="" id="relation_distance">
+                            <div class="slider_slider" id="relation_distance"></div>
+                        </div>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="relation_link_width">線的粗細 : </label>
+                            <input type="text" value="" id="relation_link_width">
+                            <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
+                            <div class="slider_slider" id="relation_link_width"></div>
+                        </div>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="relation_font_size">線的字體大小 : </label>
+                            <input type="text" value="" id="relation_font_size">
+                            <div class="slider_slider" id="relation_font_size"></div>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>點的調整</summary>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="node_distance">點的群聚度 : </label>
+                            <input type="text" value="" id="node_distance">
+                            <div class="slider_slider" id="node_distance"></div>
+                        </div>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="node_size">點的背景大小 : </label>
+                            <input type="text" value="" id="node_size">
+                            <div class="slider_slider" id="node_size"></div>
+                        </div>
+                        <div class="slider_item">
+                            <label class="slider_describe" for="subject_font_size">點的字體大小 : </label>
+                            <input type="text" value="" id="subject_font_size">
+                            <div class="slider_slider" id="subject_font_size"></div>
+                        </div>
+                        <input type="checkbox"id="alone" name='alone'onclick='filterControler("alone",0)'  checked>
+                        <label for="alone">顯示無連線點</label>
+                    </details>
                     <div class="slider_item">
-                        <label class="slider_describe" for="relation_distance">線的距離區間 : </label>
-                        <input type="text" value="" id="relation_distance">
-                        <div class="slider_slider" id="relation_distance"></div>
-                    </div>
-                    <div class="slider_item">
-                        <label class="slider_describe" for="relation_link_width">線的粗細 : </label>
-                        <input type="text" value="" id="relation_link_width">
-                        <!-- <input type="range" class="slider_slider" value="" id="relation_link_width"> -->
-                        <div class="slider_slider" id="relation_link_width"></div>
-                    </div>
-                    <div class="slider_item">
-                        <label class="slider_describe" for="relation_font_size">線的字體大小 : </label>
-                        <input type="text" value="" id="relation_font_size">
-                        <div class="slider_slider" id="relation_font_size"></div>
+                        <label class="slider_describe" for="main_screen_room">圖形縮放 : </label>
+                        <input type="text" value="" id="main_screen_room">
+                        <div class="slider_slider" id="main_screen_room"></div>
                     </div>
                 </details>
-                <details>
-                    <summary>點的調整</summary>
-                    <div class="slider_item">
-                        <label class="slider_describe" for="node_distance">點的群聚度 : </label>
-                        <input type="text" value="" id="node_distance">
-                        <div class="slider_slider" id="node_distance"></div>
-                    </div>
-                    <div class="slider_item">
-                        <label class="slider_describe" for="node_size">點的背景大小 : </label>
-                        <input type="text" value="" id="node_size">
-                        <div class="slider_slider" id="node_size"></div>
-                    </div>
-                    <div class="slider_item">
-                        <label class="slider_describe" for="subject_font_size">點的字體大小 : </label>
-                        <input type="text" value="" id="subject_font_size">
-                        <div class="slider_slider" id="subject_font_size"></div>
-                    </div>
-                </details>
-                <div class="slider_item">
-                    <label class="slider_describe" for="main_screen_room">圖形縮放 : </label>
-                    <input type="text" value="" id="main_screen_room">
-                    <div class="slider_slider" id="main_screen_room"></div>
-                </div>
                 <div class="slider_item word_strength">
                     <label class="slider_describe" for="word_strength">單點出現次數   ≥</label>
                     <input type="text" value="" id="word_strength">
@@ -90,7 +96,7 @@
                     <div class="slider_slider" id="common_show_value"></div>
                 </div>
                 <div class="slider_item max_level">
-                    <label class="slider_describe" for="max_level">最大階層數 : </label>
+                    <label class="slider_describe" for="max_level">距離篩選 : </label>
                     <input type="text" value="" id="max_level">
                     <div class="slider_slider" id="max_level"></div>
                 </div>
@@ -102,7 +108,7 @@
                     <option value="closeness">親密中心性</option>
                 </select>
                 <div class="slider_item centrality">
-                    <label class="slider_describe" for="centrality">中心性 : </label>
+                    <label class="slider_describe" for="centrality">中心性 >= </label>
                     <input type="text" value="" id="centrality">
                     <div class="slider_slider" id="centrality"></div>
                 </div>
@@ -123,6 +129,7 @@
                 <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
                 <div class="keyword">
+                    <div id="div"></div>
                 </div>
             </div> 
             <div class="nodeSelect">
@@ -154,12 +161,14 @@
     <script src="./lib/closeness.js"></script>
     <script src="./lib/degree.js"></script>
     <script src='./lib/eccentricity.js'></script>
-    
+    <script>
+        var book_id = '39267';
+    </script>
 
     <!-- resource -->
     <!-- english data -->
     <!-- <script src="./source/清史錄-宣統政紀-師生朋友親屬關係.js"></script> -->
-    <!-- <script src="./source/清史稿-人物關係.js"></script> -->
+    <script src="./source/清史稿-人物關係.js"></script>
     <!-- <script src="./source/清史稿-人.js"></script> -->
     <!-- <script src="./source/2-paragraph.js"></script> -->
     <!-- <script src="./source/Dream of the Red Chamber.js"></script> -->
@@ -170,7 +179,10 @@
     <!-- <script src="./source/multi-paragraph.js"></script> -->
     <!-- <script src="./source/p_test.js"></script> -->
     <!-- <script src="./source/example.js"></script> -->
-    <script  src="./source/p_test1.js"></script>
+    <!-- <script  src="./source/p_test1.js"></script> -->
+    <!-- <script  src="./source/test2.js"></script> -->
+    <!-- <script  src="./source/snareport.js"></script> -->
+    <!-- <script src="./source/紅樓夢-二字詞人.js"></script> -->
     <!-- <script src="./source/book 2.js"></script> -->
 
 

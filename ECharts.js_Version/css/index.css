@@ -2,13 +2,12 @@
 .wrap {
     overflow: hidden;
 }
-
+p,h1,h2,h3,h4,h5,h6,summary,option,select{font-family: 'Noto Sans TC', sans-serif;}
 /* canvas */
 #main {
     z-index: 0;
     position: relative;
 }
-
 /* sidebar */
 .sidebar {
     position : fixed;
@@ -130,6 +129,7 @@
     margin-bottom:3px;
 }
 label{
+	font-family: 'Noto Sans TC', sans-serif;
     margin-top: 0px;
     margin-bottom: 0px;
 }
@@ -210,6 +210,7 @@ label{
 	box-sizing:content-box;
 }
 .switch-label {
+	font-family: 'Noto Sans TC', sans-serif;
 	position: relative;
 	display: block;
 	height: inherit;
@@ -232,12 +233,14 @@ label{
 	box-sizing:content-box;
 }
 .switch-label:before {
+	font-family: 'Noto Sans TC', sans-serif;
 	content: attr(data-off);
 	right: 110px;
 	color: #ffffff;
 	text-shadow: 0 1px rgba(255, 255, 255, 0.5);
 }
 .switch-label:after {
+	font-family: 'Noto Sans TC', sans-serif;
 	content: attr(data-on);
 	left: 11px;
 	color: #FFFFFF;

@@ -103,7 +103,7 @@ var option = {
                         fontSize: 17
                     },
                     formatter:function(param){
-                        return param.name ;
+                        return param.name + `(` + param.data.orign_idf + `)` ;
                     },
                     // position : 'left'
                 },
@@ -165,19 +165,40 @@ else{
     data.all_category.forEach(function(categories, index){
         if(categories.name === '未定義'){
             categories.lineStyle.normal.color = 'black';
-            categories.lineStyle.normal.type = 'doted'
             categories.lineStyle.normal.shadowBlur = 10;
         }
     });
     option.series[0].categories.forEach(function(category, index){
         if(category.name === '未定義'){
             category.lineStyle.normal.color = 'black';
-            category.lineStyle.normal.type = 'doted'
             category.lineStyle.normal.shadowBlur = 10;
         }
     }); 
 }
-console.log(option);
+var edgeMask = [[],[]];
+option.series[0].categories.forEach(category =>{
+    if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id))
+    option.series[0].categories.forEach(item =>{
+        if(item.target === category.source && item.source === category.target){
+            if(item.name === category.name){
+                if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id)){
+                    edgeMask[0].push(category.id);
+                    edgeMask[1].push(item.id);
+                }
+            }
+        }
+    })
+})
+option.series[0].links.forEach(function(link,index,array){
+    if(edgeMask[1].includes(link.id)){
+        option.series[0].links.splice(index,1);
+    }
+    if(edgeMask[0].includes(link.id)){
+        link.symbol = 'arrow';
+    }
+});
+console.log(edgeMask);
+// console.log(option);
 // ! setup all option
 Chart.setOption(option,true);
 sidebar_level_render();

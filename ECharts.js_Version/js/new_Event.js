@@ -119,7 +119,8 @@ class searchTarget {
 										//看看這條線有沒有在條件內
 										if (item.length > 1) {
 											//如果條件為多種關係組合
-											bench.push(category.target, category.source); //放入bench裡
+											if(!edgeMask[1].includes(category.id))
+												bench.push(category.target, category.source); //放入bench裡
 										} else {
 											union_collect.push(category.target, category.source);
 											categories.push(category); //準備要加入圖中
@@ -157,10 +158,15 @@ class searchTarget {
 						count.forEach((element) => {
 							//確保剩下的節點所串成的路徑都與條件相符，確認是否有多條一樣的target and source
 							let a = count.filter((category) => {
-								if (element.target === category.target && element.source === category.source)
-									return category;
-								else if (element.target === category.source && element.source === category.target)
-									return category;
+								if (element.target === category.target && element.source === category.source){
+									if(element.name === category.name && element.id === category.id)
+										return category;
+									else if(element.name !== category.name)	return category;
+								}
+								else if (element.target === category.source && element.source === category.target){
+									if(element.name != category.name)
+										return category;
+								}
 							});
 							if (a.length === item.length) {
 								categories.push(element);
@@ -238,8 +244,10 @@ class searchTarget {
 						if (category.show === true) {
 							if (item.includes(category.name)) {
 								if (item.length > 1) {
+									if(!edgeMask[1].includes(category.id))
 									bench.push(category.target, category.source);
 								} else {
+									console.log(category.name)
 									collect.push(category.target, category.source);
 									categories.push(category);
 								}
@@ -248,11 +256,12 @@ class searchTarget {
 					}
 				});
 				if (item.length > 1) {
+					console.log(bench.length);
 					for (let i = 1; i < item.length; i++)
 						bench = bench.filter(function(element, index, arr) {
 							return arr.indexOf(element) !== index;
 						});
-					console.log(bench);
+					console.log(bench.length);
 					data.category.filter((category) => {
 						if (!notKeyword.includes(category.target) && !notKeyword.includes(category.source)) {
 							if (category.show === true) {
@@ -266,10 +275,15 @@ class searchTarget {
 					});
 					count.forEach((element) => {
 						let a = count.filter((category) => {
-							if (element.target === category.target && element.source === category.source)
-								return category;
-							else if (element.target === category.source && element.source === category.target)
-								return category;
+							if (element.target === category.target && element.source === category.source){
+								if(element.name === category.name && element.id === category.id)
+									return category;
+								else if(element.name !== category.name)	return category;
+							}
+							else if (element.target === category.source && element.source === category.target){
+								if(element.name != category.name)
+									return category;
+							}
 						});
 						if (a.length === item.length) {
 							categories.push(element);
@@ -456,8 +470,10 @@ class searchTarget {
 							if (keywordTemp === category.target || keywordTemp === category.source) {
 								if (item.includes(category.name)) {
 									if (item.length > 1) {
-										//
-										bench.push(category.target, category.source);
+										if(!edgeMask[1].includes(category.id)){
+											bench.push(category.target, category.source);
+										}
+									
 									} else {
 										union_collect.push(category.target, category.source);
 										temp.push(category);
@@ -482,10 +498,15 @@ class searchTarget {
 							});
 							count.forEach((element) => {
 								let a = count.filter((category) => {
-									if (element.target === category.target && element.source === category.source)
-										return category;
-									else if (element.target === category.source && element.source === category.target)
-										return category;
+									if (element.target === category.target && element.source === category.source){
+										if(element.name === category.name && element.id === category.id)
+											return category;
+										else if(element.name !== category.name)	return category;
+									}
+									else if (element.target === category.source && element.source === category.target){
+										if(element.name != category.name)
+											return category;
+									}
 								});
 								if (a.length === item.length) {
 									categories.push(element);
@@ -652,7 +673,7 @@ class searchWord {
 					for (var x = 1; x < keyword_search_name_s.length; x++) {
 						for (var i = keywordPoint; i < keywordPoint + keywordCount; i++) {
 							//複製前面的值來append
-							keywordCollection.push(JSON.parse(JSON.stringify(keywordCollection[i])));
+							keywordCollection.push(new searchTarget(keywordCollection[i].nodeName, keywordCollection[i].lineName, keywordCollection[i].lineName2));
 						}
 					}
 				}
@@ -727,10 +748,13 @@ class searchWord {
 			keywordCount = 1;
 			if (lineName.includes('|')) {
 				lineName = lineName.split('|');
+				let lenName = [];
 				lineName.forEach((item) => {
-					if (item.includes('&')) item.split('&');
-					else item = Array(item);
+					if (item.includes('&')) item = item.split('&');
+					else item = new Array(item);
+					lenName.push(item);
 				});
+				lineName = lenName;
 			} else {
 				if (lineName.includes('&')) lineName = lineName.split('&');
 				else lineName = Array(lineName);
@@ -843,14 +867,36 @@ function lineCtrl() {
  */
 function keyword_search(e) {
 	// get the search name
-	if (e.which === 13 || e.type === 'click') {
+	if((e.which>=48&&e.which<=57)||(e.which>=65&&e.which<=90)||e.which==8||e.which==32||e.which==46){
+		var seachText=$("#keyword_search_field").val();
+		if(seachText!=""){
+		 //構造顯示頁面
+		 var tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
+		 //遍歷解析json
+		 console.log(seachText);
+		 $.each(data.all_nodes,function(id, item){
+		  //如果包含則為table賦值
+		  if(item.includes(seachText)){
+			  console.log(item);
+		  tab+="<tr align='center'><td>"+item+"</td></tr>";
+		  }
+		 })
+		 tab+="</table>";
+		 $("#div").html(tab);
+		 //重新覆蓋掉，不然會追加
+		 tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
+		}else{
+		 $("#div").html("");
+		}
+	}
+	else if (e. which=== 13 || e.type === 'click') {
 		//點搜尋或按ENTER
 		keyword_search_name = $('#keyword_search_field').val();
 		keyword_search_name = keyword_search_name.toLowerCase();
 		keyword_search_name = keyword_search_name.replace(' and ', '&');
 		keyword_search_name = keyword_search_name.replace(' or ', '|');
 		var keywordSearchType = $('#kClass').val();
-		if ((releation = false)) var keywordModel = 'node';
+		if (releation == false) var keywordModel = 'node';
 		else var keywordModel = $('#kModel').val();
 		if (keyword.includes(keyword_search_name)) {
 			alert(`Error :  same keyword can not search more than twice`);
@@ -1355,7 +1401,7 @@ $(() => {
 	$('.slider_slider').slider({
 		slide: function(e, ui) {
 			if (e.target.id == 'common_show_value') {
-				if (ui.value == min_common_show_value - 1) {
+				if (ui.value == - 1) {
 					$('input[id=' + e.target.id + ']').val('沒共現');
 				} else {
 					$('input[id=' + e.target.id + ']').val(`${ui.value}`);
@@ -1420,6 +1466,7 @@ $(() => {
 	});
 	nodeList();
 	lineList();
+	edgeFilter();
 	ngraph();
 });
 function change_width(width_value) {
@@ -1450,7 +1497,7 @@ function filterControler(target,value){
 		var value_filter = [];
 		// console.log(value);//normal
 			option.series[0].links = option.series[0].links.filter((category) => {
-				if(value == min_common_show_value - 1 ){
+				if(value == - 1 ){
 					if(category.orign_v == 0){
 						value_filter.push(category.target, category.source);
 						return category;
@@ -1470,6 +1517,7 @@ function filterControler(target,value){
 
 	function word_strength(value) {
 		var valueFilter = [];
+		var valueFilter2 = [];
 		option.series[0].nodes =  option.series[0].nodes.filter((node) => {
 			if(node.orign_idf >= value){
 				valueFilter.push(node.name);
@@ -1478,12 +1526,19 @@ function filterControler(target,value){
 		});
 		option.series[0].links = option.series[0].links.filter((category) => {
 			if (valueFilter.includes(category.target) && valueFilter.includes(category.source)) {
+				valueFilter2.push(category.target,category.source);
 				return category;
 			}
 		});
+		if($('#alone').is(":checked") === false){
+			option.series[0].nodes = data.nodes.filter((node) => {
+				return valueFilter2.includes(node.name);
+			});
+		}
 	}
 	
 	function centralityContrl(value){
+		if(centralHash.length === 0) return;
 		$(`.slider_item > input[id=centrality]`).val(centralHash[value]);
 		temp = [];
 		var temp1 = []; 
@@ -1491,14 +1546,16 @@ function filterControler(target,value){
 			if(item[1] < centralHash[value])
 				temp.push(item[0]);
 		});
-		option.series[0].links = option.series[0].links.filter(function(item, index, array){
-			if(!temp.includes(item.target) && !temp.includes(item.source)){
-				temp1.push(item.target, item.source);
-				return item;
+		option.series[0].links.forEach(function(item, index, array){
+			if(temp.includes(item.target) || temp.includes(item.source)){
+				item.lineStyle.normal.opacity = 0.1;
+				item.label.show = false;
 			}
 		});
-		option.series[0].nodes = data.nodes.filter((node) => {
-			return temp1.includes(node.name);
+		option.series[0].nodes.forEach((node) => {
+			node.itemStyle.normal.opacity = 1;
+			if(temp.includes(node.name))
+				node.itemStyle.normal.opacity = 0.1;
 		});
 	}
 	event_setOption_function();
@@ -1554,87 +1611,61 @@ function change_spaecialone_type(symbol = 'circle', color = 'pink') {
 }
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = false) {
-	Chart.setOption(option, rander);
 	if(lastView !== option.series[0].categories.length){
+		lastView = option.series[0].categories.length;
 		nodeList();
 		lineList();
 		ngraph();
+		console.log($('#Cselecter').val());
+		if($('#Cselecter').val() !== '')
+			centrality($('#Cselecter').val());
 	}
-	lastView = option.series[0].categories.length;
+	edgeFilter();
+	nodeTypeChange();
+	Chart.setOption(option, rander);
 }
 Chart.on('click', (e) => {
 	// console.log(e);
-	console.log(e.data.source, e.data.target, e.data.name);
-	searchBookAssociation(24970, '寶玉', '高興', 'test');
+	console.log(book_id,e.data.source, e.data.target, e.data.name);
+	if(book_id.indexOf("_")==-1)
+    {
+        if(e.data.source==undefined && e.data.target==undefined)
+            searchBookUnit(book_id,e.data.name); 
+        else
+            searchBookAssociation(book_id, e.data.source, e.data.target,  e.data.name);
+    }
 
-	function searchBookAssociation(bid, key1, key2, relation) {
-		var associationQuery = '"' + key1 + '" AND "' + key2 + '"';
-		// http://dh.ascdc.sinica.edu.tw/member/text/segementRelationDetails.jsp
-		$.get(
-			'http://dh.ascdc.sinica.edu.tw/member/text/segementRelationDetails.jsp',
-			{
-				bid: bid,
-				searchKey: associationQuery,
-				pages: 1,
-				isStart: '1',
-				relation: relation
-			},
-			function(data) {
-				//$('#layout_main').html(data);
-				var w = window.open('about:blank', key1 + key2, 'width=800,height=600');
-				w.document.write(data);
-				w.document.close();
-			}
-		);
-	}
+    function searchBookAssociation(bid, key1, key2, relation) {
+        var associationQuery = '"' + key1 + '" AND "' + key2 + '"';
+        // http://dh.ascdc.sinica.edu.tw/member/text/segementRelationDetails.jsp
+        $.get(window.location.origin+'/member/text/segementRelationDetails.jsp', {
+            'bid': bid,
+            'searchKey': associationQuery,
+            'pages': 1,
+            'isStart': '1',
+            'relation': relation
+        }, function (data) {
+            //$('#layout_main').html(data);
+            var w = window.open('about:blank', key1 + key2, 'width=800,height=600');
+            w.document.write(data);
+            w.document.close();
+        });
+    }
+    function searchBookUnit(bid,associationKey){
+    //alert(bid);
+    var associationQuery = "";
+    associationQuery = '"'+associationKey+'"';
+    //$('#searchKey').val(associationKey);
+    $.get(window.location.origin+'/member/text/segementDetails.jsp',{'only_show_authority':$("#only_show_authority").val(),'show_info':$("#show_info").val(),'pageNums':$("#pageNums").val(),'bookID':bid,'bid':bid,'searchKey':associationQuery,'ckDic':$("#DicCK").prop("checked"),'pages': 1,'isStart':'1'}, function(data) {
+           //$('#layout_main').html(data);
+            var w = window.open('about:blank', associationKey,'width=800,height=600');
+            w.document.write(data);
+            w.document.close();
+             
+    });
+    
+}
 });
-
-function highlightRoad(e) {
-	var routIndex = e;
-	console.log(e);
-	option.series[0].nodes.forEach((item) => {
-		item.itemStyle.normal.opacity = 0.1;
-	});
-	option.series[0].categories.forEach((item) => {
-		item.lineStyle.normal.opacity = 0.1;
-	});
-	option.series[0].links.forEach((item) => {
-		item.lineStyle.normal.opacity = 0.1;
-	});
-	// route.forEach(index => {if(index == e) routIndex = index;})
-	option.series[0].nodes.forEach((item) => {
-		if (route[e].includes(item.name)) item.itemStyle.normal.opacity = 1;
-	});
-	option.series[0].categories.forEach((category) => {
-		for (var i = 0, len = route[routIndex].length; i < len - 1; i++)
-			if (route[routIndex][i].includes(category.target) && route[routIndex][i + 1].includes(category.source))
-				category.lineStyle.normal.opacity = 1;
-			else if (route[routIndex][i + 1].includes(category.target) && route[routIndex][i].includes(category.source))
-				category.lineStyle.normal.opacity = 1;
-	});
-	option.series[0].links.forEach((category) => {
-		for (var i = 0, len = route[routIndex].length; i < len - 1; i++)
-			if (route[routIndex][i].includes(category.target) && route[routIndex][i + 1].includes(category.source))
-				category.lineStyle.normal.opacity = 1;
-			else if (route[routIndex][i + 1].includes(category.target) && route[routIndex][i].includes(category.source))
-				category.lineStyle.normal.opacity = 1;
-	});
-	// sidebar_level_render();
-	event_setOption_function(false);
-}
-function recoveryRoad() {
-	option.series[0].nodes.forEach((item) => {
-		item.itemStyle.normal.opacity = 1;
-	});
-	option.series[0].categories.forEach((item) => {
-		item.lineStyle.normal.opacity = 1;
-	});
-	option.series[0].links.forEach((item) => {
-		item.lineStyle.normal.opacity = 1;
-	});
-	// sidebar_level_render();
-	event_setOption_function(false);
-}
 function nodeList() {
 	$('.nodeSelected').children().remove();
 	option.series[0].nodes.forEach((item) => {
@@ -1681,7 +1712,14 @@ function nodeListChange(e) {
 	keyword_item_delete();
 }
 function centrality(value){
-	
+	var valueFilter = [];
+	option.series[0].categories.forEach(category =>{
+		valueFilter.push(category.target,category.source);
+	})
+	valueFilter = Array.from(new Set(valueFilter));
+	option.series[0].nodes = data.nodes.filter((node) => {
+		return valueFilter.includes(node.name);
+	});
 	if(value === 'betweenness')
 		countBetweenness();
 	else if(value === 'closeness')
@@ -1771,16 +1809,14 @@ function ngraph(){
 	g = createGraph();
 	option.series[0].nodes.forEach(node =>{
 		g.addNode(node.name);
-	})
-	let ccc = 0;
-	option.series[0].categories.forEach(category =>{
-		ccc += category.orign_v;
-		for(let i = 0; i<category.orign_v; i++){
-			g.addLink(category.target, category.source);
-		}
-		// g.addLink(category.target, category.source);
 	});
-	console.log(g);
+	option.series[0].categories.forEach(category =>{
+		// ccc += category.orign_v;
+		// for(let i = 0; i<category.orign_v; i++){
+		// 	g.addLink(category.target, category.source);
+		// }
+		g.addLink(category.target, category.source);
+	});
 }
 
 function reRunKeyword() {
@@ -1864,4 +1900,36 @@ function reRunKeyword() {
 	}
 	event_setOption_function();
 	sidebar_level_render();
+}
+function edgeFilter(){																					
+	option.series[0].links.forEach(function(link,index,array){
+		if(edgeMask[1].includes(link.id)){
+			option.series[0].links.splice(index,1);
+		}
+		if(edgeMask[0].includes(link.id)){
+			link.symbol = 'arrow';
+		}
+	})
+}
+function nodeTypeChange(){
+	let target = option.series[0].links.map(function(item, index, array) {
+		return item.target;
+	});
+	let source = option.series[0].links.map(function(item, index, array) {
+		return item.source;
+	});
+		option.series[0].nodes.forEach(item =>{
+		if(source.includes(item.name) && target.includes(item.name)){
+			item.symbol = "circle"
+			item.itemStyle.normal.color = "#955539";
+		}
+		else if(target.includes(item.name)){
+			item.symbol = "rect"
+			item.itemStyle.normal.color = '#4c8dae';
+		}
+		else if(source.includes(item.name)){
+			item.symbol = "roundRect"
+			item.itemStyle.normal.color = "#789262";
+		}
+	});
 }

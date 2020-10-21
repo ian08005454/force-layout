@@ -119,7 +119,7 @@ function data_format(data, LODtype=0) {
                         symbol: symbol,//kg2_element.css[0].symbol,
                         itemStyle: {
                             normal: {
-                                opacity:1,//work
+                                opacity:0.9,//work
                                 borderType: bType,   //'solid',
                                 borderColor: bColor,  //'orange',
                                 borderWidth: bWidth, //0,
@@ -157,6 +157,8 @@ function data_format(data, LODtype=0) {
                     value: kg2_element.v,
                     category: kg2_element.type[0] + `(` + orignal_v + `)`,
                     show: true,//不知道要做甚麼
+                    symbol: ['arrow'],
+                    symbolSize:20,
                     orign_v: orignal_v,
                     orign_idf: orignal_idf,
                     force: {
@@ -172,6 +174,9 @@ function data_format(data, LODtype=0) {
                             shadowColor : shadowColor,
                             shadowBlur : shadowBlur
                         }
+                    },
+                    label:{
+                        show : true
                     },
                 });
                 // buf.all_category has the every property that links object need, etc : source, target, value, lineStyle
@@ -263,6 +268,7 @@ function data_format(data, LODtype=0) {
                     linkcolor = random_color;
                     var shadowColor = 'orange';
                     var shadowBlur = 0;
+                    
                 buf.all_category.push({
                     id: id++,
                     name: kg2_element.type[0],
@@ -274,6 +280,8 @@ function data_format(data, LODtype=0) {
                     // value: kg2_element.v,
                     category: kg2_element.type[0],
                     show: true,//不知道要做甚麼
+                    symbol:['arrow'],
+                    symbolSize:20,
                     lineStyle: {
                         normal: {
                             opacity:1,//work
@@ -284,6 +292,9 @@ function data_format(data, LODtype=0) {
                             shadowColor : shadowColor,
                             shadowBlur : shadowBlur
                         }
+                    },
+                    label:{
+                        show : true
                     },
                 });
 
