@@ -867,29 +867,29 @@ function lineCtrl() {
  */
 function keyword_search(e) {
 	// get the search name
-	if((e.which>=48&&e.which<=57)||(e.which>=65&&e.which<=90)||e.which==8||e.which==32||e.which==46){
-		var seachText=$("#keyword_search_field").val();
-		if(seachText!=""){
-		 //構造顯示頁面
-		 var tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
-		 //遍歷解析json
-		 console.log(seachText);
-		 $.each(data.all_nodes,function(id, item){
-		  //如果包含則為table賦值
-		  if(item.includes(seachText)){
-			  console.log(item);
-		  tab+="<tr align='center'><td>"+item+"</td></tr>";
-		  }
-		 })
-		 tab+="</table>";
-		 $("#div").html(tab);
-		 //重新覆蓋掉，不然會追加
-		 tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
-		}else{
-		 $("#div").html("");
-		}
-	}
-	else if (e. which=== 13 || e.type === 'click') {
+	// if((e.which>=48&&e.which<=57)||(e.which>=65&&e.which<=90)||e.which==8||e.which==32||e.which==46){
+	// 	var seachText=$("#keyword_search_field").val();
+	// 	if(seachText!=""){
+	// 	 //構造顯示頁面
+	// 	 var tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
+	// 	 //遍歷解析json
+	// 	 console.log(seachText);
+	// 	 $.each(data.all_nodes,function(id, item){
+	// 	  //如果包含則為table賦值
+	// 	  if(item.includes(seachText)){
+	// 		  console.log(item);
+	// 	  tab+="<tr align='center'><td>"+item+"</td></tr>";
+	// 	  }
+	// 	 })
+	// 	 tab+="</table>";
+	// 	 $("#div").html(tab);
+	// 	 //重新覆蓋掉，不然會追加
+	// 	 tab="<table width='300' border='1' cellpadding='0' cellspacing='0'><tr align='center'><td>名稱</td></tr>";
+	// 	}else{
+	// 	 $("#div").html("");
+	// 	}
+	// }
+	if (e. which=== 13 || e.type === 'click') {
 		//點搜尋或按ENTER
 		keyword_search_name = $('#keyword_search_field').val();
 		keyword_search_name = keyword_search_name.toLowerCase();
@@ -1919,7 +1919,10 @@ function nodeTypeChange(){
 		return item.source;
 	});
 		option.series[0].nodes.forEach(item =>{
-		if(source.includes(item.name) && target.includes(item.name)){
+		if(item.itemStyle.normal.color == "red"){
+
+			}
+		else if(source.includes(item.name) && target.includes(item.name)){
 			item.symbol = "circle"
 			item.itemStyle.normal.color = "#955539";
 		}
@@ -1930,6 +1933,10 @@ function nodeTypeChange(){
 		else if(source.includes(item.name)){
 			item.symbol = "roundRect"
 			item.itemStyle.normal.color = "#789262";
+		}
+		else if(!source.includes(item.name) && !target.includes(item.name)){
+			item.symbol = "circle"
+			item.itemStyle.normal.color = "#ceb888";
 		}
 	});
 }
