@@ -849,7 +849,7 @@ function lineCtrl() {
 			} else {
 				if (item === '無共現') {
 					data.all_category = data.all_category.filter((category) => {
-						if (category.orign_v === 0) category.show = false;
+						if (category.value === 0) category.show = false;
 						return category;
 					});
 				} else {
@@ -1241,7 +1241,6 @@ function data_filter_and() {
 			: (node.itemStyle.normal.color = user_colors[node.gp]);
 		return nodeCollection.includes(node.name);
 	});
-	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
 	dataAppendOr(categories, links, nodes);
 }
 function dataAppendOr(categories, links, nodes) {
@@ -1287,7 +1286,7 @@ function lineList() {
 		}
 	}
 	option.series[0].categories.forEach((item) => {
-		if (item.orign_v === 0) {
+		if (item.value === 0) {
 			if (!list.includes('無共現')) {
 				list.push('無共現');
 				$('.lineSelected').append(`<div class="lineSelected_item" data-item="無共現">
@@ -1347,7 +1346,6 @@ function resetChart() {
 		node.itemStyle.normal.color = user_colors[node.gp];
 		return collect.includes(node.name);
 	});
-	change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color);
 	event_setOption_function();
 	sidebar_level_render();
 }
@@ -1371,11 +1369,6 @@ function max_Level(ui_value) {
 // the involve function that will read the jquery_slider_setting in Main_setting.js, then create the jquery slider
 $(() => {
 	$('.centrality').hide();
-	if (releation === false) {
-		$('.lineSelected').hide();
-		$('#kModel').hide();
-		$('.current_relation').hide();
-	}
 	// const length = [option.series[0].force.edgeLength[0], option.series[0].force.edgeLength[1]]
 	$(`.slider_item > #relation_distance`).slider({
 		range: true,
@@ -1498,12 +1491,12 @@ function filterControler(target,value){
 		// console.log(value);//normal
 			option.series[0].links = option.series[0].links.filter((category) => {
 				if(value == - 1 ){
-					if(category.orign_v == 0){
+					if(category.value == 0){
 						value_filter.push(category.target, category.source);
 						return category;
 						}
 				}
-				else if(category.orign_v >= value){
+				else if(category.value >= value){
 					value_filter.push(category.target, category.source);
 					return category;
 				}
@@ -1519,7 +1512,7 @@ function filterControler(target,value){
 		var valueFilter = [];
 		var valueFilter2 = [];
 		option.series[0].nodes =  option.series[0].nodes.filter((node) => {
-			if(node.orign_idf >= value){
+			if(node.idf >= value){
 				valueFilter.push(node.name);
 				return node;
 			}
@@ -1561,54 +1554,6 @@ function filterControler(target,value){
 	event_setOption_function();
 	sidebar_level_render();
 }
-
-none_orign_idf_node(csType.css_link[0].borderType, csType.css_link[0].borderColor, csType.css_link[0].borderWidth); //可以改變idf=0的樣式
-function none_orign_idf_node(bType = 'solid', bColor = '#808080', bWidth = 3) {
-	//idf==0的點有border
-	var temp;
-	temp = data.nodes.filter((node) => {
-		return node.orign_idf == 0;
-	});
-	temp.forEach((t) => {
-		var ttemp = t.itemStyle.normal;
-		ttemp.borderType = bType;
-		ttemp.borderColor = '#fcbf08';
-		ttemp.borderWidth = bWidth;
-	});
-	// console.log(temp);
-	Chart.setOption(option);
-}
-change_spaecialone_type(csType.css3[0].symbol, csType.css3[0].normal.color); //可以改變同時為輸出及輸入的樣式
-function change_spaecialone_type(symbol = 'circle', color = 'pink') {
-	var result_t = []; //裝target的點
-	var result_s = []; //裝source的點
-	var concat; //target source合併之後的點
-	var Result; //要變成咖啡色的點
-	user_colors[3] = color;
-	data.category.forEach((c) => {
-		result_t.push(c.target);
-		result_s.push(c.source);
-	});
-	result_t = Array.from(new Set(result_t));
-	result_s = Array.from(new Set(result_s));
-	// console.log(result_s);
-	concat = result_t.concat(result_s);
-
-	Result = concat.filter((element, index, arr) => {
-		return arr.indexOf(element) !== index;
-	});
-	// console.log(Result);
-	Result = data.nodes.filter((node) => {
-		return Result.includes(node.name);
-	});
-	Result.forEach((t) => {
-		t.symbol = symbol;
-		if (t.itemStyle.normal.color !== 'red') {
-			t.itemStyle.normal.color = color;
-		}
-	});
-	Chart.setOption(option);
-}
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = false) {
 	if(lastView !== option.series[0].categories.length){
@@ -1621,7 +1566,7 @@ function event_setOption_function(rander = false) {
 			centrality($('#Cselecter').val());
 	}
 	edgeFilter();
-	nodeTypeChange();
+	// nodeTypeChange();
 	Chart.setOption(option, rander);
 }
 Chart.on('click', (e) => {
@@ -1811,8 +1756,8 @@ function ngraph(){
 		g.addNode(node.name);
 	});
 	option.series[0].categories.forEach(category =>{
-		// ccc += category.orign_v;
-		// for(let i = 0; i<category.orign_v; i++){
+		// ccc += category.value;
+		// for(let i = 0; i<category.value; i++){
 		// 	g.addLink(category.target, category.source);
 		// }
 		g.addLink(category.target, category.source);
@@ -1898,7 +1843,7 @@ function reRunKeyword() {
 		maxLevelSlider(0);
 		max_Level(0);
 	}
-	event_setOption_function();
+	event_setOption_function(true);
 	sidebar_level_render();
 }
 function edgeFilter(){																					
@@ -1911,32 +1856,32 @@ function edgeFilter(){
 		}
 	})
 }
-function nodeTypeChange(){
-	let target = option.series[0].links.map(function(item, index, array) {
-		return item.target;
-	});
-	let source = option.series[0].links.map(function(item, index, array) {
-		return item.source;
-	});
-		option.series[0].nodes.forEach(item =>{
-		if(item.itemStyle.normal.color == "red"){
+// function nodeTypeChange(){
+// 	let target = option.series[0].links.map(function(item, index, array) {
+// 		return item.target;
+// 	});
+// 	let source = option.series[0].links.map(function(item, index, array) {
+// 		return item.source;
+// 	});
+// 		option.series[0].nodes.forEach(item =>{
+// 		if(item.itemStyle.normal.color == "red"){
 
-			}
-		else if(source.includes(item.name) && target.includes(item.name)){
-			item.symbol = "circle"
-			item.itemStyle.normal.color = "#955539";
-		}
-		else if(target.includes(item.name)){
-			item.symbol = "rect"
-			item.itemStyle.normal.color = '#4c8dae';
-		}
-		else if(source.includes(item.name)){
-			item.symbol = "roundRect"
-			item.itemStyle.normal.color = "#789262";
-		}
-		else if(!source.includes(item.name) && !target.includes(item.name)){
-			item.symbol = "circle"
-			item.itemStyle.normal.color = "#ceb888";
-		}
-	});
-}
+// 			}
+// 		else if(source.includes(item.name) && target.includes(item.name)){
+// 			item.symbol = "circle"
+// 			item.itemStyle.normal.color = "#955539";
+// 		}
+// 		else if(target.includes(item.name)){
+// 			item.symbol = "rect"
+// 			item.itemStyle.normal.color = '#4c8dae';
+// 		}
+// 		else if(source.includes(item.name)){
+// 			item.symbol = "roundRect"
+// 			item.itemStyle.normal.color = "#789262";
+// 		}
+// 		else if(!source.includes(item.name) && !target.includes(item.name)){
+// 			item.symbol = "circle"
+// 			item.itemStyle.normal.color = "#ceb888";
+// 		}
+// 	});
+// }

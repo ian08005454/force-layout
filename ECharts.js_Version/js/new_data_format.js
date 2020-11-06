@@ -9,19 +9,36 @@ var buf = { //暫存資料用
     all_category: [],
 };
 var random_color;
-var temp_v = 0;
 var all_values = [];
-var all_node_values = [];
-var all_gp = [];
 var all_idf = [];
-var user_colors = [];
+var user_colors = ["#4c8dae", "#789262", "#955539"];
 var HSL = [];
 var id = 0;
-function data_format(data, LODtype=0) {
-    start = new Date().getTime();//回傳Date()物件
+function push_element(data_element,name, bType = 'solid', bColor = 'gray', bWidth = 0) {
+    if(data_element.idf === 0){
+        var lenghValue = 1;
+    }
+    else lenghValue = data_element.idf;
+    buf.nodes.push({
+        name: name,
+        gp: data_element.gp,
+        idf: data_element.idf,
+        symbolSize: 30 * Math.sqrt(Math.sqrt(lenghValue, 3) / 0.8),
+        value: data_element.idf,          //data_element.idf,
+        symbol: "circle",
+        itemStyle: {
+            normal: {
+                opacity:0.9,//work
+                borderType: bType, //'solid',
+                borderColor: bColor,//'orange',
+                borderWidth: bWidth,//css_ele.borderWidth,  //0,
+                color:  user_colors[data_element.gp]//css_ele.color  //"blue"
+            }
+        }
+    });
+}
+function data_format(data) {
     const set = new Set(); //為了之後去除重複
-    var orignal_idf;
-    if (LODtype == 0) {
         data.forEach(data_element => {
             if (color.hasOwnProperty(data_element.gp)) {
                 node_color = color[data_element.gp]
@@ -30,36 +47,10 @@ function data_format(data, LODtype=0) {
                 color[data_element.gp] = node_color;
             }
             all_idf.push(data_element.idf);
-            if (data_element.idf == 0) {
-                orignal_idf = data_element.idf;
-                data_element.idf = 1;
-            } else {
-                orignal_idf = data_element.idf;
-            }
-            // push k1 into nodes array
-            all_gp.push(data_element.gp);
-            push_element1(csType.css1[0].symbol, csType.css1[0].normal.borderType, csType.css1[0].normal.borderColor, csType.css1[0].normal.borderWidth, csType.css1[0].normal.color);
-            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'gray', bWidth = 0, color = 'blue') {
-                user_colors[1] = color;//刪除搜尋之後會顯現的顏色
-                buf.nodes.push({
-                    name: data_element.k1,
-                    gp: data_element.gp,
-                    idf: data_element.idf,
-                    orign_idf: orignal_idf,
-                    symbolSize: 30 * Math.sqrt(Math.sqrt(data_element.idf, 3) / 0.8),
-                    value: orignal_idf,          //data_element.idf,
-                    symbol: symbol,//data_element.css[0].symbol,
-                    itemStyle: {
-                        normal: {
-                            opacity:1,//work
-                            borderType: bType, //'solid',
-                            borderColor: bColor,//'orange',
-                            borderWidth: bWidth,//css_ele.borderWidth,  //0,
-                            color: color//css_ele.color  //"blue"
-                        }
-                    }
-                });
-            }
+            if(data_element.idf === 0)
+            push_element(data_element,data_element.k1,'solid','#ffb61e',3);
+            else
+            push_element(data_element,data_element.k1);
             var largest = data_element.kg2[0].v;
             data_element.kg2.forEach(kg2Element =>{
                 if(kg2Element.v > largest)
@@ -75,8 +66,6 @@ function data_format(data, LODtype=0) {
                 var square = 1;
             // foreach kg2 array
             data_element.kg2.forEach(kg2_element => {
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
-                     kg2_element.type[0]  ='未定義'; 
                 // random a new color without duplicate, this color will according with category color to pair link color
                 if (color.hasOwnProperty(kg2_element.type[0])) {
                     // console.log(kg2_element.type[0]);
@@ -86,9 +75,7 @@ function data_format(data, LODtype=0) {
                     random_color = getRandomColor();//calculate_color
                     color[kg2_element.type[0]] = random_color;
                     // console.log(kg2_element.type[0]);
-
                 }
-
                 if (color.hasOwnProperty(kg2_element.gp)) {
                     node_color = color[kg2_element.gp]
                 } else {
@@ -96,82 +83,54 @@ function data_format(data, LODtype=0) {
                     color[kg2_element.gp] = node_color;
                 }
                 all_idf.push(kg2_element.idf);
-                if (kg2_element.idf == 0) {
-                    orignal_idf = kg2_element.idf;
-                    kg2_element.idf = 1;
-
-                } else {
-                    orignal_idf = kg2_element.idf;
-                }
-                all_gp.push(kg2_element.gp);
-
                 // first : push k2 into nodes array, ignore duplicate problem e.g.AB互為兄弟時 會產生重複兩個節點
-                push_element2(csType.css2[0].symbol, csType.css2[0].normal.borderType, csType.css2[0].normal.borderColor, csType.css2[0].normal.borderWidth, csType.css2[0].normal.color);
-                function push_element2(symbol = 'rect', bType = 'solid', bColor = 'purple', bWidth = 0, color = 'green') {
-                    user_colors[2] = color;
-                    buf.nodes.push({
-                        name: kg2_element.k2,
-                        gp: kg2_element.gp,
-                        idf: kg2_element.idf,
-                        orign_idf: orignal_idf,
-                        symbolSize: 30 * Math.sqrt(Math.sqrt(kg2_element.idf, 3) / 0.8),
-                        value: orignal_idf,//kg2_element.idf,
-                        symbol: symbol,//kg2_element.css[0].symbol,
-                        itemStyle: {
-                            normal: {
-                                opacity:0.9,//work
-                                borderType: bType,   //'solid',
-                                borderColor: bColor,  //'orange',
-                                borderWidth: bWidth, //0,
-                                color: color,  //"green"
-                            }
-                        }
-                    });
-                }
-
+                if(kg2_element.idf == 0)
+                push_element(kg2_element, kg2_element.k2,'solid','#ffb61e',3);
+                else
+                push_element(kg2_element, kg2_element.k2);
                 // second : push all category into buf.category array, ignore duplicate problem
-
                 all_values.push(kg2_element.v);
                 if (kg2_element.v == 0) {
-                    var ttype;
                     var dash = 'dashed';
-                    var linksolid = 'solid';
-                    orignal_v = kg2_element.v;
-                    kg2_element.v = 1;
-                    ttype = dash;
+                    var ttype = dash;
                 } else {
-                    orignal_v = kg2_element.v;
-                    ttype = linksolid;
-                }                  
-                    linkcolor = random_color;
-                    var shadowColor = 'orange';
+                    var linksolid = 'solid';
+                    var ttype = linksolid;
+                }
+                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
+                    kg2_element.type[0]  ='未定義';  
+                    random_color = 'black'
+                    var shadowBlur = 10;
+                }      
+                else
                     var shadowBlur = 0;
+                if(kg2_element.v === 0){
+                    var lenghValue = 1;
+                }
+                else lenghValue = kg2_element.v;
                 buf.all_category.push({
                     id: id++,
                     name: kg2_element.type[0],
                     itemStyle: {
-                        color: linkcolor,
+                        color: random_color,
                     },
                     target: data_element.k1,
                     source: kg2_element.k2,
                     value: kg2_element.v,
-                    category: kg2_element.type[0] + `(` + orignal_v + `)`,
                     show: true,//不知道要做甚麼
                     symbol: ['arrow'],
                     symbolSize:20,
-                    orign_v: orignal_v,
-                    orign_idf: orignal_idf,
                     force: {
-                        edgeLength: Math.sqrt(kg2_element.v, square) * 10000000
+                        edgeLength: Math.sqrt(lenghValue, square) * 10000000
                     },
                     lineStyle: {
                         normal: {
                             opacity:1,//work
-                            color: linkcolor,
+                            color: random_color,
                             curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
-                            width: Math.sqrt(kg2_element.v, square),
+                            width: Math.sqrt(lenghValue, square),
                             type: ttype, //kg2_element.css[0].linetype  //'dashed'
-                            shadowColor : shadowColor,
+                            shadowColor : 'orange',
                             shadowBlur : shadowBlur
                         }
                     },
@@ -193,118 +152,6 @@ function data_format(data, LODtype=0) {
               return 0;
           });
           console.log(buf.all_category);
-    } else {//1的話只呈現LOD
-        $(".common_show_value").hide();
-        $(".word_strength").hide();
-        data.forEach(data_element => {
-            if (color.hasOwnProperty(data_element.gp)) {
-                node_color = color[data_element.gp]
-            } else {
-                node_color = getRandomColor();//calculate_color
-                color[data_element.gp] = node_color;
-            }
-            all_gp.push(data_element.gp);
-            push_element1(csType.css1[0].symbol, csType.css1[0].normal.borderType, csType.css1[0].normal.borderColor, csType.css1[0].normal.borderWidth, csType.css1[0].normal.color);
-            function push_element1(symbol = 'roundRect', bType = 'solid', bColor = 'gray', bWidth = 0, color = 'blue') {
-                user_colors[1] = color;//刪除搜尋之後會顯現的顏色
-
-                buf.nodes.push({
-                    name: data_element.k1,
-                    gp: data_element.gp,
-                    symbolSize: 50 ,
-                    symbol: symbol,
-                    itemStyle: {
-                        normal: {
-                            opacity:1,//work
-                            borderType: bType, //'solid',
-                            borderColor: bColor,//'orange',
-                            borderWidth: bWidth,//css_ele.borderWidth,  //0,
-                            color: color//css_ele.color  //"blue"
-                        }
-                    }
-                });
-            }
-
-            // foreach kg2 array
-            data_element.kg2.forEach(kg2_element => {
-                if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') 
-                     kg2_element.type[0]  ='未定義'; 
-                // random a new color without duplicate, this color will according with category color to pair link color
-                if (color.hasOwnProperty(kg2_element.type[0])) {
-                    random_color = color[kg2_element.type[0]]
-                } else {
-                    random_color = getRandomColor();//calculate_color
-                    color[kg2_element.type[0]] = random_color;
-                }
-
-                if (color.hasOwnProperty(kg2_element.gp)) {
-                    node_color = color[kg2_element.gp]
-                } else {
-                    node_color = getRandomColor();//calculate_color
-                    color[kg2_element.gp] = node_color;
-                }
-                all_gp.push(kg2_element.gp);
-                // first : push k2 into nodes array, ignore duplicate problem e.g.AB互為兄弟時 會產生重複兩個節點
-                push_element2(csType.css2[0].symbol, csType.css2[0].normal.borderType, csType.css2[0].normal.borderColor, csType.css2[0].normal.borderWidth, csType.css2[0].normal.color);
-                function push_element2(symbol = 'rect', bType = 'solid', bColor = 'purple', bWidth = 0, color = 'green') {
-                    user_colors[2] = color;
-                    buf.nodes.push({
-                        name: kg2_element.k2,
-                        gp: kg2_element.gp,
-                        symbolSize: 50,
-                        symbol: symbol,
-                        itemStyle: {
-                            normal: {
-                                opacity:1,//work
-                                borderType: bType,   //'solid',
-                                borderColor: bColor,  //'orange',
-                                borderWidth: bWidth, //0,
-                                color: color,  //"green"
-                            }
-                        }
-                    });
-                }
-                // second : push all category into buf.category array, ignore duplicate problem
-                    linkcolor = random_color;
-                    var shadowColor = 'orange';
-                    var shadowBlur = 0;
-                    
-                buf.all_category.push({
-                    id: id++,
-                    name: kg2_element.type[0],
-                    itemStyle: {
-                        color: linkcolor,
-                    },
-                    target: data_element.k1,
-                    source: kg2_element.k2,
-                    // value: kg2_element.v,
-                    category: kg2_element.type[0],
-                    show: true,//不知道要做甚麼
-                    symbol:['arrow'],
-                    symbolSize:20,
-                    lineStyle: {
-                        normal: {
-                            opacity:1,//work
-                            color: linkcolor,
-                            curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
-                            width: 1,
-                            type: ttype, //kg2_element.css[0].linetype  //'dashed'
-                            shadowColor : shadowColor,
-                            shadowBlur : shadowBlur
-                        }
-                    },
-                    label:{
-                        show : true
-                    },
-                });
-
-                // buf.all_category has the every property that links object need, etc : source, target, value, lineStyle
-                buf.links = buf.all_category;
-            })
-        });
-    }//1的話只呈現LOD
-
-
     // remove duplicate item in buf.nodes array
     buf.nodes = buf.nodes.filter(item => !set.has(item.name) ? set.add(item.name) : false);
     set.clear();

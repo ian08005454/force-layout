@@ -8,18 +8,19 @@ const Chart = echarts.init(document.getElementById('main'), null, {
     // height: 800 //有置中問題
 });
 var jdata; // ! api.js variable
-var onlyLOD=0;//0 or 1
-
+dataType = 0;
 Chart.showLoading('default');//轉圈圈~~
 // jQuery ajax data from back-end
+start = new Date().getTime();//回傳Date()物件
 const api_url = API_generator(2207, 56, 54, 1000);//後端給的api不用動
 GetJSON(api_url);//串接後端的東西 不用動
-const data = data_format(jdata,onlyLOD);//
+const data = data_format(jdata);//
 console.log("data:")
 console.log(data);
 Chart.hideLoading(); //跑好後關圈圈~~~
 $('.sidebar').show();//圖形顯示後再出現slider
-
+End = new Date().getTime();//回傳Date()物件
+console.log(End-start);
 var max_common_show_value = Math.max(...all_values);
 var min_common_show_value = Math.min(...all_values);
 var max_idf = Math.max(...all_idf);
@@ -103,7 +104,7 @@ var option = {
                         fontSize: 17
                     },
                     formatter:function(param){
-                        return param.name + `(` + param.data.orign_idf + `)` ;
+                        return param.name + `(` + param.data.idf + `)` ;
                     },
                     // position : 'left'
                 },
@@ -136,7 +137,7 @@ var option = {
                 },
                 formatter: function (param) {
                     // param.name = `${param.data.target}>${param.data.source}`;
-                    return param.data.category;
+                    return param.data.name + `(` + param.data.value + `)` ;
                 },
                 position: 'middle',
                 align: 'center',
@@ -150,30 +151,24 @@ var option = {
         zoom: 1
     }]
 }
-var releation = false;
-data.all_category.forEach(categories =>{
-    if(categories.name !== '未定義')
-        releation = true;
-});
-if(releation === false){
+if(dataType === 1){
     option.series[0].edgeLabel.normal.show = false;
     option.series[0].edgeSymbol = [];
     option.series[0].force.repulsion = 10000;
     option.series[0].force.edgeLength = [150, 400];
+    $('.lineSelected').hide();
+    $('#kModel').hide();
+    $('.current_relation').hide();
 }
-else{
-    data.all_category.forEach(function(categories, index){
-        if(categories.name === '未定義'){
-            categories.lineStyle.normal.color = 'black';
-            categories.lineStyle.normal.shadowBlur = 10;
-        }
-    });
-    option.series[0].categories.forEach(function(category, index){
-        if(category.name === '未定義'){
-            category.lineStyle.normal.color = 'black';
-            category.lineStyle.normal.shadowBlur = 10;
-        }
-    }); 
+else if(dataType === 2){
+    option.series[0].edgeLabel.normal.formatter = function (param) {
+        return param.data.name;
+    };
+    option.series[0].itemStyle.normal.label.formatter = function (param) {
+        return param.name;
+    };
+    $(".common_show_value").hide();
+    $(".word_strength").hide();
 }
 var edgeMask = [[],[]];
 option.series[0].categories.forEach(category =>{
