@@ -8,19 +8,16 @@ const Chart = echarts.init(document.getElementById('main'), null, {
     // height: 800 //有置中問題
 });
 var jdata; // ! api.js variable
-dataType = 0;
 Chart.showLoading('default');//轉圈圈~~
 // jQuery ajax data from back-end
-start = new Date().getTime();//回傳Date()物件
-const api_url = API_generator(2207, 56, 54, 1000);//後端給的api不用動
-GetJSON(api_url);//串接後端的東西 不用動
+start = new Date().getTime();
 const data = data_format(jdata);//
 console.log("data:")
 console.log(data);
 Chart.hideLoading(); //跑好後關圈圈~~~
 $('.sidebar').show();//圖形顯示後再出現slider
-End = new Date().getTime();//回傳Date()物件
-console.log(End-start);
+End = new Date().getTime();
+console.log(End-start + 'ms');
 var max_common_show_value = Math.max(...all_values);
 var min_common_show_value = Math.min(...all_values);
 var max_idf = Math.max(...all_idf);
@@ -154,8 +151,9 @@ var option = {
 if(dataType === 1){
     option.series[0].edgeLabel.normal.show = false;
     option.series[0].edgeSymbol = [];
-    option.series[0].force.repulsion = 10000;
-    option.series[0].force.edgeLength = [150, 400];
+    option.series[0].edgeLabel.normal.formatter = function (param) {
+        return param.data.value;
+    };
     $('.lineSelected').hide();
     $('#kModel').hide();
     $('.current_relation').hide();
@@ -170,7 +168,8 @@ else if(dataType === 2){
     $(".common_show_value").hide();
     $(".word_strength").hide();
 }
-var edgeMask = [[],[]];
+
+    var edgeMask = [[],[]];
 option.series[0].categories.forEach(category =>{
     if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id))
     option.series[0].categories.forEach(item =>{

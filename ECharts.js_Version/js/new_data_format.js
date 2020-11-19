@@ -76,6 +76,9 @@ function data_format(data) {
                     color[kg2_element.type[0]] = random_color;
                     // console.log(kg2_element.type[0]);
                 }
+                if(dataType === 1){
+                    random_color = '#1A75CF'
+                }
                 if (color.hasOwnProperty(kg2_element.gp)) {
                     node_color = color[kg2_element.gp]
                 } else {
@@ -98,14 +101,19 @@ function data_format(data) {
                     var ttype = linksolid;
                 }
                 if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
-                    kg2_element.type[0]  ='未定義';  
-                    random_color = 'black'
-                    var shadowBlur = 10;
+                    if(dataType !== 1){
+                        kg2_element.type[0]  ='未定義';  
+                        random_color = 'black'
+                        var shadowBlur = 10;
+                    }
                 }      
                 else
                     var shadowBlur = 0;
                 if(kg2_element.v === 0){
                     var lenghValue = 1;
+                }
+                else if(dataType === 2){
+                    var lenghValue = 5;
                 }
                 else lenghValue = kg2_element.v;
                 buf.all_category.push({
@@ -118,7 +126,6 @@ function data_format(data) {
                     source: kg2_element.k2,
                     value: kg2_element.v,
                     show: true,//不知道要做甚麼
-                    symbol: ['arrow'],
                     symbolSize:20,
                     force: {
                         edgeLength: Math.sqrt(lenghValue, square) * 10000000
@@ -165,10 +172,6 @@ function data_format(data) {
     buf.all_category = buf.all_category.sort((a, b) => {
         return a.name > b.name ? 1 : -1;
     })
-
-    // push the object that not duplicate in buf.all_category array into buf.category
-    // buf.category = buf.all_category.filter(item => !set.has(item.name) ? set.add(item.name) : false);
-    // set.clear();
         /**
     * 生成边曲度优先使用列表
     * @return  [0.2, -0.2, 0.4, -0.4, 0.6, -0.6, 0.8, -0.8, 1, -1, 0.1, -0.1, 0.3, -0.3, 0.5, -0.5, 0.7, -0.7, 0.9, -0.9]

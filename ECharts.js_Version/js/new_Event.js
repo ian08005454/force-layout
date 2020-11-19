@@ -1461,6 +1461,8 @@ $(() => {
 	lineList();
 	edgeFilter();
 	ngraph();
+	End = new Date().getTime();
+	console.log(End-start + 'ms');
 });
 function change_width(width_value) {
 	data.links.forEach((link) => {
