@@ -1,11 +1,11 @@
-module.exports = closeness;
+// module.exports = closeness;
 
 /**
  * In a connected graph, the normalized closeness centrality of a node is the average
  * length of the shortest path between the node and all other nodes in the
  * graph. Thus the more central a node is, the closer it is to all other nodes.
  */
-function closeness(graph, oriented) {
+export function closeness(graph, oriented) {
   var Q = [];
   // list of predecessors on shortest paths from source
   // distance from source

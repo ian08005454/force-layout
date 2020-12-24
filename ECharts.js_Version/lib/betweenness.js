@@ -1,10 +1,10 @@
-module.exports = betweennes;
+// module.exports = betweennes;
 
 /**
  * I'm using http://www.inf.uni-konstanz.de/algo/publications/b-vspbc-08.pdf
  * as a reference for this implementation
  */
-function betweennes(graph, oriented) {
+export function betweennes(graph, oriented) {
   var Q = [],
     S = []; // Queue and Stack
   // list of predecessors on shortest paths from source

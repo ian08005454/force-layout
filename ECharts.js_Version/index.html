@@ -21,7 +21,7 @@
         <div class="sidebar">
             <div class="slider">
                 <label class="switch switch-left-right">
-                    <input class="switch-input" type="checkbox"  onclick="switchType()"/>
+                    <input class="switch-input" type="checkbox"/>
                     <span class="switch-label" data-on="切換網絡圖" data-off="切換環狀圖"></span> <span class="switch-handle"></span> </label>
                 <!-- <div class="slider_item">
                     <label class="slider_describe" for="relation_strength">關係強度 : </label>
@@ -76,7 +76,7 @@
                             <input type="text" value="" id="subject_font_size">
                             <div class="slider_slider" id="subject_font_size"></div>
                         </div>
-                        <input type="checkbox"id="alone" name='alone'onclick='filterControler("alone",0)'  checked>
+                        <input class='alone'type="checkbox"id="alone" name='alone' checked>
                         <label for="alone">顯示無連線點</label>
                     </details>
                     <div class="slider_item">
@@ -100,7 +100,7 @@
                     <input type="text" value="" id="max_level">
                     <div class="slider_slider" id="max_level"></div>
                 </div>
-                <select class="centralitySelecter" id= "Cselecter" onchange="centrality(this.value)">
+                <select class="centralitySelecter" id= "Cselecter">
                     <option value="" selected>請選擇中心性</option>
                     <option value="betweenness">中介中心性</option>
                     <option value="degree">度中心性</option>
@@ -151,16 +151,11 @@
         </div>
     <!-- CDN JS library  -->
     <!-- avoid echarts.js library console.warn, use the download file and common out console.warn @lib/echarts 4.2.0-rc.2.js line 72314 which is warning about Legend data should be same with series name or data name-->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.0-rc.2/echarts.js"></script> -->
     <script src="./lib/echarts.js"></script>
     <!-- <script src="./lib/echarts-graph-modularity.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
     <script src='https://unpkg.com/ngraph.graph@19.0.0/dist/ngraph.graph.min.js'></script>
-    <script src="./lib/betweenness.js"></script>
-    <script src="./lib/closeness.js"></script>
-    <script src="./lib/degree.js"></script>
-    <script src='./lib/eccentricity.js'></script>
     <script>
         var book_id = '39267';
         var dataType = 0;
@@ -172,6 +167,7 @@
     <!-- <script src="./source/清史稿-人物關係.js"></script> -->
     <!-- <script src="./source/清史稿-人.js"></script> -->
     <script src="./source/2-paragraph.js"></script>
+    <!-- <script src="./source/students.js"></script> -->
     <!-- <script src="./source/Dream of the Red Chamber.js"></script> -->
     <!-- <script src="./source/台灣文獻叢刊_人對人.js"></script> -->
     <!-- <script src="./source/台灣文獻叢刊_人對地.js"></script> -->
@@ -193,14 +189,7 @@
     <!-- <script src="./source/2d_combine_synonyms_with_custom_relations_none_direction.js"></script> -->
 
     <!-- js file -->
-    <script src="./js/node_css.js"></script>
-    <script src="./js/new_data_format.js"></script>
-    <!-- <script src="./js/API.js"></script> -->
-    <script src="./js/Main_setting.js"></script>
-    <!-- <script src="./js/bootstrap.bundle.min.js"></script> -->
-    <script src="./js/new_Event.js"></script>
-    <!-- <script src="./js/new_Event.bundle.js"></script> -->
-    <!-- <script src="./js/new_Event copy.js"></script> -->
+    <script type="module" src="./js/mainSetting.js"></script>
 </body>
 
 </html>

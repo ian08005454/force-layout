@@ -1,4 +1,4 @@
-module.exports = degree;
+// module.exports = degree;
 
 /**
  * Calculates graph nodes degree centrality (in/out or both).
@@ -11,7 +11,7 @@ module.exports = degree;
  *   'out'   - calculate out-degree centrality
  *   'inout' - (default) generic degree centrality is calculated
  */
-function degree(graph, kind) {
+export function degree(graph, kind) {
   var getNodeDegree;
   var result = Object.create(null);
 

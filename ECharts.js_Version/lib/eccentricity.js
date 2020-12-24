@@ -1,10 +1,10 @@
-module.exports = eccentricity;
+// module.exports = eccentricity;
 
 /**
  * The eccentricity centrality of a node is the greatest distance between that node and
  * any other node in the network. 
  */
-function eccentricity(graph, oriented) {
+export function eccentricity(graph, oriented) {
   var Q = [];
   // distance from source
   var dist = Object.create(null);
