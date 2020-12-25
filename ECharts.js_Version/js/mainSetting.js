@@ -9,7 +9,7 @@
 import { keywordItemAppend, keywordCleanUp } from "./keywordCleaner.js";
 import { searchKeyword, changeMaxlevel } from "./searchFunction.js";
 import { silderInit, sliderBar, centrality } from "./sliderbarSetting.js";
-import { dataFormat, user_colors, allValues, allIdf } from "./dataFormater.js";
+import { dataFormat, userColors, allValues, allIdf } from "./dataFormater.js";
 // init HTML dom
 $('.sidebar').hide();//在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
@@ -233,7 +233,7 @@ export var jquery_slider_setting = [{
     range: 'min'
 }, {
     object: 'word_strength',//idf詞頻強度
-    min: min_idf,
+    min: min_idf -1,
     max: max_idf,
     step: 1,
     value: min_idf,
@@ -420,7 +420,7 @@ export function keywordFliter() {
 function viewDataChange() {
     option.series[0].categories = viewResult.category
     option.series[0].links = viewResult.links
-    let keywords = [];
+    keywords = [];
     result.keywordCollection.forEach((item) =>{
         item.nodeName.forEach((node) =>{
             keywords.push(node);
@@ -429,7 +429,7 @@ function viewDataChange() {
     option.series[0].nodes = viewResult.nodes.filter((node) => {
         keywords.includes(node.name)
         ? (node.itemStyle.normal.color = 'red')
-        : (node.itemStyle.normal.color = user_colors[node.gp]);
+        : (node.itemStyle.normal.color = userColors[node.gp]);
         return node;
     });
     event_setOption_function();
@@ -468,7 +468,7 @@ function resetChart() {
     option.series[0].links = option.series[0].categories;
     collect = Array.from(new Set(collect));
     option.series[0].nodes = data.nodes.filter((node) => {
-        node.itemStyle.normal.color = user_colors[node.gp];
+        node.itemStyle.normal.color = userColors[node.gp];
         return collect.includes(node.name);
     });
     event_setOption_function(true);
@@ -507,42 +507,38 @@ $(() => {
 });
 // The function to render the data to canvas after set all option finish
 function event_setOption_function(rander = true) {
-    console.log("viewChange");
-    if(rander === true){
         nodeList();
         lineList();
         if($('#Cselecter').val() !== '')
             sliderBar('All');
-    }
-    edgeFilter();
+        edgeFilter();
     // nodeTypeChange();
     Chart.setOption(option, rander);
     function nodeList() {
         $('.current_node').html(`顯示的點 : (${option.series[0].nodes.length})`);
         $('.nodeSelected').children().remove();
+        console.log(keywords);
         option.series[0].nodes.forEach((item) => {
-            if (!keywords.includes(item.name)) {
+            var lableName = item.name;
+            var disabled = '';
             if(viewResult !== undefined){
                 if (viewResult.route.length !== 0 ) {
                     var routeCount = 0;
-                    iewResult.route.forEach((element) => {
+                    viewResult.route.forEach((element) => {
                         if (element.includes(item.name)) routeCount++;
                     });
-                    if (iewResult.route.length === routeCount)
-                        $('.nodeSelected').append(`<div class="nodeSelected_item" value="${item.name}">
-                        <label><font color="blue"><input type="checkbox" name="node_list" value="${item.name}" checked >${item.name} (必要)</front></label>
-                        </div>`);
-                    else
-                        $('.nodeSelected').append(`<div class="nodeSelected_item" value="${item.name}">
-                    <label><input type="checkbox" name="node_list" value="${item.name}" checked >${item.name}</label></div>`);
-                } else
-                    $('.nodeSelected').append(`<div class="nodeSelected_item" value="${item.name}">
-                <label><input type="checkbox" name="node_list" value="${item.name}" checked >${item.name}</label></div>`);
+                    if (viewResult.route.length === routeCount)
+                        lableName = `${item.name} (必要)`
+                }
             }
+            if (keywords.includes(item.name))
+            $('.nodeSelected').append(`<div class="nodeSelected_item" value="${item.name}">
+            <label><font color="${item.itemStyle.normal.color}"><input type="checkbox" id="${item.name}" name="node_list" value="${item.name}" disabled="disabled" checked  >${lableName}</front></label>
+            </div>`);
             else
             $('.nodeSelected').append(`<div class="nodeSelected_item" value="${item.name}">
-            <label><input type="checkbox" name="node_list" value="${item.name}" checked >${item.name}</label></div>`);
-            }
+             <label><font color="${item.itemStyle.normal.color}"><input type="checkbox" id="${item.name}" name="node_list" value="${item.name}"   checked >${lableName}</front></label>
+             </div>`);
         });
         $('.nodeSelected').scrollTop(function() {
             return this.scrollHeight;

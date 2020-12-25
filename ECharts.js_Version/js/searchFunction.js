@@ -496,7 +496,7 @@ function search_AND(keyword, route) {
 	});
 	console.log('finish');
 }
-function data_filter_and(data, route, routeFloor) {
+function data_filter_and(route, routeFloor) {
 	var categories = [],
 		links = [],
 		nodes = [];

@@ -9,7 +9,8 @@ var buf = { //暫存資料用
 };
 var allValues = [];
 var allIdf = [];
-var user_colors = ["#4c8dae", "#789262", "#955539"];
+var userColors = ["#4c8dae", "#789262", "#955539", "#8076a3"];
+// var userColors = [];
 var HSL = [];
 var id = 0;
 function push_element(data_element,name, bType = 'solid', bColor = 'gray', bWidth = 0) {
@@ -17,6 +18,12 @@ function push_element(data_element,name, bType = 'solid', bColor = 'gray', bWidt
         var lenghValue = 1;
     }
     else lenghValue = data_element.idf;
+    if (userColors.hasOwnProperty(data_element.gp)) {
+        var nodeColor = userColors[data_element.gp]
+    } else {
+        var nodeColor = getRandomColor();//calculate_color
+        userColors[data_element.gp] = nodeColor;
+    }
     buf.nodes.push({
         name: name,
         gp: data_element.gp,
@@ -31,7 +38,7 @@ function push_element(data_element,name, bType = 'solid', bColor = 'gray', bWidt
                 borderType: bType, //'solid',
                 borderColor: bColor,//'orange',
                 borderWidth: bWidth,//css_ele.borderWidth,  //0,
-                color:  user_colors[data_element.gp]//css_ele.color  //"blue"
+                color:  nodeColor
             }
         }
     });
@@ -40,10 +47,10 @@ function dataFormat(data) {
     const set = new Set(); //為了之後去除重複
         data.forEach(data_element => {
             if (color.hasOwnProperty(data_element.gp)) {
-                var node_color = color[data_element.gp]
+                var LineColor = color[data_element.gp]
             } else {
-                var node_color = getRandomColor();//calculate_color
-                color[data_element.gp] = node_color;
+                var LineColor = getRandomColor();//calculate_color
+                color[data_element.gp] = LineColor;
             }
             allIdf.push(data_element.idf);
             if(data_element.idf === 0)
@@ -79,10 +86,10 @@ function dataFormat(data) {
                     random_color = '#1A75CF'
                 }
                 if (color.hasOwnProperty(kg2_element.gp)) {
-                    node_color = color[kg2_element.gp]
+                    LineColor = color[kg2_element.gp]
                 } else {
-                    node_color = getRandomColor();//calculate_color
-                    color[kg2_element.gp] = node_color;
+                    LineColor = getRandomColor();//calculate_color
+                    color[kg2_element.gp] = LineColor;
                 }
                 allIdf.push(kg2_element.idf);
                 // first : push k2 into nodes array, ignore duplicate problem e.g.AB互為兄弟時 會產生重複兩個節點
@@ -270,4 +277,4 @@ function hslToHex(h, s, l) {
     };
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
-  export{dataFormat, user_colors, allValues, allIdf};
+  export{dataFormat, userColors, allValues, allIdf};

@@ -29,6 +29,9 @@ export function silderInit(){
             step: jquery_slider_setting_element.step,
             value: jquery_slider_setting_element.value
         });
+        if(jquery_slider_setting_element.object ==='word_strength' || jquery_slider_setting_element.object ==='common_show_value' )
+        $(`.slider_item > input[id=${jquery_slider_setting_element.object}]`).val(`≥ ${jquery_slider_setting_element.value}`);
+        else
         $(`.slider_item > input[id=${jquery_slider_setting_element.object}]`).val(jquery_slider_setting_element.value);
     }
 }
@@ -38,9 +41,13 @@ export function sliderBar(e, ui) {
     }
     else{
         if (e.target.id == 'common_show_value' && ui.value == - 1) {
-            $('input[id=' + e.target.id + ']').val('沒共現');
-    } else {
-        $('input[id=' + e.target.id + ']').val(ui.value);
+            $('input[id=' + e.target.id + ']').val('= 0');
+    }
+    else if(e.target.id == 'word_strength' && ui.value == - 1) {
+        $('input[id=' + e.target.id + ']').val('= 0');
+    }
+    else {
+        $('input[id=' + e.target.id + ']').val(`≥ ${ui.value}`);
     }
     switch (e.target.id) {
         case 'relation_strength':
