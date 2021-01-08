@@ -241,12 +241,36 @@ export var jquery_slider_setting = [{
     range: 'min'
 }
 ];
+const hexToRgb = hex =>
+  hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+             ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1).match(/.{2}/g)
+    .map(x => parseInt(x, 16))
+const rgbToHex = (r, g, b) => '#' + [r, g, b]
+    .map(x => x.toString(16).padStart(2, '0')).join('')
 if(dataType === 1){
     option.series[0].edgeLabel.normal.show = false;
     option.series[0].edgeSymbol = [];
     option.series[0].edgeLabel.normal.formatter = function (param) {
         return param.data.value;
     };
+    data.category.forEach(category=>{
+        var color = [];
+        data.nodes.forEach(node =>{
+            if(node.name === category.target || node.name === category.source)
+                color.push(node.itemStyle.normal.color);
+        })
+        console.log(color);
+        var target = hexToRgb(color[0]);
+        var source = hexToRgb(color[1]);
+        color = [];
+        for (let index = 0; index < target.length; index++) {
+            color[index] = parseInt((target[index] + source[index])/2);
+            
+        }
+        category.lineStyle.normal.color = rgbToHex(color[0], color[1], color[2]);
+        console.log(category.lineStyle.normal.color);
+    })
     $('.lineSelected').hide();
     $('#kModel').hide();
     $('.current_relation').hide();
@@ -260,6 +284,25 @@ else if(dataType === 2){
     };
     $(".common_show_value").hide();
     $(".word_strength").hide();
+}
+else{
+    data.category.forEach(category=>{
+        var color = [];
+        data.nodes.forEach(node =>{
+            if(node.name === category.target || node.name === category.source)
+                color.push(node.itemStyle.normal.color);
+        })
+        console.log(color);
+        var target = hexToRgb(color[0]);
+        var source = hexToRgb(color[1]);
+        color = [];
+        for (let index = 0; index < target.length; index++) {
+            color[index] = parseInt((target[index] + source[index])/2);
+            
+        }
+        category.lineStyle.normal.color = rgbToHex(color[0], color[1], color[2]);
+        console.log(category.lineStyle.normal.color);
+    })
 }
 
 var edgeMask = [[],[]];

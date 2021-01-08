@@ -9,7 +9,8 @@ var buf = { //暫存資料用
 };
 var allValues = [];
 var allIdf = [];
-var userColors = ["#4c8dae", "#789262", "#955539", "#8076a3"];
+var userColors = ["#cc0000", "#00cc00", "#0000cc"];
+// var userColors = ["#4c8dae", "#8076a3", "#789262", "#955539"];
 // var userColors = [];
 var HSL = [];
 var id = 0;
