@@ -139,7 +139,7 @@ label{
     height: 15px;
     margin-right: 40px;
     float : right;
-    border: 1.5px;
+    border: 2px;
     border-color: white;
     border-style: solid;
     border-radius: 4px;
@@ -293,4 +293,15 @@ label{
 	-webkit-transition: All 0.3s ease;
 	-moz-transition: All 0.3s ease;
 	-o-transition: All 0.3s ease;
+}
+[role="button"] {
+	width: 30px;
+    height: 18px;
+    padding: 5px;
+    border: 2px solid #ffffff;
+}
+
+button[aria-pressed="true"],
+[role="button"][aria-pressed="true"] {
+    border: 4px solid #000;
 }

@@ -10,6 +10,7 @@ import { keywordItemAppend, keywordCleanUp } from "./keywordCleaner.js";
 import { searchKeyword, changeMaxlevel } from "./searchFunction.js";
 import { silderInit, sliderBar, centrality } from "./sliderbarSetting.js";
 import { dataFormat, userColors, allValues, allIdf } from "./dataFormater.js";
+import { colorPanelInit } from "./colorPanelSetting.js";
 // init HTML dom
 $('.sidebar').hide();//在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
@@ -254,23 +255,23 @@ if(dataType === 1){
     option.series[0].edgeLabel.normal.formatter = function (param) {
         return param.data.value;
     };
-    data.category.forEach(category=>{
-        var color = [];
-        data.nodes.forEach(node =>{
-            if(node.name === category.target || node.name === category.source)
-                color.push(node.itemStyle.normal.color);
-        })
-        console.log(color);
-        var target = hexToRgb(color[0]);
-        var source = hexToRgb(color[1]);
-        color = [];
-        for (let index = 0; index < target.length; index++) {
-            color[index] = parseInt((target[index] + source[index])/2);
+    // data.category.forEach(category=>{
+    //     var color = [];
+    //     data.nodes.forEach(node =>{
+    //         if(node.name === category.target || node.name === category.source)
+    //             color.push(node.itemStyle.normal.color);
+    //     })
+    //     console.log(color);
+    //     var target = hexToRgb(color[0]);
+    //     var source = hexToRgb(color[1]);
+    //     color = [];
+    //     for (let index = 0; index < target.length; index++) {
+    //         color[index] = parseInt((target[index] + source[index])/2);
             
-        }
-        category.lineStyle.normal.color = rgbToHex(color[0], color[1], color[2]);
-        console.log(category.lineStyle.normal.color);
-    })
+    //     }
+    //     category.lineStyle.normal.color = rgbToHex(color[0], color[1], color[2]);
+    //     console.log(category.lineStyle.normal.color);
+    // })
     $('.lineSelected').hide();
     $('#kModel').hide();
     $('.current_relation').hide();
@@ -285,26 +286,6 @@ else if(dataType === 2){
     $(".common_show_value").hide();
     $(".word_strength").hide();
 }
-else{
-    data.category.forEach(category=>{
-        var color = [];
-        data.nodes.forEach(node =>{
-            if(node.name === category.target || node.name === category.source)
-                color.push(node.itemStyle.normal.color);
-        })
-        console.log(color);
-        var target = hexToRgb(color[0]);
-        var source = hexToRgb(color[1]);
-        color = [];
-        for (let index = 0; index < target.length; index++) {
-            color[index] = parseInt((target[index] + source[index])/2);
-            
-        }
-        category.lineStyle.normal.color = rgbToHex(color[0], color[1], color[2]);
-        console.log(category.lineStyle.normal.color);
-    })
-}
-
 var edgeMask = [[],[]];
 option.series[0].categories.forEach(category =>{
     if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id))
@@ -613,25 +594,49 @@ function event_setOption_function(rander = true) {
         option.series[0].categories.forEach((item) => {
             if (!list.includes(item.name)) {
                 list.push(item.name);
+                var name = item.name;
                 if (mustLine.includes(item.name)) {
-                    $('.lineSelected').append(`<div class="lineSelected_item" value="${item.name}">
-                    <label><font color="${item.itemStyle
-                        .color}"><input type="checkbox" name="lineList" value="${item.name}" checked>${item.name} (必要)</front></label></div><div class="color-lump" style="background-color: ${item
-                        .itemStyle.color}"></div>`);
-                } else
+                    name = `${item.name} (必要)`
+                }
                     $('.lineSelected').append(`<div class="lineSelected_item" value="${item.name}">
                 <label><font color="${item.itemStyle
-                    .color}"><input type="checkbox" name="lineList" value="${item.name}" checked>${item.name}</front></label></div><div class="color-lump" style="background-color: ${item
-                        .itemStyle.color}"></div>`);
+                    .color}"><input type="checkbox" name="lineList" value="${item.name}" checked>${name}</front></label></div><div classs="${item.name}"><button type='button' class="color-lump" role="button"  name="${item.name}" value="${item.itemStyle.color}" style="background-color: ${item
+                        .itemStyle.color}"></button></div>`);
             }
         });
         $('.lineSelected').scrollTop(function() {
             return this.scrollHeight;
         });
         document.querySelector('.lineSelected').onchange = function(e){lineListChange(e)};
+        $('.color-lump').off('click').click((e) => {
+            console.log(e.currentTarget.name);
+            console.log(e.currentTarget.value);
+            colorPanelInit(e.currentTarget.name, e.currentTarget.value);
+        });
     }
     
 
+}
+export function lineColorChanger(name, color){
+    data.category.forEach(category =>{
+        if(category.name === name){
+            category.itemStyle.color = color;
+            category.lineStyle.normal.color = color;
+        }
+    });
+    option.series[0].categories.forEach(category =>{
+        if(category.name === name){
+            category.itemStyle.color = color;
+            category.lineStyle.normal.color = color;
+        }
+    });
+    option.series[0].links.forEach(category =>{
+        if(category.name === name){
+            category.itemStyle.color = color;
+            category.lineStyle.normal.color = color;
+        }
+    });
+    event_setOption_function();
 }
 Chart.on('click', (e) => {
     // console.log(e);
