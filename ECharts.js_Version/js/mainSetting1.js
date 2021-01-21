@@ -8,7 +8,7 @@
 //將模組以keyword 和 keywordCollection 為基礎分割
 import { keywordItemAppend, keywordCleanUp } from "./keywordCleaner.js";
 import { searchKeyword, changeMaxlevel } from "./searchFunction.js";
-import { silderInit, sliderBar, centrality, positionCalculator } from "./sliderbarSetting.js";
+import { silderInit, sliderBar, centrality } from "./sliderbarSetting.js";
 import { dataFormat, userColors, allValues, allIdf } from "./dataFormater.js";
 import { colorPanelInit } from "./colorPanelSetting.js";
 // init HTML dom
@@ -90,7 +90,7 @@ export var option = {
     // },
     series: [{
         type: 'graph',
-        layout: 'none',
+        layout: 'force',
         categories: data.category,
         nodes: data.nodes,
         modularity: true,
@@ -536,7 +536,6 @@ function event_setOption_function(rander = true) {
         lineList();
         if($('#Cselecter').val() !== '')
             sliderBar('All');
-        positionCalculator();
         edgeFilter();
     // nodeTypeChange();
     Chart.setOption(option, rander);
@@ -576,7 +575,7 @@ function event_setOption_function(rander = true) {
                 disabled = `disabled="disabled"`;
                 $(`.nodeList${index}`).append(`<div class="nodeSelected_item" value="${item.name}">
                  <label><font color="${item.itemStyle.normal.color}"><input type="checkbox" id="${item.name}" name="node_list" value="${item.name}" ${disabled}  checked >${lableName}</front></label>
-                 </div>`);
+                 <div class="color-lump" style="background-color:${item.itemStyle.normal.color}"></div></div>`);
                 }
             });
             index ++;
@@ -626,7 +625,7 @@ function event_setOption_function(rander = true) {
             return this.scrollHeight;
         });
         document.querySelector('.lineSelected').onchange = function(e){lineListChange(e)};
-        $('.color-lump').off('click').click((e) => {
+        $('button.color-lump').off('click').click((e) => {
             console.log(e.currentTarget.name);
             console.log(e.currentTarget.value);
             console.log(e.currentTarget.id);
@@ -732,7 +731,6 @@ function edgeFilter(){
         }
     })
 }
-
 // function nodeTypeChange(){
 // 	let target = option.series[0].links.map(function(item, index, array) {
 // 		return item.target;

@@ -1,6 +1,6 @@
 import { lineColorChanger } from "./mainSetting.js"
 let pickr = null;
-   export function colorPanelInit(name, initColor){
+   export function colorPanelInit(name, initColor, id){
         // Delete previous instance
         if (pickr) {
             pickr.destroyAndRemove();
@@ -54,7 +54,7 @@ let pickr = null;
         }).on('save', (color, instance) => {
             console.log(color.toHEXA().toString());
             // console.log('Event: "save"', color, instance);
-            lineColorChanger(name, color.toHEXA().toString());
+            lineColorChanger(name, color.toHEXA().toString(), id);
             pickr.hide();
         }).on('change', (color, source, instance) => {
             // console.log('Event: "change"', color, source, instance);

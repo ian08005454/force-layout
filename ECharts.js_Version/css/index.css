@@ -297,7 +297,7 @@ label{
 [role="button"] {
 	width: 30px;
     height: 18px;
-    padding: 5px;
+    padding: 0,0,0,5px;
     border: 2px solid #ffffff;
 }
 

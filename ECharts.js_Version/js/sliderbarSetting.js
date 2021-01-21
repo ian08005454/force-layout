@@ -18,7 +18,7 @@ export function silderInit(){
         values: option.series[0].force.edgeLength,
         disable: false
     });
-    console.log(option);
+    // console.log(option);
     $(`.slider_item > input[id=relation_distance]`).val(option.series[0].force.edgeLength);
     for (let jquery_slider_setting_element of jquery_slider_setting) {
         $(`.slider_item > #${jquery_slider_setting_element.object}`).slider({
@@ -269,6 +269,7 @@ function ngraph(){
     option.series[0].nodes.forEach(node =>{
         g.addNode(node.name);
     });
+    console.log(g);
     option.series[0].categories.forEach(category =>{
         // ccc += category.value;
         // for(let i = 0; i<category.value; i++){
@@ -276,4 +277,21 @@ function ngraph(){
         // }
         g.addLink(category.target, category.source);
     });
+}
+export function positionCalculator(){
+
+    ngraph();
+    
+    ngraphCreateLayout(g);
+    option.series[0].nodes.forEach(function(node){
+        node.x = ngraphCreateLayout(g).getNodePosition(node.name).x;
+        node.y = ngraphCreateLayout(g).getNodePosition(node.name).y;
+    });
+    console.log(option.series[0].nodes);
+      // now we can ask layout where each node/link is best positioned:
+    //   g.forEachNode(function(node) {
+    //     console.log(ngraphCreateLayout(g).getNodePosition(node.id).y);
+    //     // Node position is pair of x,y coordinates:
+    //     // {x: ... , y: ... }
+    //   });
 }

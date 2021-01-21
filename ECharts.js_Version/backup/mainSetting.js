@@ -8,7 +8,7 @@
 //將模組以keyword 和 keywordCollection 為基礎分割
 import { keywordItemAppend, keywordCleanUp } from "./keywordCleaner.js";
 import { searchKeyword, changeMaxlevel } from "./searchFunction.js";
-import { silderInit, sliderBar, centrality, positionCalculator } from "./sliderbarSetting.js";
+import { silderInit, sliderBar, centrality } from "./sliderbarSetting.js";
 import { dataFormat, userColors, allValues, allIdf } from "./dataFormater.js";
 import { colorPanelInit } from "./colorPanelSetting.js";
 // init HTML dom
@@ -90,7 +90,7 @@ export var option = {
     // },
     series: [{
         type: 'graph',
-        layout: 'none',
+        layout: 'force',
         categories: data.category,
         nodes: data.nodes,
         modularity: true,
@@ -536,7 +536,6 @@ function event_setOption_function(rander = true) {
         lineList();
         if($('#Cselecter').val() !== '')
             sliderBar('All');
-        positionCalculator();
         edgeFilter();
     // nodeTypeChange();
     Chart.setOption(option, rander);
@@ -732,7 +731,6 @@ function edgeFilter(){
         }
     })
 }
-
 // function nodeTypeChange(){
 // 	let target = option.series[0].links.map(function(item, index, array) {
 // 		return item.target;
