@@ -1,4 +1,6 @@
 import { lineColorChanger } from "./mainSetting.js"
+import '@simonwep/pickr/dist/themes/nano.min.css';      // 'nano' theme
+import Pickr from '@simonwep/pickr';
 let pickr = null;
    export function colorPanelInit(name, initColor, id){
         // Delete previous instance
@@ -34,9 +36,9 @@ let pickr = null;
                 interaction: {
                     hex: true,
                     rgba: true,
-                    hsla: true,
-                    hsva: true,
-                    cmyk: true,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
                     input: true,
                     clear: false,
                     save: true

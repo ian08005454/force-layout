@@ -1,4 +1,4 @@
-import { data } from "./mainSetting.js";
+import { data } from "./chartSetting.js";
 /**
 * 
 * 給max_level slider的對照表

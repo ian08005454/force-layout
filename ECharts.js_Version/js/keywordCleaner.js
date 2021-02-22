@@ -1,4 +1,5 @@
-import { keywordFliter } from "./mainSetting.js"
+import { keywordFliter } from "./mainSetting.js";
+import { data } from "./chartSetting";
 /**
    * 紀錄前面多少次搜尋是與這次搜尋有關連
    * @type {number}
@@ -24,14 +25,15 @@ import { keywordFliter } from "./mainSetting.js"
    * @type {array}
    */
   var notKeyword = [];
-  var keyword = [];
+  var rawKeywords = [];
+  export var keywords = []
 export function keywordCleanUp(){
 	keywordPoint = 0;
 	keywordCount = 0;
 	keywordCollection = [];
 	lineStack = [];
 	notKeyword = [];
-	keyword.forEach((item) => {
+	rawKeywords.forEach((item) => {
 		if (item.type === 'not') {
 			item.keywordNot();
 		} else if (item.model === 'line') {
@@ -39,12 +41,16 @@ export function keywordCleanUp(){
 		} else {
 			item.keywordCleanUp();
 		}
-	})
-	var result ={keywordCollection : keywordCollection, 
-				lineStack : lineStack,
-				notKeyword : notKeyword}
-	console.log(result);
-	return result
+	});
+	keywords = [];
+	for(let item of keywordCollection){
+		for (const node of item.nodeName) {
+		  keywords.push(node);
+		}
+	}
+	if(lineStack.length !== 0 || notKeyword !== 0)
+        lineCtrl(lineStack, notKeyword);
+	return keywordCollection;
 }
 function searchTarget(nodeName, lineName, lineName2) {
 	this.nodeName = nodeName; //搜尋的節點
@@ -245,37 +251,37 @@ class searchWord {
 }
   /**
    * 資訊加入線方的搜尋欄
-   * @param {string} kwd_search_name 搜尋的項目
+   * @param {string} keywordSearchName 搜尋的項目
    * @param {string} keywordSearchType 搜尋的類型是and or not
    * @param {string} keywordModel	搜尋的是點或是線
    */
-  export function keywordItemAppend(kwd_search_name, keywordSearchType, keywordModel) {
-	if (keyword.includes(kwd_search_name)) {
+  export function keywordItemAppend(keywordSearchName, keywordSearchType, keywordModel) {
+	if (rawKeywords.includes(keywordSearchName)) {
 		alert(`Error :  same keyword can not search more than twice`);
 		$('#keyword_search_field').val('');
 		return 1;
 	}
-	keyword.push(new searchWord(keywordSearchType, kwd_search_name, keywordModel));
+	rawKeywords.push(new searchWord(keywordSearchType, keywordSearchName, keywordModel));
 	if (keywordModel === 'line') keywordModel = '線';
 	else keywordModel = '點';
-	let kwd_en = kwd_search_name.replace('&', ' and ');
+	let kwd_en = keywordSearchName.replace('&', ' and ');
 	kwd_en = kwd_en.replace('|', ' or ');
 	$('#keyword_search_field').val(''); // clear the keyword search field
-	if (keyword.length === 1)
-		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+	if (rawKeywords.length === 1)
+		$('.keyword').append(`<div class="keyword_item" data-item="${keywordSearchName}">
 		<p class="keyword_name" >${keywordModel}:<font color="red">${kwd_en}</font></p>
-		<button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
+		<button class="keyword_delete" data-name='${keywordSearchName}'>刪除</button>
 	</div>`);
 	else
-		$('.keyword').append(`<div class="keyword_item" data-item="${kwd_search_name}">
+		$('.keyword').append(`<div class="keyword_item" data-item="${keywordSearchName}">
 		<p class="keyword_name" >${keywordSearchType} ${keywordModel}:<font color="red">${kwd_en}</font></p>
-		<button class="keyword_delete" data-name='${kwd_search_name}'>刪除</button>
+		<button class="keyword_delete" data-name='${keywordSearchName}'>刪除</button>
 	</div>`);
 	keyword_item_delete();
 	$('.keyword').scrollTop(function() {
 		return this.scrollHeight;
 	});
-	return 0;
+	return 0
 }
 // bind the keyword delete button click event
 /**
@@ -286,13 +292,63 @@ function keyword_item_delete() {
 	$('.keyword_delete').off('click').click((e) => {
 		var name = e.currentTarget.dataset.name;
 		console.log(name);
-			let mapping = keyword.map(function(item, index, array) {
+			let mapping = rawKeywords.map(function(item, index, array) {
 				return item.name;
 			});
 			let index = mapping.indexOf(name);
-			keyword.splice(index, 1);
+			rawKeywords.splice(index, 1);
 			$(`div[data-item="${name}"]`).remove();
 			$('.max_level').hide();
 			keywordFliter();
 	});
+}
+/**
+ * 將不要的關係從圖中移除，資訊由{@link notKeyword}和{@link lineStack}取得
+ * @param
+ * @param 
+ */
+function lineCtrl(lineStack,notKeyword) {
+    data.all_category = data.all_category.filter((category) => {
+        category.show = true;
+        return category;
+    });
+    if (lineStack.length !== 0) {
+        lineStack.forEach((item) => {
+            let bench = [];
+            if (Array.isArray(item)) {
+                data.all_category.filter((category) => {
+                    if (item.includes(category.name)) bench.push(category.target, category.source);
+                });
+                for (let i = 1; i < item.length; i++)
+                    bench = bench.filter(function(element, index, arr) {
+                        return arr.indexOf(element) !== index;
+                    });
+                data.all_category = data.all_category.filter((category) => {
+                    if (item.includes(category.name)) {
+                        if (bench.includes(category.target) && bench.includes(category.source)) category.show = false;
+                    }
+                    return category;
+                });
+            } else {
+                if (item === '無共現') {
+                    data.all_category = data.all_category.filter((category) => {
+                        if (category.value === 0) category.show = false;
+                        return category;
+                    });
+                } else {
+                    data.all_category = data.all_category.filter((category) => {
+                        if (item === category.name) category.show = false;
+                        return category;
+                    });
+                }
+            }
+        });
+    }
+    console.log(notKeyword.length);
+    if(notKeyword.length !== 0){
+        data.all_category = data.all_category.filter((category) => {
+            if (notKeyword.includes(category.target) ||　notKeyword.includes(category.source)) category.show = false;
+            return category;
+        });
+    }
 }
