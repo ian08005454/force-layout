@@ -27,7 +27,9 @@ import { data } from "./chartSetting";
   var notKeyword = [];
   var rawKeywords = [];
   export var keywords = []
-export function keywordCleanUp(){
+export 
+
+function keywordCleanUp(){
 	keywordPoint = 0;
 	keywordCount = 0;
 	keywordCollection = [];

@@ -1,4 +1,4 @@
-import { data } from "./chartSetting.js";
+import { data, option } from "./chartSetting.js";
 /**
 * 
 * 給max_level slider的對照表
@@ -20,7 +20,7 @@ export function searchKeyword( keywordCollection, routeFloor){
 	keywordCollection.forEach((item) => {
 		if (item.nodeName.length === 0) lineOr(item);
 		else if (item.nodeName.length === 1) data_filter(item, routeFloor);
-		else search_AND( item, result.route);
+		else andSearchControler( item, result.route);
 	});
 	if(result.route.length !== 0){
 		result.route.forEach((item) => {//調整最大階層的sliderbar
@@ -231,15 +231,11 @@ function lineOr(keyword) {
 	});
 	dataAppendOr(categories, links, nodes); 
 }
-/**
- * @method search_AND
- *  @memberof searchTarget
- * @description 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
- * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
- */
-function search_AND(keyword, route) {
+function andSearchStartpointFinder(keyword){
 	let first = []; //存入各個節點到其他節點的最短距離
-	let routeTemp = [];
+	class {
+		
+	}
 	keyword.nodeName.forEach((item) => {
 		let minus = [];
 		minus.push(item);
@@ -268,22 +264,29 @@ function search_AND(keyword, route) {
 				break;
 			}
 		} while (1);
-		first.push(count); //記錄階層數
+		first.push([item,count]); //記錄階層數
 	});
 	first.sort(function(a, b) {
 		//將所有節點的距離排序
-		return b - a;
+		return b[1] - a[1];
 	});
 	console.log(first);
+
+}
+function andSearchControler(keyword){
+	var start = new Date().getTime();
+	andSearchStartpointFinder();
+}
+function andSearchRangeControl(keyword){
 	//類flooding演算法
 	let goalCount = new Array(); //儲存到目標的路徑長度
 	let nodeStack = new Array(); //存搜到的點[節點名稱,距離]
 	let secondaryStack = new Array(); //存當次要搜尋的節點
-	nodeStack.push(new Array(keyword.nodeName[0]));
+	nodeStack.push(new Array(first[0][0]));
 	nodeStack.push(new Array());
 	nodeStack[1].push(0);
-	secondaryStack.push(keyword.nodeName[0]);
-	let goal = keyword.nodeName[1];
+	secondaryStack.push(first[0][0]);
+	let goal = first[1];
 	let categories = [];
 	let c = 0; //階層數
 	let union_collect = [];
@@ -317,7 +320,6 @@ function search_AND(keyword, route) {
 		});
 		if (secondaryStack.length === 0) break; //如果下一次沒東西就跳出去
 	} while (1);
-	console.log('YA!!!!!');
 	console.log(nodeStack);
 	goalCount = Array.from(new Set(goalCount));
 	console.log(goalCount);
@@ -368,6 +370,15 @@ function search_AND(keyword, route) {
 		});
 		if (categories.length === last) break; //如果刪除前後長度一樣就結束
 	} while (1);
+}
+/**
+ * @method andSearch
+ *  @memberof searchTarget
+ * @description 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
+ * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
+ */
+function andSearch(keyword, route) {
+	let routeTemp = [];
 	//類老鼠迷宮演算法
 	for (let z = 1; z < keyword.nodeName.length; z++) {
 		//為了因應可能會有fully connection 的情況，我想需要針對所有的條件節點運算一次
@@ -477,6 +488,8 @@ function search_AND(keyword, route) {
 		} while (1);
 	}
 	console.log('YA!!!!!');
+	var end = new Date().getTime();
+	console.log('timer', end - start);
 	console.log(routeTemp.length);
 	console.log(routeTemp);
 	for (var i = 0; i < routeTemp.length; i++) {

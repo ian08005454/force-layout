@@ -1,5 +1,6 @@
 // variable
-var color = {};
+import { SetLineColor } from "./assignColor";
+var lineColors = {};
 var buf = {
 	//暫存資料用
 	nodes: [],
@@ -12,9 +13,8 @@ var allValues = [];
 var allIdf = [];
 // var userColors = ["#cc0000", "#00cc00", "#0000cc"];
 // var userColors = [];
-var HSL = [];
 var id = 0;
-function push_element(data_element, name, bType = 'solid', bColor = 'gray', bWidth = 0) {
+function appendNode(data_element, name, bType = 'solid', bColor = 'gray', bWidth = 0) {
 	if (data_element.idf === 0) {
 		var lenghValue = 1;
 	} else lenghValue = data_element.idf;
@@ -41,51 +41,48 @@ function push_element(data_element, name, bType = 'solid', bColor = 'gray', bWid
 		}
 	});
 }
+function setSquare(largest){
+	if (largest > 4096) var square = 4;
+	else if (largest > 256) var square = 3;
+	else if (largest > 16) var square = 2;
+	else var square = 1;
+	return square;
+}
 function dataFormat(data) {
 	const set = new Set(); //為了之後去除重複
 	data.forEach((data_element) => {
-		if (color.hasOwnProperty(data_element.gp)) {
-			var LineColor = color[data_element.gp];
-		} else {
-			var LineColor = getRandomColor(); //calculate_color
-			color[data_element.gp] = LineColor;
-		}
 		allIdf.push(data_element.idf);
-		if (data_element.idf === 0) push_element(data_element, data_element.k1, 'solid', '#ffb61e', 3);
-		else push_element(data_element, data_element.k1);
+		if (data_element.idf === 0) appendNode(data_element, data_element.k1, 'solid', '#ffb61e', 3);
+		else appendNode(data_element, data_element.k1);
 		var largest = data_element.kg2[0].v;
 		data_element.kg2.forEach((kg2Element) => {
 			if (kg2Element.v > largest) largest = kg2Element.v;
 		});
-		if (largest > 4096) var square = 4;
-		else if (largest > 256) var square = 3;
-		else if (largest > 16) var square = 2;
-		else var square = 1;
+		var square = setSquare(largest);
 		// foreach kg2 array
 		data_element.kg2.forEach((kg2_element) => {
 			// random a new color without duplicate, this color will according with category color to pair link color
-			if (color.hasOwnProperty(kg2_element.type[0])) {
-				// console.log(kg2_element.type[0]);
-				var random_color = color[kg2_element.type[0]];
+			if (lineColors.hasOwnProperty(kg2_element.type[0])) {
+				var lineColor = lineColors[kg2_element.type[0]].color;
 			} else {
 				// let name = kg2_element.type[0];
-				var random_color = getRandomColor(); //calculate_color
-				color[kg2_element.type[0]] = random_color;
-				// console.log(kg2_element.type[0]);
+				var lineColor = '#1A75CF'; //calculate_color getRandomColor()
+				lineColors[kg2_element.type[0]] = {color:lineColor, group:[]};
+				for (let index = 0; index < userColors.length; index++) {
+					lineColors[kg2_element.type[0]].group.push(0);
+				}
+			}
+			if(kg2_element.gp !== data_element.gp){
+				lineColors[kg2_element.type[0]].group[kg2_element.gp]++;
+				lineColors[kg2_element.type[0]].group[data_element.gp]++;
 			}
 			if (dataType === 1) {
-				random_color = '#1A75CF';
-			}
-			if (color.hasOwnProperty(kg2_element.gp)) {
-				LineColor = color[kg2_element.gp];
-			} else {
-				LineColor = getRandomColor(); //calculate_color
-				color[kg2_element.gp] = LineColor;
+				lineColor = '#1A75CF';
 			}
 			allIdf.push(kg2_element.idf);
 			// first : push k2 into nodes array, ignore duplicate problem e.g.AB互為兄弟時 會產生重複兩個節點
-			if (kg2_element.idf == 0) push_element(kg2_element, kg2_element.k2, 'solid', '#ffb61e', 3);
-			else push_element(kg2_element, kg2_element.k2);
+			if (kg2_element.idf == 0) appendNode(kg2_element, kg2_element.k2, 'solid', '#ffb61e', 3);
+			else appendNode(kg2_element, kg2_element.k2);
 			// second : push all category into buf.category array, ignore duplicate problem
 			allValues.push(kg2_element.v);
 			if (kg2_element.v == 0) {
@@ -98,7 +95,7 @@ function dataFormat(data) {
 			if (kg2_element.type[0] == '未定義' || kg2_element.type[0] == '') {
 				if (dataType !== 1) {
 					kg2_element.type[0] = '未定義';
-					random_color = 'black';
+					lineColor = 'black';
 					var shadowBlur = 10;
 				}
 			} else var shadowBlur = 0;
@@ -113,14 +110,15 @@ function dataFormat(data) {
 				target: data_element.k1,
 				source: kg2_element.k2,
 				value: kg2_element.v,
-				show: true, //不知道要做甚麼
+				show: true, //是否要顯示於畫面上
+				bilateral: 'false',
 				force: {
 					edgeLength: Math.sqrt(lenghValue, square) * 10000000
 				},
 				lineStyle: {
 					opacity: 1, //work
-					color: random_color,
-					curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
+					color: lineColor,
+					// curveness: 0.4, //原1 / Math.sqrt(kg2_element.v, 2) //曲度
 					width: Math.sqrt(lenghValue, square),
 					originalWidth: Math.sqrt(lenghValue, square),
 					type: ttype, //kg2_element.css[0].linetype  //'dashed'
@@ -129,7 +127,7 @@ function dataFormat(data) {
 				},
 				label: {
 					show: true,
-					color: random_color
+					color: lineColor
 				}
 			});
 			// buf.all_category has the every property that links object need, etc : source, target, value, lineStyle
@@ -159,47 +157,24 @@ function dataFormat(data) {
 	buf.all_category = buf.all_category.sort((a, b) => {
 		return a.name > b.name ? 1 : -1;
 	});
-	/**
-    * 生成边曲度优先使用列表
-    * @return  [0.2, -0.2, 0.4, -0.4, 0.6, -0.6, 0.8, -0.8, 1, -1, 0.1, -0.1, 0.3, -0.3, 0.5, -0.5, 0.7, -0.7, 0.9, -0.9]
-    */
-	const CURVENESS_LIST = [
-		0.4,
-		-0.6,
-		0.2,
-		-0.4,
-		0.6,
-		-0.2,
-		0.8,
-		-0.8,
-		1,
-		-1,
-		0.1,
-		-0.1,
-		0.3,
-		-0.3,
-		0.5,
-		-0.5,
-		0.7,
-		-0.7,
-		0.9,
-		-0.9
-	];
-	// Array.from({ length: 20 })
-	//    .map((_, i) => (((i < 10 ? i + 2 : i - 9) - (i % 2)) / 10) * (i % 2 ? -1 : 1))
-
-	// 2. 预期生成的优化曲度后的列表
-	const echartLinks = [];
-	buf.all_category.forEach((link) => {
-		// 3. 查询已优化的列表中，已存在的两个顶点相同的边
-		const sameLink = echartLinks.filter((item) => item.source === link.source && item.target === link.target);
-		// 4. 优化曲度
-		link.lineStyle.curveness = CURVENESS_LIST[sameLink.length] || Math.random();
-
-		echartLinks.push(link);
+	buf.all_category.forEach(category =>{
+		buf.all_category.forEach(item =>{
+			if(item.target === category.source && item.source === category.target){
+				if(item.name === category.name && category.bilateral !== 'delete'){
+					category.bilateral = 'true';
+					item.bilateral  = 'delete';
+				}
+			}
+		})
 	});
+	var colorList = Object.keys(lineColors);
+	console.log(lineColors);
+	lineColors = SetLineColor(colorList, lineColors, userColors);
+	buf.all_category.forEach(category =>{
+		category.lineStyle.color = lineColors[category.name].color;
+		category.label.color = lineColors[category.name].color;
+	})
 	buf.category = buf.all_category;
-	// console.log(buf.nodes);
 	return buf;
 }
 

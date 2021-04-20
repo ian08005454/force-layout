@@ -11,26 +11,36 @@ export var option = {
 	title: {
         show: true,
 		text: bookName, // this field will connect to the book name
-		subtext: bookId,
 		textStyle: {
 			fontSize: 32,
 			fontWeight: 'bolder',
             color: '#595759'
 		},
-		subtextStyle: {
-			fontSize: 15,
-			fontWeight: 'bolder'
-		},
+		// subtextStyle: {
+		// 	fontSize: 15,
+		// 	fontWeight: 'bolder'
+		// },
         top: "bottom",
         left: "right",
         triggerEvent: true,
 	},
 	tooltip: {
 		show: true,
-		formatter: function(data) {
-			if (data.dataType == 'node') return data.name  +'(<b>' + data.value + '</b>)';
-			if (data.dataType == 'edge')
-				return data.data.source + ' -- <b>' + data.data.name + '(' + data.value + '</b>) -->   ' + data.data.target;
+		formatter: function(element) {
+			if (element.dataType == 'node') return element.name  +'(<b>' + element.value + '</b>)';
+			if (element.dataType == 'edge'){
+				var target,source
+				data.nodes.forEach(node => {
+					if(node.name === element.data.target)
+						target = node.value;
+					else if (node.name === element.data.source)
+						source = node.value
+				});
+				if(element.data.bilateral === 'true')
+					return element.data.source +  '('+ source +')' + ' <-- <b>' + element.data.name + '(' + element.value + '</b>) -->   ' + element.data.target + '('+ target +')' ;
+				else
+					return element.data.source +  '('+ source +')' + ' -- <b>' + element.data.name + '(' + element.value + '</b>) -->   ' + element.data.target + '('+ target +')' ;
+			}
 		}
 		// showContent:false, //mouseover是否顯示
 	},
@@ -107,7 +117,12 @@ export var option = {
             edgeSymbolSize: [10, arrowSize],
 			emphasis: {
 				focus: 'adjacency',
-				scale: true
+				scale: true,
+				lable: {
+					show: true,
+					color: "#121212",
+					fontSize: 20
+				}
 			},
 			autoCurveness: true, //auto calculate each curveness of lines
 			edgeLabel: {
@@ -124,12 +139,11 @@ export var option = {
 				position: 'middle',
 				align: 'center',
 				ellipsis: '...',
-				rotate: 0
 			},
 			lineStyle: {
 				opacity: 1
 			},
-			zoom: 1
+			zoom: 1,
 		}
 	]
 };

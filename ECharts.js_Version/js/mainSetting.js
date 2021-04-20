@@ -4,24 +4,24 @@
  * @createDate 2020-05-21
  */
 // import * as echarts from '../lib/echarts.min.js';
-// import * as echarts from '../lib/echarts';
-import * as echarts from 'echarts/core';
-import {
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-    ToolboxComponent
-} from 'echarts/components';
-import {
-    GraphChart
-} from 'echarts/charts';
-import {
-    CanvasRenderer
-} from 'echarts/renderers';
+import * as echarts from '../lib/echarts';
+// import * as echarts from 'echarts/core';
+// import {
+//     TitleComponent,
+//     TooltipComponent,
+//     LegendComponent,
+//     ToolboxComponent
+// } from 'echarts/components';
+// import {
+//     GraphChart
+// } from 'echarts/charts';
+// import {
+//     CanvasRenderer
+// } from 'echarts/renderers';
 
-echarts.use(
-    [TitleComponent, TooltipComponent, LegendComponent, GraphChart, CanvasRenderer, ToolboxComponent]
-);
+// echarts.use(
+//     [TitleComponent, TooltipComponent, LegendComponent, GraphChart, CanvasRenderer, ToolboxComponent]
+// );
 import '../css/index.css';
 import $ from 'jquery/dist/jquery';
 window.jQuery = window.$ = $;
@@ -92,20 +92,6 @@ else if(dataType === 2){
     $(".common_show_value").hide();
     $(".word_strength").hide();
 }
-var edgeMask = [[],[]];
-option.series[0].categories.forEach(category =>{
-    if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id))
-    option.series[0].categories.forEach(item =>{
-        if(item.target === category.source && item.source === category.target){
-            if(item.name === category.name){
-                if(!edgeMask[0].includes(category.id) && !edgeMask[1].includes(category.id)){
-                    edgeMask[0].push(category.id);
-                    edgeMask[1].push(item.id);
-                }
-            }
-        }
-    })
-})
 /**
  * 儲存max_level slider的現值
  * @type {string}
@@ -352,19 +338,20 @@ Chart.on('click', (e) => {
 });
 Chart.on('dblclick', params => {
     if (params.componentType === 'title') {
-      let titleName = prompt("請填入標題名稱");
-      if(titleName !== null)
-      option.title.text = titleName;
+      bookName = prompt("請填入標題名稱", bookName);
+      if(bookName !== null)
+      option.title.text = bookName;
       event_setOption_function(false);
     }
   });
 function edgeFilter(){																					
     option.series[0].links.forEach(function(link,index,array){
-        if(edgeMask[1].includes(link.id)){
+        if(link.bilateral == 'delete'){
             option.series[0].links.splice(index,1);
         }
-        if(edgeMask[0].includes(link.id)){
+        if(link.bilateral == 'true'){
             link.symbol = 'arrow';
+            link.symbolSize = arrowSize;
         }
     });
 }
