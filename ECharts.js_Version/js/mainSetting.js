@@ -1,5 +1,5 @@
 /**
- * @file Main_setting
+ * @file MainSetting
  * @author Wei-Jie Li
  * @createDate 2020-05-21
  */

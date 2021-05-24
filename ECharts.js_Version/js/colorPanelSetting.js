@@ -1,3 +1,4 @@
+//https://github.com/Simonwep/pickr
 import { lineColorChanger } from "./mainSetting.js"
 import '@simonwep/pickr/dist/themes/nano.min.css';      // 'nano' theme
 import Pickr from '@simonwep/pickr';

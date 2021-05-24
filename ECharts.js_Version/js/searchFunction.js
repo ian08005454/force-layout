@@ -1,3 +1,4 @@
+
 import { data, option } from "./chartSetting.js";
 /**
 * 
@@ -20,7 +21,7 @@ export function searchKeyword( keywordCollection, routeFloor){
 	keywordCollection.forEach((item) => {
 		if (item.nodeName.length === 0) lineOr(item);
 		else if (item.nodeName.length === 1) data_filter(item, routeFloor);
-		else andSearchControler( item, result.route);
+		else andSearchStartpointFinder(item, result.route,routeHash);
 	});
 	if(result.route.length !== 0){
 		result.route.forEach((item) => {//調整最大階層的sliderbar
@@ -47,10 +48,10 @@ export function changeMaxlevel(keywordCollection, routeFloor){
 }
 /**
  * 回報找不到路線
- * @param {string} keyword_search_name 
+ * @param {string} nodeName
  */
-function andSearchNoRoute(keyword_search_name) {
-	alert(`Error2 : 搜尋不到路徑 : ${keyword_search_name}`);
+function andSearchNoRoute(nodeName) {
+	alert(`Error2 : 搜尋不到路徑 : ${nodeName}`);
 }
 /**
  * 
@@ -99,7 +100,7 @@ function searchLine2Filter(item, bench, categories, dataSet = data.category){
  * 單一和or搜尋的function，會用searchTarget的資訊尋找出的點，並傳給{@link dataAppendOr()}整合搜尋結果
  * @param {object} keyword 搜尋的目標
  * @param {object} routeFloor 要搜尋到的階層
- */
+ */				
 function data_filter(keyword, routeFloor) {
 	if (routeFloor === 'All') {
 		// 確認最大階層數，如果是All就跑到100層
@@ -231,65 +232,58 @@ function lineOr(keyword) {
 	});
 	dataAppendOr(categories, links, nodes); 
 }
-function andSearchStartpointFinder(keyword){
+function andSearchStartpointFinder(keyword, route){
 	let first = []; //存入各個節點到其他節點的最短距離
-	class {
-		
-	}
-	keyword.nodeName.forEach((item) => {
-		let minus = [];
-		minus.push(item);
+	for (let item = 0; item < keyword.nodeName.length; item++) {
+		let minus = new Array(keyword.nodeName[item]);
+		let lastMinusLen = 0;
 		let category_collect = [];
-		count = 0;
+		let count = 0;
 		do {
 			//基礎的or搜尋
-			data.category.filter((category) => {
+			data.category.forEach((category) => {
 				if (minus.includes(category.target) || minus.includes(category.source)) {
 					category_collect.push(category.target, category.source);
-					return category;
 				}
 			});
-			category_collect = Array.from(new Set(category_collect));
-			// console.log(category_collect);
-			minus = category_collect.filter((items) => {
-				return !items.includes(item);
-			});
+			minus = Array.from(new Set(category_collect));
+			console.log(data.category);
 			count++;
 			var countdown = 0;
 			keyword.nodeName.forEach((item) => {
 				if (minus.includes(item)) countdown++;
 			});
-			if (countdown === keyword.nodeName.length - 1) {
+			if (countdown === keyword.nodeName.length) {
 				//在要顯示的點鐘找到所有的點就停止
 				break;
 			}
+			if(lastMinusLen === minus.length){
+				return andSearchNoRoute(keyword.nodeName)
+			}
+			lastMinusLen = minus.length;
 		} while (1);
 		first.push([item,count]); //記錄階層數
-	});
+	}
 	first.sort(function(a, b) {
 		//將所有節點的距離排序
 		return b[1] - a[1];
 	});
 	console.log(first);
-
+	return limitSearchRange(first, route)
 }
-function andSearchControler(keyword){
-	var start = new Date().getTime();
-	andSearchStartpointFinder();
-}
-function andSearchRangeControl(keyword){
+function limitSearchRange(keyword, route){
+	let searchRange = new Array();
 	//類flooding演算法
+	for(let i;i<keyword.nodeName.length;i++){
 	let goalCount = new Array(); //儲存到目標的路徑長度
 	let nodeStack = new Array(); //存搜到的點[節點名稱,距離]
 	let secondaryStack = new Array(); //存當次要搜尋的節點
-	nodeStack.push(new Array(first[0][0]));
+	nodeStack.push(new Array(keyword.nodeName[i]));
 	nodeStack.push(new Array());
 	nodeStack[1].push(0);
-	secondaryStack.push(first[0][0]);
-	let goal = first[1];
+	secondaryStack.push(keyword.nodeName[i]);
 	let categories = [];
 	let c = 0; //階層數
-	let union_collect = [];
 	do {
 		c++;
 		categories = [];
@@ -299,8 +293,7 @@ function andSearchRangeControl(keyword){
 			if (secondaryStack.includes(category.target) || secondaryStack.includes(category.source)) {
 					if (category.show === true) {
 						//如果節點是目標則加入距離到goalCount
-						if (category.target === goal || category.source === goal) goalCount.push(c);
-						else if (!nodeStack[0].includes(category.target)) {
+						if (!nodeStack[0].includes(category.target)) {
 							//如果節點不在陣列裡面就放進去
 							union_collect.push(category.target);
 							nodeStack[0].push(category.target);
@@ -316,11 +309,10 @@ function andSearchRangeControl(keyword){
 		union_collect = Array.from(new Set(union_collect)); //去掉重複的節點
 		secondaryStack = union_collect.filter((item) => {
 			//去掉目標後加入下一次搜尋
-			if (item !== goal) return item;
+			if (!keyword.nodeName.includes(item)) return item;
 		});
 		if (secondaryStack.length === 0) break; //如果下一次沒東西就跳出去
 	} while (1);
-	console.log(nodeStack);
 	goalCount = Array.from(new Set(goalCount));
 	console.log(goalCount);
 	goalCount.sort(function(a, b) {
@@ -345,7 +337,7 @@ function andSearchRangeControl(keyword){
 	do {
 		nodeStack[0].forEach(function(item, index, array) {
 			//將不是目標的終點去掉
-			if (item !== goal) {
+			if (!keyword.nodeName.includes(item)) {
 				let temp = categories.filter((category) => {
 					if (category.target === item) {
 						if (nodeStack[1][nodeStack[0].indexOf(category.source)] > nodeStack[1][index])
@@ -370,6 +362,21 @@ function andSearchRangeControl(keyword){
 		});
 		if (categories.length === last) break; //如果刪除前後長度一樣就結束
 	} while (1);
+		for (const node in nodeStack) {
+			searchRange.push(node[0])
+		}
+	}
+	searchRange = searchRange.filter(function(element, index, arr){
+		return arr.indexOf(element) !== index;
+	});
+	let searchRangeData = data.category.filter((category) => {
+		//取的刪除終點後線的資料
+		if (searchRange.includes(category.target) && searchRange.includes(category.source)) {
+			return category;
+		}
+	});
+	console.log(searchRange)
+	return andSearch(keyword, route, searchRangeData)
 }
 /**
  * @method andSearch
@@ -377,11 +384,9 @@ function andSearchRangeControl(keyword){
  * @description 搜尋多節點之間的所有路徑，方法:先用flooding演算法找出整理過搜尋範圍，並去掉多餘的線與點，再交由底下的參考範例時做出類老鼠迷宮，找出所有路線
  * @see {@link https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/713294/2} 參考範例
  */
-function andSearch(keyword, route) {
+function andSearch(keyword, route, searchRangeData) {
 	let routeTemp = [];
 	//類老鼠迷宮演算法
-	for (let z = 1; z < keyword.nodeName.length; z++) {
-		//為了因應可能會有fully connection 的情況，我想需要針對所有的條件節點運算一次
 		let primaryStack = new Array(); //參考了老鼠迷宮的做法，這是主堆疊
 		let secondaryStack = new Array(); //副堆疊
 		let temp2 = new Array(); //當次搜尋的結果
@@ -389,7 +394,7 @@ function andSearch(keyword, route) {
 		let keywordTemp = keyword.nodeName[0]; //搜尋目標
 		let nodeCollection;
 		let secondaryStackCount = -1; //存副堆疊長度
-		let goal = keyword.nodeName[z];
+		let goal = keyword.nodeName[keyword.nodeName.length];
 		do {
 			//找出與目標有關的線
 			temp2 = [];
@@ -400,7 +405,7 @@ function andSearch(keyword, route) {
 				//篩選掉線段限制，大部分和data_filter()一樣
 				keyword.lineName.forEach((item) => {
 					let bench = [];
-					categories.filter((category) => {
+					searchRangeData.filter((category) => {
 						if (keywordTemp === category.target || keywordTemp === category.source) {
 								if (item.includes(category.name)) {
 									if (item.length > 1) {
@@ -417,19 +422,19 @@ function andSearch(keyword, route) {
 							bench = bench.filter(function(element, index, arr) {
 								return arr.indexOf(element) !== index;
 							});
-						dataSet = categories.filter((category) => {
+						dataSet = searchRangeData.filter((category) => {
 							if (keywordTemp === category.target || keywordTemp === category.source) {
 								return category
 							}
 						});
-						temp = searchLine2Filter(item, bench, categories, dataSet);
+						temp = searchLine2Filter(item, bench, searchRangeData, dataSet);
 						temp.forEach((category) => {
 						collect.push(category.target, category.source);
 					});
 					}
 				});
 			} else {
-				temp = categories.filter((category) => {
+				temp = searchRangeData.filter((category) => {
 					if (keywordTemp === category.target || keywordTemp === category.source) return category;
 				});
 			}
@@ -486,7 +491,6 @@ function andSearch(keyword, route) {
 				break;
 			}
 		} while (1);
-	}
 	console.log('YA!!!!!');
 	var end = new Date().getTime();
 	console.log('timer', end - start);
@@ -508,6 +512,117 @@ function andSearch(keyword, route) {
 		route.push(item);
 	});
 	console.log('finish');
+}
+function floodingSearch(keyword, routeHash, searchFloor){
+	let nodeStack = new Array();
+	for(let i;i<keyword.nodeName.length;i++){
+		let c = 0;
+		let secondaryStack = new Array(keyword.nodeName[i]);
+		let lockLiine = new Array();
+		let nextLockLine = new Array();
+		do{
+		c++;
+		categories = [];
+		let union_collect = [];
+		data.category.filter((category) => {
+			//搜尋陣列理的節點連到的下一個節點
+			if (secondaryStack.includes(category.target) || secondaryStack.includes(category.source)) {
+					if (category.show === true && !lockLiine.includes(category.id)) {
+						if(secondaryStack.includes(category.target)){
+							union_collect.push(category.source)
+							nextLockLine.push(category,id);
+						}else{
+							union_collect.push(category.target)
+							nextLockLine.push(category,id);
+						}
+	  				} 
+			}
+		});
+		lockLiine = Array,from(nextLockLine)
+		nextLockLine = [];
+		secondaryStack = Array.from(new Set(union_collect)); //去掉重複的節點
+		secondaryStack = secondaryStack.filter((item) => {
+			//去掉目標後加入下一次搜尋
+			if (item !== keyword.nodeName[i]) return item;
+		});
+		if(nodeStack.length-1<=c){
+			secondaryStack.forEach(item=>{
+				nodeStack[c-1].push(item);
+			});
+		}
+		else{
+			nodeStack.push(new Array());
+			secondaryStack.forEach(item=>{
+				nodeStack[c-1].push(item);
+			});
+		}
+		if (secondaryStack.length === 0) break; //如果下一次沒東西就跳出去
+	} while(1);
+		let floor = [];
+		let allNodes = [];
+		miniusFloor = -1;
+		for (const  [i, value] of nodeStack) {
+			value.forEach(node =>{
+				allNodes.push(node);
+			});
+			let count = 0;
+			keyword.nodeName.forEach(node=>{
+				if(allNodes.includes(node))
+					count++;
+			});
+			if(count === keyword.nodeName.length){
+				miniusFloor = i;
+				break;
+			}
+		}
+		if(miniusFloor === -1){
+			return andSearchNoRoute(keyword.nodeName);
+		}
+		for(i = miniusFloor;i<nodeStack.length;i++){
+			if(item.includes(keyword.nodeName)){
+				routeHash.push(index)
+			}
+		}
+		let range = [];
+		for(i = 0;i<=searchFloor;i++){
+			nodeStack[i].forEach(item =>{
+				range.push(item);
+			});
+		}
+		searchFilter(range);
+	}
+}
+function searchFilter(floorStack){
+	unionCollect = [];
+	categories =  data.category.filter(category =>{
+		if(floorStack.hasOwnProperty(category.id)){
+			unionCollect.push(category.target,category.source);
+			return category;
+		}
+	});
+	unionCollect = unionCollect.filter(function(element, index, arr){
+		return arr.indexOf(element) !== index;
+	});
+	do{
+		let unionCollect1 = [];
+		data.category.forEach(category =>{
+			if(unionCollect.includes(category.target) && unionCollect.includes(category.source))
+				unionCollect1.push(category.target,category.source);
+		});
+		unionCollect = unionCollect1.filter(function(element, index, arr){
+			return arr.indexOf(element) !== index;
+		});
+		if(unionCollect.length === unionCollect1.length)
+		break;
+	}while(1)
+	data.category.forEach(category =>{
+		if(!unionCollect.includes(category.target) || !unionCollect.includes(category.source))
+			if(floorStack.hasOwnProperty(category.id)){
+				floorStack.splice(floorStack[category.id], 1);
+			}
+	});
+	return floorStack;
+
 }
 function data_filter_and(route, routeFloor) {
 	var categories = [],

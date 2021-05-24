@@ -1,3 +1,10 @@
+/**
+ * @file graphologyLayoutSystem
+ * @author Wei-Jie Li
+ * @createDate 2021-01-21
+ * @see  github {@link https://github.com/graphology/graphology-gexf} 
+ * @see  information{@link https://graphology.github.io/}
+ */
 import Graph from "graphology";
 import noverlap from 'graphology-layout-noverlap';
 // import forceAtlas2 from 'graphology-layout-forceatlas2';
