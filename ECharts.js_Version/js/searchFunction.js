@@ -21,17 +21,8 @@ export function searchKeyword( keywordCollection, routeFloor){
 	keywordCollection.forEach((item) => {
 		if (item.nodeName.length === 0) lineOr(item);
 		else if (item.nodeName.length === 1) data_filter(item, routeFloor);
-		else andSearchStartpointFinder(item, result.route,routeHash);
+		else floodingSearch(item, routeFloor);
 	});
-	if(result.route.length !== 0){
-		result.route.forEach((item) => {//調整最大階層的sliderbar
-			if (!result.routeHash.includes(item.length-1)) result.routeHash.push(item.length-1);
-		});
-		result.routeHash.sort(function(a, b) {
-			return a - b;
-		});
-		data_filter_and(result.route, routeFloor);
-	}
 	return result;
 }
 export function changeMaxlevel(keywordCollection, routeFloor){
@@ -41,9 +32,8 @@ export function changeMaxlevel(keywordCollection, routeFloor){
 	keywordCollection.forEach((item) => {
 		if (item.nodeName.length === 0) lineOr(item);
 		else if (item.nodeName.length === 1) data_filter(item, routeFloor);
+		else	floodingSearch(item, routeFloor);
 	});
-	if(result.route.length !== 0)
-	data_filter_and(result.route, routeFloor);
 	return result;
 }
 /**
@@ -513,39 +503,34 @@ function andSearch(keyword, route, searchRangeData) {
 	});
 	console.log('finish');
 }
-function floodingSearch(keyword, routeHash, searchFloor){
-	let nodeStack = new Array();
-	for(let i;i<keyword.nodeName.length;i++){
+function floodingSearch(keyword, searchFloor){
+	let nodeStack = new Array([]);
+	for(let i=0;i<keyword.nodeName.length;i++){ 
 		let c = 0;
 		let secondaryStack = new Array(keyword.nodeName[i]);
-		let lockLiine = new Array();
-		let nextLockLine = new Array();
+		let lockLine = new Array();
+		//let nextLockLine = new Array();
 		do{
 		c++;
-		categories = [];
 		let union_collect = [];
 		data.category.filter((category) => {
 			//搜尋陣列理的節點連到的下一個節點
 			if (secondaryStack.includes(category.target) || secondaryStack.includes(category.source)) {
-					if (category.show === true && !lockLiine.includes(category.id)) {
+					if (category.show === true && !lockLine.includes(category.id)) {
 						if(secondaryStack.includes(category.target)){
 							union_collect.push(category.source)
-							nextLockLine.push(category,id);
+							lockLine.push(category.id);
 						}else{
 							union_collect.push(category.target)
-							nextLockLine.push(category,id);
+							lockLine.push(category.id);
 						}
 	  				} 
 			}
 		});
-		lockLiine = Array,from(nextLockLine)
-		nextLockLine = [];
+		//lockLine = Array.from(nextLockLine)
+		//nextLockLine = [];
 		secondaryStack = Array.from(new Set(union_collect)); //去掉重複的節點
-		secondaryStack = secondaryStack.filter((item) => {
-			//去掉目標後加入下一次搜尋
-			if (item !== keyword.nodeName[i]) return item;
-		});
-		if(nodeStack.length-1<=c){
+		if(nodeStack.length-1>=c){
 			secondaryStack.forEach(item=>{
 				nodeStack[c-1].push(item);
 			});
@@ -556,73 +541,89 @@ function floodingSearch(keyword, routeHash, searchFloor){
 				nodeStack[c-1].push(item);
 			});
 		}
+		secondaryStack = secondaryStack.filter((item) => {
+			//去掉目標後加入下一次搜尋
+			if (item !== keyword.nodeName[i]) return item;
+		});
 		if (secondaryStack.length === 0) break; //如果下一次沒東西就跳出去
 	} while(1);
-		let floor = [];
-		let allNodes = [];
-		miniusFloor = -1;
-		for (const  [i, value] of nodeStack) {
-			value.forEach(node =>{
-				allNodes.push(node);
-			});
-			let count = 0;
-			keyword.nodeName.forEach(node=>{
-				if(allNodes.includes(node))
-					count++;
-			});
-			if(count === keyword.nodeName.length){
-				miniusFloor = i;
-				break;
-			}
-		}
-		if(miniusFloor === -1){
-			return andSearchNoRoute(keyword.nodeName);
-		}
-		for(i = miniusFloor;i<nodeStack.length;i++){
-			if(item.includes(keyword.nodeName)){
-				routeHash.push(index)
-			}
-		}
-		let range = [];
-		for(i = 0;i<=searchFloor;i++){
-			nodeStack[i].forEach(item =>{
-				range.push(item);
-			});
-		}
-		searchFilter(range);
+	
 	}
-}
-function searchFilter(floorStack){
-	unionCollect = [];
-	categories =  data.category.filter(category =>{
-		if(floorStack.hasOwnProperty(category.id)){
-			unionCollect.push(category.target,category.source);
-			return category;
-		}
-	});
-	unionCollect = unionCollect.filter(function(element, index, arr){
-		return arr.indexOf(element) !== index;
-	});
-	do{
-		let unionCollect1 = [];
-		data.category.forEach(category =>{
-			if(unionCollect.includes(category.target) && unionCollect.includes(category.source))
-				unionCollect1.push(category.target,category.source);
+	let allNodes = [];
+	let miniusFloor = -1;
+	console.log(nodeStack);
+	let i = 0;
+	for (const  value of nodeStack) {
+		console.log(value);
+		value.forEach(node =>{
+			allNodes.push(node);
 		});
-		unionCollect = unionCollect1.filter(function(element, index, arr){
+		let count = 0;
+		keyword.nodeName.forEach(node=>{
+			if(allNodes.includes(node))
+				count++;
+		});
+		if(count === keyword.nodeName.length){
+			miniusFloor = i;
+			break;
+		}
+		i++;
+	}
+	if(miniusFloor === -1){
+		return andSearchNoRoute(keyword.nodeName);
+	}
+	console.log(miniusFloor)
+	for(let i = miniusFloor;i<nodeStack.length;i++){
+		if(nodeStack[i].includes(keyword.nodeName)){
+			if(!result.routeHash.includes(index))
+			result.routeHash.push(index)
+		}
+	}
+	console.log(result.routeHash);
+	let range = [];
+	if(searchFloor === 'All'){
+		searchFloor = nodeStack.length;
+	}
+	for(let i = 0;i<searchFloor;i++){
+		nodeStack[i].forEach(item =>{
+			range.push(item);
+		});
+	}
+	range = searchFilter(range, keyword);
+	let categories = data.category.filter(category =>{
+		if(range.includes(category.target) && range.includes(category.source))
+			return category
+	});
+	let links = categories.filter((category) => {
+		//將要顯示的線整理起來
+		if (category.show == true) return category;
+	});
+	let nodes = data.nodes.filter((node) => {
+		//將要顯示的點整理起來
+		return range.includes(node.name);
+	});
+	dataAppendOr(categories, links, nodes); //將資料整合起來
+}
+function searchFilter(range, keyword){
+	do{
+		let unionCollect = [];
+		data.category.forEach(category =>{
+			if(range.includes(category.target) && range.includes(category.source)){
+				unionCollect.push(category.target,category.source);
+			}
+		});
+		range = unionCollect.filter(function(element, index, arr){
+			if(keyword.nodeName.includes(element))
+				return element;
+			else 	
 			return arr.indexOf(element) !== index;
 		});
-		if(unionCollect.length === unionCollect1.length)
+		unionCollect = Array.from(new Set(unionCollect)); 
+		range = Array.from(new Set(range)); 
+		if(unionCollect.length === range.length)
 		break;
 	}while(1)
-	data.category.forEach(category =>{
-		if(!unionCollect.includes(category.target) || !unionCollect.includes(category.source))
-			if(floorStack.hasOwnProperty(category.id)){
-				floorStack.splice(floorStack[category.id], 1);
-			}
-	});
-	return floorStack;
-
+	return range;
 }
 function data_filter_and(route, routeFloor) {
 	var categories = [],
