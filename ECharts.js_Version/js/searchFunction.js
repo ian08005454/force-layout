@@ -1,4 +1,5 @@
 
+import { node } from "webpack";
 import { data, option } from "./chartSetting.js";
 /**
 * 
@@ -504,11 +505,14 @@ function andSearch(keyword, route, searchRangeData) {
 	console.log('finish');
 }
 function floodingSearch(keyword, searchFloor){
-	let nodeStack = new Array([]);
+	let lineStack = {};
+	let lockLine = new Array();
+	data.category.forEach(item=>{
+		lineStack[item.id] = 1;
+	});
 	for(let i=0;i<keyword.nodeName.length;i++){ 
 		let c = 0;
 		let secondaryStack = new Array(keyword.nodeName[i]);
-		let lockLine = new Array();
 		//let nextLockLine = new Array();
 		do{
 		c++;
@@ -520,89 +524,81 @@ function floodingSearch(keyword, searchFloor){
 						if(secondaryStack.includes(category.target)){
 							union_collect.push(category.source)
 							lockLine.push(category.id);
+							lineStack[category.id] = (lineStack[category.id] + c)/2;
 						}else{
 							union_collect.push(category.target)
 							lockLine.push(category.id);
+							lineStack[category.id] = (lineStack[category.id] + c)/2;
 						}
 	  				} 
 			}
 		});
-		//lockLine = Array.from(nextLockLine)
-		//nextLockLine = [];
 		secondaryStack = Array.from(new Set(union_collect)); //去掉重複的節點
-		if(nodeStack.length-1>=c){
-			secondaryStack.forEach(item=>{
-				nodeStack[c-1].push(item);
-			});
-		}
-		else{
-			nodeStack.push(new Array());
-			secondaryStack.forEach(item=>{
-				nodeStack[c-1].push(item);
-			});
-		}
 		secondaryStack = secondaryStack.filter((item) => {
 			//去掉目標後加入下一次搜尋
 			if (item !== keyword.nodeName[i]) return item;
 		});
 		if (secondaryStack.length === 0) break; //如果下一次沒東西就跳出去
 	} while(1);
-	
+		lineStack = objectRemover(lineStack, lockLine);
 	}
-	let allNodes = [];
-	let miniusFloor = -1;
-	console.log(nodeStack);
-	let i = 0;
-	for (const  value of nodeStack) {
-		console.log(value);
-		value.forEach(node =>{
-			allNodes.push(node);
-		});
-		let count = 0;
-		keyword.nodeName.forEach(node=>{
-			if(allNodes.includes(node))
-				count++;
-		});
-		if(count === keyword.nodeName.length){
-			miniusFloor = i;
-			break;
+	console.log(lineStack);
+	let unionCollect = [];
+	let categories = data.category.filter(category =>{
+		if(lineStack.hasOwnProperty(category.id)){
+			unionCollect.push(category.target,category.source);
+			return category
 		}
-		i++;
-	}
-	if(miniusFloor === -1){
+	});
+	let count = 0;
+	keyword.nodeName.forEach(item=>{
+		if(unionCollect.includes(item))
+			count++;
+	});
+	if(count < keyword.nodeName.length){
 		return andSearchNoRoute(keyword.nodeName);
 	}
-	console.log(miniusFloor)
-	for(let i = miniusFloor;i<nodeStack.length;i++){
-		if(nodeStack[i].includes(keyword.nodeName)){
-			if(!result.routeHash.includes(index))
-			result.routeHash.push(index)
-		}
-	}
+	lockLine = [];
+	let range = searchFilter(unionCollect, keyword);
+	data.category.forEach(category =>{
+		if(range.includes(category.source) && range.includes(category.target))
+			lockLine.push(category.id);
+	});
+	lockLine.forEach(item=>{
+		lineStack[item] = Math.floor(lineStack[item]);
+		if(!result.routeHash.includes(lineStack[item]))
+			result.routeHash.push(lineStack[item])
+	});
+	console.log(result.routeHash)
+	console.log(lineStack);
+	result.routeHash.sort(function(a, b) {
+		return a - b;
+	});
 	console.log(result.routeHash);
-	let range = [];
 	if(searchFloor === 'All'){
-		searchFloor = nodeStack.length;
+		searchFloor = result.routeHash[result.routeHash.length - 1];
 	}
-	for(let i = 0;i<searchFloor;i++){
-		nodeStack[i].forEach(item =>{
-			range.push(item);
-		});
-	}
-	range = searchFilter(range, keyword);
-	let categories = data.category.filter(category =>{
-		if(range.includes(category.target) && range.includes(category.source))
+	categories = data.category.filter(category =>{
+		if(lineStack.hasOwnProperty(category.id) && lineStack[category.id] <= searchFloor)
 			return category
 	});
+	let nodes = [];
 	let links = categories.filter((category) => {
 		//將要顯示的線整理起來
-		if (category.show == true) return category;
-	});
-	let nodes = data.nodes.filter((node) => {
-		//將要顯示的點整理起來
-		return range.includes(node.name);
+		if (category.show == true) {
+			nodes.push(category.target,category.source);
+			return category;
+		}
 	});
 	dataAppendOr(categories, links, nodes); //將資料整合起來
+}
+function objectRemover(object, keepId){
+		let temp = {};
+		keepId.forEach(item =>{
+			temp[item] = object[item];
+		})
+		return temp;
+		
 }
 function searchFilter(range, keyword){
 	do{
