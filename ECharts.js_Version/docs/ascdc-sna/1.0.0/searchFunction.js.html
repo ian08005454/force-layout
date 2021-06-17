@@ -1,4 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>searchFunction.js - Documentation</title>
 
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="searchWord.html">searchWord</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="searchWord.html#.keywordCleanUp">keywordCleanUp</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="searchWord.html#.lineAppend">lineAppend</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#adaptiveTimeStepWeight">adaptiveTimeStepWeight</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#andSearchNoRoute">andSearchNoRoute</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#data_filter">data_filter</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#dimensions">dimensions</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#dragCoefficient">dragCoefficient</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#gravity">gravity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#keyword_item_delete">keyword_item_delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#keyword_search">keyword_search</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#keywordCollection">keywordCollection</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#keywordCount">keywordCount</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#keywordFliter">keywordFliter</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#keywordItemAppend">keywordItemAppend</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#keywordPoint">keywordPoint</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#label_rotate">label_rotate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#lineCtrl">lineCtrl</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#lineOr">lineOr</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#lineStack">lineStack</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#notKeyword">notKeyword</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#result">result</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#routeFloor">routeFloor</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#searchLine2Filter">searchLine2Filter</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#shuffle">shuffle</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#springCoefficient">springCoefficient</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#springLength">springLength</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#theta">theta</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#timeStep">timeStep</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">searchFunction.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
 import { data, option } from "./chartSetting.js";
 /**
 * 
@@ -53,7 +94,7 @@ function andSearchNoRoute(nodeName) {
 function searchLine2Filter(item, bench, categories, dataSet = data.category){
 	let count = [];//存入用bench的資料找出相關的線
 	//只有條件為多種關係的情況才需要執行
-	for (let i = 1; i < item.length; i++)
+	for (let i = 1; i &lt; item.length; i++)
 			bench = bench.filter(function(element, index, arr) {
 			return arr.indexOf(element) !== index;
 		});
@@ -61,7 +102,7 @@ function searchLine2Filter(item, bench, categories, dataSet = data.category){
 		dataSet.filter((category) => {		//找出串聯點的線
 			if (category.show === true) {
 				if (item.includes(category.name)) {
-					if (bench.includes(category.target) && bench.includes(category.source)) {
+					if (bench.includes(category.target) &amp;&amp; bench.includes(category.source)) {
 						count.push(category);
 					}
 				}
@@ -70,12 +111,12 @@ function searchLine2Filter(item, bench, categories, dataSet = data.category){
 	//確保剩下的節點所串成的路徑都與條件相符，確認是否有多條一樣的target and source
 	count.forEach((element) => {
 		let a = count.filter((category) => {
-			if (element.target === category.target && element.source === category.source){
-				if(element.name === category.name && element.id === category.id)
+			if (element.target === category.target &amp;&amp; element.source === category.source){
+				if(element.name === category.name &amp;&amp; element.id === category.id)
 					return category;
 				else if(element.name !== category.name)	return category;
 			}
-			else if (element.target === category.source && element.source === category.target){
+			else if (element.target === category.source &amp;&amp; element.source === category.target){
 				if(element.name != category.name)
 					return category;
 			}
@@ -104,7 +145,7 @@ function data_filter(keyword, routeFloor) {
 	let minus = JSON.parse(JSON.stringify(keyword.nodeName));
 	let collect = []; // 暫存node
 	var layer = 0;
-	for (let i = 0; i < ui_user; i++) {
+	for (let i = 0; i &lt; ui_user; i++) {
 		if (keyword.lineName.length !== 0) {
 			//看看有沒有個別線的條件
 			keyword.lineName.forEach((item) => {
@@ -156,7 +197,7 @@ function data_filter(keyword, routeFloor) {
 		if (categories.length === layer) {
 			//跑到最大階層後就停下來
 			let maxlevel = i;
-			for (var x = 1; x <= maxlevel; x++) {
+			for (var x = 1; x &lt;= maxlevel; x++) {
 				//調整最大階層的sliderbar
 				if (!result.routeHash.includes(x)) result.routeHash.push(x);
 			}
@@ -224,7 +265,7 @@ function lineOr(keyword) {
 }
 function andSearchStartpointFinder(keyword, route){
 	let first = []; //存入各個節點到其他節點的最短距離
-	for (let item = 0; item < keyword.nodeName.length; item++) {
+	for (let item = 0; item &lt; keyword.nodeName.length; item++) {
 		let minus = new Array(keyword.nodeName[item]);
 		let lastMinusLen = 0;
 		let category_collect = [];
@@ -264,7 +305,7 @@ function andSearchStartpointFinder(keyword, route){
 function limitSearchRange(keyword, route){
 	let searchRange = new Array();
 	//類flooding演算法
-	for(let i;i<keyword.nodeName.length;i++){
+	for(let i;i&lt;keyword.nodeName.length;i++){
 	let goalCount = new Array(); //儲存到目標的路徑長度
 	let nodeStack = new Array(); //存搜到的點[節點名稱,距離]
 	let secondaryStack = new Array(); //存當次要搜尋的節點
@@ -320,7 +361,7 @@ function limitSearchRange(keyword, route){
 	nodeStack[1].push(largest);
 	categories = data.category.filter((category) => {
 		//將與陣列中的點有關的線篩選出來
-		if (nodeStack[0].includes(category.target) && nodeStack[0].includes(category.source)) {
+		if (nodeStack[0].includes(category.target) &amp;&amp; nodeStack[0].includes(category.source)) {
 				return category;
 		}
 	});
@@ -346,7 +387,7 @@ function limitSearchRange(keyword, route){
 		let last = categories.length;
 		categories = categories.filter((category) => {
 			//取的刪除終點後線的資料
-			if (nodeStack[0].includes(category.target) && nodeStack[0].includes(category.source)) {
+			if (nodeStack[0].includes(category.target) &amp;&amp; nodeStack[0].includes(category.source)) {
 				return category;
 			}
 		});
@@ -361,7 +402,7 @@ function limitSearchRange(keyword, route){
 	});
 	let searchRangeData = data.category.filter((category) => {
 		//取的刪除終點後線的資料
-		if (searchRange.includes(category.target) && searchRange.includes(category.source)) {
+		if (searchRange.includes(category.target) &amp;&amp; searchRange.includes(category.source)) {
 			return category;
 		}
 	});
@@ -408,7 +449,7 @@ function andSearch(keyword, route, searchRangeData) {
 						}
 					});
 					if (item.length > 1) {
-						for (let i = 1; i < item.length; i++)
+						for (let i = 1; i &lt; item.length; i++)
 							bench = bench.filter(function(element, index, arr) {
 								return arr.indexOf(element) !== index;
 							});
@@ -434,7 +475,7 @@ function andSearch(keyword, route, searchRangeData) {
 				nodeCollection.push(category.target, category.source);
 			});
 			nodeCollection = Array.from(new Set(nodeCollection));
-			for (let i = 0, uLen = nodeCollection.length; i < uLen; i++) {
+			for (let i = 0, uLen = nodeCollection.length; i &lt; uLen; i++) {
 				//將nodeCollection中走過的路線刪掉
 				if (!primaryStack.includes(nodeCollection[i])) {
 					temp2.push(nodeCollection[i]);
@@ -446,7 +487,7 @@ function andSearch(keyword, route, searchRangeData) {
 				//如果路線最後一點是目標
 				routeTemp.push(Array.from(primaryStack)); //存入路線陣列
 				console.log(primaryStack);
-				for (var i = 0, uLen = secondaryStack.length; i < uLen; i++) {
+				for (var i = 0, uLen = secondaryStack.length; i &lt; uLen; i++) {
 					if (secondaryStack[i].length != 0) {
 						//副堆疊等於0就算是結束了
 						Finish = false;
@@ -459,7 +500,7 @@ function andSearch(keyword, route, searchRangeData) {
 					Finish = false;
 				}
 			}
-			if (primaryStack.length == 0 && routeTemp.length == 0) return andSearchNoRoute(keyword.nodeName); //如果路線和路線陣列的長度都是0就算結束
+			if (primaryStack.length == 0 &amp;&amp; routeTemp.length == 0) return andSearchNoRoute(keyword.nodeName); //如果路線和路線陣列的長度都是0就算結束
 			do {
 				//遇到死路的處理:主堆疊pop出去由副堆疊pop出一個值PUSH進去
 				//下一個節點選法:副堆疊pop出一個值PUSH進去
@@ -486,7 +527,7 @@ function andSearch(keyword, route, searchRangeData) {
 	console.log('timer', end - start);
 	console.log(routeTemp.length);
 	console.log(routeTemp);
-	for (var i = 0; i < routeTemp.length; i++) {
+	for (var i = 0; i &lt; routeTemp.length; i++) {
 		var count = 0;
 		keyword.nodeName.forEach((item) => {
 			if (routeTemp[i].includes(item)) count++;
@@ -509,7 +550,7 @@ function floodingSearch(keyword, searchFloor){
 	data.category.forEach(item=>{
 		lineStack[item.id] = 0;
 	});
-	for(let i=0;i<keyword.nodeName.length;i++){ 
+	for(let i=0;i&lt;keyword.nodeName.length;i++){ 
 		let c = 0;
 		let secondaryStack = new Array(keyword.nodeName[i]);
 		lockLine = [];
@@ -519,46 +560,15 @@ function floodingSearch(keyword, searchFloor){
 		data.category.filter((category) => {
 			//搜尋陣列理的節點連到的下一個節點
 			if (secondaryStack.includes(category.target) || secondaryStack.includes(category.source)) {
-					if (category.show === true && !lockLine.includes(category.id)) {
-						let answer  = false;
-						if (keyword.lineName.length !== 0) {
-							//看看有沒有個別線的條件
-							keyword.lineName.forEach((item) => {
-								if (item.includes(category.name)) {
-									//看看這條線有沒有在條件內
-									if (item.length > 1) {
-										//如果條件為多種關係組合
-										let bench = [];
-										data.category.forEach(cat =>{
-											if(cat.target === category.target || cat.source === category.source)
-												bench.push(cat.name);
-											else if(cat.target === category.target || cat.source === category.source)
-												bench.push(cat.name);
-										});
-										let c = 0;
-										item.forEach(a=>{
-											if(bench.includes(a))
-											c++;
-										});
-										if(c ===  item.length)
-											answer = true;
-									} else {
-										answer =  true;
-									}
-								}
-							});
-						}
-						else{
-							answer =  true;
-						}
-						if(answer ===  true){
-							if(secondaryStack.includes(category.target)){
-								union_collect.push(category.source);
-							}else{
-								union_collect.push(category.target);
-							}
+					if (category.show === true &amp;&amp; !lockLine.includes(category.id)) {
+						if(secondaryStack.includes(category.target)){
+							union_collect.push(category.source)
 							lockLine.push(category.id);
-								lineStack[category.id] = lineStack[category.id] + c;
+							lineStack[category.id] = lineStack[category.id] + c;
+						}else{
+							union_collect.push(category.target)
+							lockLine.push(category.id);
+							lineStack[category.id] = lineStack[category.id] + c;
 						}
 	  				} 
 			}
@@ -581,13 +591,13 @@ function floodingSearch(keyword, searchFloor){
 		if(unionCollect.includes(item))
 			count++;
 	});
-	if(count < keyword.nodeName.length){
+	if(count &lt; keyword.nodeName.length){
 		return andSearchNoRoute(keyword.nodeName);
 	}
 	lockLine = [];
 	let range = searchFilter(unionCollect, keyword);
 	data.category.forEach(category =>{
-		if(range.includes(category.source) && range.includes(category.target))
+		if(range.includes(category.source) &amp;&amp; range.includes(category.target))
 			lockLine.push(category.id);
 	});
 	lineStack = objectRemover(lineStack, lockLine);
@@ -607,14 +617,14 @@ function floodingSearch(keyword, searchFloor){
 	}
 	unionCollect = [];
 	categories = data.category.filter(category =>{
-		if(lineStack.hasOwnProperty(category.id) && lineStack[category.id] <= searchFloor){
+		if(lineStack.hasOwnProperty(category.id) &amp;&amp; lineStack[category.id] &lt;= searchFloor){
 			unionCollect.push(category.target,category.source);
 			return category;
 		}
 	});
 	unionCollect = searchFilter(unionCollect, keyword)
 	categories = data.category.filter(category =>{
-		if(unionCollect.includes(category.target)&& unionCollect.includes(category.source))
+		if(unionCollect.includes(category.target)&amp;&amp; unionCollect.includes(category.source))
 			return category;
 	});
 	let links = categories.filter((category) => {
@@ -639,7 +649,7 @@ function searchFilter(range, keyword){
 	do{
 		let unionCollect = [];
 		data.category.forEach(category =>{
-			if(range.includes(category.target) && range.includes(category.source)){
+			if(range.includes(category.target) &amp;&amp; range.includes(category.source)){
 				unionCollect.push(category.target,category.source);
 			}
 		});
@@ -665,22 +675,22 @@ function data_filter_and(route, routeFloor) {
 	if (routeFloor === 'All') {
 		var y = 0;
 	} else {
-		for (var i = 0, q = route.length; i < q; i++) {
+		for (var i = 0, q = route.length; i &lt; q; i++) {
 			if (route[i].length - 1 === routeFloor) {
 				y = i;
 				break;
 			}
 		}
 	}
-	for (; y < route.length; y++) {
-		for (var i = 0, len = route[y].length; i < len - 1; i++)
+	for (; y &lt; route.length; y++) {
+		for (var i = 0, len = route[y].length; i &lt; len - 1; i++)
 			var temp = temp.concat(
 				data.category.filter((category) => {
-					if (route[y][i].includes(category.target) && route[y][i + 1].includes(category.source)) {
+					if (route[y][i].includes(category.target) &amp;&amp; route[y][i + 1].includes(category.source)) {
 						if (category.show === true) {
 							return category;
 						}
-					} else if (route[y][i + 1].includes(category.target) && route[y][i].includes(category.source)) {
+					} else if (route[y][i + 1].includes(category.target) &amp;&amp; route[y][i].includes(category.source)) {
 						if (category.show === true) {
 							return category;
 						}
@@ -697,7 +707,7 @@ function data_filter_and(route, routeFloor) {
 		nodeCollection = Array.from(new Set(nodeCollection));
 		categories = categories.concat(temp);
 		if (y + 1 === route.length) break;
-		if (routeFloor !== 'All' && route[y].length !== route[y + 1].length) break;
+		if (routeFloor !== 'All' &amp;&amp; route[y].length !== route[y + 1].length) break;
 	}
 	links = categories.filter((category) => {
 		if (category.show == true) {
@@ -731,4 +741,22 @@ function dataAppendOr(categories, links, nodes) {
 		return !a.includes(node.name);
 	});
 	result.nodes = result.nodes.concat(nodes);
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Tue Jun 08 2021 16:53:36 GMT+0800 (台北標準時間) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

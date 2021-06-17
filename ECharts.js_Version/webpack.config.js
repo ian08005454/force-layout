@@ -1,4 +1,4 @@
-const webpack = require('webpack'); //to access built-in plugins
+//const webpack = require('webpack'); //to access built-in plugins
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require('path');
 module.exports = {
