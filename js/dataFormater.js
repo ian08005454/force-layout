@@ -21,12 +21,12 @@ var allIdf = [];
 // var userColors = [];
 var id = 0;
 /**
- * 將節點加入陣列
- * @param {*} data_element - 物件json檔
- * @param {*} name - 別點名字
- * @param {*} bType - 形狀類型
- * @param {*} bColor - 邊界顏色
- * @param {*} bWidth - 邊界寬度
+ * 將節點加入資料集陣列
+ * @param {object} data_element - 物件json檔
+ * @param {string} name - 別點名字
+ * @param {string} bType - 形狀類型
+ * @param {string} bColor - 邊界顏色
+ * @param {number} bWidth - 邊界寬度
  */
 function appendNode(data_element, name, bType = 'solid', bColor = 'gray', bWidth = 0) {
 	if (data_element.idf === 0) {
@@ -57,7 +57,7 @@ function appendNode(data_element, name, bType = 'solid', bColor = 'gray', bWidth
 }
 /**
  * 以資料的最大值設定平方數
- * @param {*} largest - 全部資料的最大數值 
+ * @param {number} largest - 全部資料的最大數值 
  * @returns {number} 平方數
  */
 function setSquare(largest){
@@ -69,7 +69,7 @@ function setSquare(largest){
 }
 /**
  * 將jason資料轉換成echarts的資料格式
- * @param {*} data - json資料 
+ * @param {json} data - json資料 
  * @returns {object} 轉換後的資料
  */
 function dataFormat(data) {
@@ -201,7 +201,6 @@ function dataFormat(data) {
 	buf.category = buf.all_category;
 	return buf;
 }
-
 // set each data color a random hex color
 // function calculate_color() {
 //     return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);//<<=左移賦值
