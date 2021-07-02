@@ -100,7 +100,7 @@ class searchWord {
 	/**
 	 * @memberof searchWord
  	* @method keywordCleanUp
- 	* @description 組合並整理使用者傳入的節點內容
+ 	* @description 組合並整理使用者傳入的節點內容整理成{@link searchTarget}格式的資料並存入{@link keywordCollection}的nodeName
  	*/
 	keywordCleanUp() {
 		let keyword_search_name_s = [];
@@ -184,7 +184,7 @@ class searchWord {
 	/**
 	 * @memberof searchWord
  	 * @method lineAppend
-	 * @description 依使用者輸入的線段項目進行處理
+	 * @description 依使用者輸入的線段項目進行處理成{@link searchTarget}格式的資料並存入{@link keywordCollection}的lineName
  	*/
 	lineAppend() {
 		let lineName = this.name;

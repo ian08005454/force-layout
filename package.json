@@ -37,7 +37,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "docs": "jsdoc --configure ./jsdoc.json --verbose",
+    "docs": "./node_modules/.bin/jsdoc --configure ./jsdoc.json --verbose",
     "dev": "webpack serve"
   },
   "repository": {
