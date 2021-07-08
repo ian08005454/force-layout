@@ -6,20 +6,34 @@
  * @exports dataFormat
  */
 import { SetLineColor } from "./assignColor";
+/**
+ * 產生顏色的次數
+ */
+var colorCount = 0;
+/**
+ * 線的顏色資訊
+ */
 var lineColors = {};
+/**
+ * 整理完成後要回傳的資料，有節點和線段資訊還有全部的
+ */
 var buf = {
 	//暫存資料用
 	nodes: [],
 	all_nodes: [],
 	links: [],
-	category: [],
-	all_category: []
+	category: []
 };
+var allCookie = parseCookie();
 var allValues = [];
 var allIdf = [];
 // var userColors = ["#cc0000", "#00cc00", "#0000cc"];
 // var userColors = [];
 var id = 0;
+/**
+ * 隨機顏色編號儲存區
+ */
+var HSL = [];
 /**
  * 將節點加入資料集陣列
  * @param {object} data_element - 物件json檔
@@ -35,7 +49,11 @@ function appendNode(data_element, name, bType = 'solid', bColor = 'gray', bWidth
 	if (userColors.hasOwnProperty(data_element.gp)) {
 		var nodeColor = userColors[data_element.gp];
 	} else {
-		var nodeColor = getRandomColor(); //calculate_color
+		if(getCookieByName(kg2_element.type[0]) != null){
+			var nodeColor = getCookieByName(kg2_element.type[0]); 
+		}else{
+			var nodeColor = getColor(); 
+		}
 		userColors[data_element.gp] = nodeColor;
 	}
 	buf.nodes.push({
@@ -89,8 +107,11 @@ function dataFormat(data) {
 			if (lineColors.hasOwnProperty(kg2_element.type[0])) {
 				var lineColor = lineColors[kg2_element.type[0]].color;
 			} else {
-				// let name = kg2_element.type[0];
-				var lineColor = '#1A75CF'; //calculate_color getRandomColor()
+				if(getCookieByName(kg2_element.type[0]) != null){
+					var lineColor = getCookieByName(kg2_element.type[0]); 
+				}else{
+					var lineColor = getColor(); 
+				}
 				lineColors[kg2_element.type[0]] = {color:lineColor, group:[]};
 				for (let index = 0; index < userColors.length; index++) {
 					lineColors[kg2_element.type[0]].group.push(0);
@@ -128,7 +149,7 @@ function dataFormat(data) {
 			} else if (dataType === 2) {
 				var lenghValue = 5;
 			} else lenghValue = kg2_element.v;
-			buf.all_category.push({
+			buf.category.push({
 				id: id++,
 				name: kg2_element.type[0],
 				target: data_element.k1,
@@ -154,11 +175,11 @@ function dataFormat(data) {
 					color: lineColor
 				}
 			});
-			// buf.all_category has the every property that links object need, etc : source, target, value, lineStyle
-			buf.links = buf.all_category;
+			// buf.category has the every property that links object need, etc : source, target, value, lineStyle
+			buf.links = buf.category;
 		});
 	});
-	buf.all_category.sort(function(a, b) {
+	buf.category.sort(function(a, b) {
 		if (a.id < b.id) {
 			return -1;
 		}
@@ -167,7 +188,6 @@ function dataFormat(data) {
 		}
 		return 0;
 	});
-	console.log(buf.all_category);
 	// remove duplicate item in buf.nodes array
 	buf.nodes = buf.nodes.filter((item) => (!set.has(item.name) ? set.add(item.name) : false));
 	set.clear();
@@ -177,12 +197,12 @@ function dataFormat(data) {
 		buf.all_nodes.push(node.name);
 	});
 
-	// sort buf.all_category
-	buf.all_category = buf.all_category.sort((a, b) => {
+	// sort buf.category
+	buf.category = buf.category.sort((a, b) => {
 		return a.name > b.name ? 1 : -1;
 	});
-	buf.all_category.forEach(category =>{
-		buf.all_category.forEach(item =>{
+	buf.category.forEach(category =>{
+		buf.category.forEach(item =>{
 			if(item.target === category.source && item.source === category.target){
 				if(item.name === category.name && category.bilateral !== 'delete'){
 					category.bilateral = 'true';
@@ -191,14 +211,13 @@ function dataFormat(data) {
 			}
 		})
 	});
-	var colorList = Object.keys(lineColors);
-	console.log(lineColors);
-	lineColors = SetLineColor(colorList, lineColors, userColors);
-	buf.all_category.forEach(category =>{
-		category.lineStyle.color = lineColors[category.name].color;
-		category.label.color = lineColors[category.name].color;
-	})
-	buf.category = buf.all_category;
+	// var colorList = Object.keys(lineColors);
+	// console.log(lineColors);
+	// lineColors = SetLineColor(colorList, lineColors, userColors);
+	// buf.category.forEach(category =>{
+	// 	category.lineStyle.color = lineColors[category.name].color;
+	// 	category.label.color = lineColors[category.name].color;
+	// })
 	return buf;
 }
 // set each data color a random hex color
@@ -206,7 +225,7 @@ function dataFormat(data) {
 //     return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);//<<=左移賦值
 // }
 /**
- * 
+ * 隨機回傳一個不重複的顏色
  * @see 參考資料{@link https://segmentfault.com/q/1010000010807637/a-1020000010809153 }
  * @returns {string} 所選的HEX顏色代碼
  */
@@ -239,10 +258,34 @@ function getRandomColor() {
 		return parseFloat(item.toFixed(2));
 	});
 
-	HSL.push(ret[0]);
+	HSL.push(ret);
 	// console.log(ret);
 	var color = hslToHex(ret[0], ret[1], ret[2]);
 	// console.log(color);
+	return color;
+}
+/**
+ * 以6個顏色red,yellow,green,cyan,blue,magenta為基礎指定顏色，
+ * @returns {string} 所選的HEX顏色代碼
+ */
+ function getColor() {
+	var hsl = [0,60,120,180,240,300,30,90,150,270,330,15,45,75,105,135,165,195,225,255,285,315,345]
+	var ret = [];
+	if (colorCount < 24) {
+		ret[0] = hsl[colorCount % 24]
+		ret[1] = 80;
+		ret[2] = 70;
+	} else if(colorCount < 48) {
+		ret[0] = hsl[colorCount % 24]
+		ret[1] = 60;
+		ret[2] = 60;
+	}else{
+		ret[0] = hsl[colorCount % 24]
+		ret[1] = 70;
+		ret[2] = 50;
+	}
+	colorCount++;
+	var color = hslToHex(ret[0], ret[1], ret[2]);
 	return color;
 }
 /**
@@ -281,5 +324,28 @@ function hslToHex(h, s, l) {
 		return hex.length === 1 ? '0' + hex : hex;
 	};
 	return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+function parseCookie() {
+    var cookieObj = {};
+    var cookieAry = document.cookie.split(';');
+    var cookie;
+    
+    for (var i=0, l=cookieAry.length; i<l; ++i) {
+        cookie = cookieAry[i].trim();
+        cookie = cookie.split('=');
+        cookieObj[cookie[0]] = cookie[1];
+    }
+    
+    return cookieObj;
+}
+function getCookieByName(name) {
+    var value = allCookie[name];
+    if (value) {
+        value = decodeURIComponent(value);
+    }else{
+		value = null;
+	}
+
+    return value;
 }
 export { dataFormat, allValues, allIdf };
