@@ -145,7 +145,7 @@ function data_filter(keyword, routeFloor) {
 	collect = Array.from(new Set(collect));
 	nodes = data.nodes.filter((node) => {
 		//將要顯示的點整理起來
-		return unionCollect.includes(node.name);
+		return collect.includes(node.name);
 	});
 	nodes.filter((node) => {
 		//將收旬的點改成紅色，但不能影響原始資料

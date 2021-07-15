@@ -27,18 +27,10 @@ function nodeList(dataset, route) {
 	var index = 0;
 	for (const name of groupName) {
 		const details = document.createElement('details');
-		var summary = document.createElement('summary');
-		summary.appendChild(document.createTextNode(name));
-		var colorLump = document.createElement('button');
-		colorLump.className = 'color-lump';
-		colorLump.role = 'button';
-		colorLump.name = index;
-		colorLump.value = colorLump.style.backgroundColor = userColors[index];
-		colorLump.id = 'node';
-		summary.appendChild(colorLump);
-		details.appendChild(summary);
 		details.className = `nodeList${index}`;
 		$('.nodeSelected').append(details);
+		$(`.nodeList${index}`).append(`<summary>${name}<button id='node' class="color-lump" role="button"  name="${name}" value="${userColors[index]}" style="background-color: ${userColors[index]}"></button></summary>`);
+		// details.appendChild(summary);
 		dataset.forEach((item) => {
 			if (item.gp === index) {
 				var lableName = item.name;

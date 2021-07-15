@@ -340,7 +340,7 @@ function keyword_item_delete() {
  * @param {array} notKeyword - 不要出現的人物，參考{@link notKeyword}
  */
 function lineCtrl(lineStack,notKeyword) {
-    data.all_category = data.all_category.filter((category) => {
+    data.category = data.category.filter((category) => {
         category.show = true;
         return category;
     });
@@ -348,14 +348,14 @@ function lineCtrl(lineStack,notKeyword) {
         lineStack.forEach((item) => {
             let bench = [];
             if (Array.isArray(item)) {
-                data.all_category.filter((category) => {
+                data.category.filter((category) => {
                     if (item.includes(category.name)) bench.push(category.target, category.source);
                 });
                 for (let i = 1; i < item.length; i++)
                     bench = bench.filter(function(element, index, arr) {
                         return arr.indexOf(element) !== index;
                     });
-                data.all_category = data.all_category.filter((category) => {
+                data.category = data.category.filter((category) => {
                     if (item.includes(category.name)) {
                         if (bench.includes(category.target) && bench.includes(category.source)) category.show = false;
                     }
@@ -363,12 +363,12 @@ function lineCtrl(lineStack,notKeyword) {
                 });
             } else {
                 if (item === '無共現') {
-                    data.all_category = data.all_category.filter((category) => {
+                    data.category = data.category.filter((category) => {
                         if (category.value === 0) category.show = false;
                         return category;
                     });
                 } else {
-                    data.all_category = data.all_category.filter((category) => {
+                    data.category = data.category.filter((category) => {
                         if (item === category.name) category.show = false;
                         return category;
                     });
@@ -378,7 +378,7 @@ function lineCtrl(lineStack,notKeyword) {
     }
     // console.log(notKeyword.length);
     if(notKeyword.length !== 0){
-        data.all_category = data.all_category.filter((category) => {
+        data.category = data.category.filter((category) => {
             if (notKeyword.includes(category.target) ||　notKeyword.includes(category.source)) category.show = false;
             return category;
         });

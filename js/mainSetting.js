@@ -32,6 +32,7 @@ import { searchKeyword, changeMaxlevel } from './searchFunction.js';
 import { silderInit, sliderBar } from './sliderbarSetting.js';
 import { data, option } from './chartSetting';
 import { listGenerator } from './listGenerator';
+import {autocomplete} from './searchSuggest';
 // import { layoutCalculator } from "./graphologyLayoutSystem.js";
 $('.sidebar').hide(); //在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
@@ -76,12 +77,13 @@ var routeFloor = 'All';
 let allLine = data.category.map(function(item, index, array) {
 	return item.name;
 });
+allLine = Array.from(new Set(allLine))
 var keywordCollection = [],
 	viewResult;
 window.onresize = () => {
 	Chart.resize();
 };
-
+autocomplete(document.getElementById("keyword_search_field"), [data.all_nodes, allLine]);
 // EventListener
 $('#keyword_search_field').keyup((e) => {
 	keyword_search(e);

@@ -274,15 +274,17 @@ function getRandomColor() {
 	if (colorCount < 24) {
 		ret[0] = hsl[colorCount % 24]
 		ret[1] = 80;
-		ret[2] = 70;
+		ret[2] = 65;
 	} else if(colorCount < 48) {
 		ret[0] = hsl[colorCount % 24]
 		ret[1] = 60;
 		ret[2] = 60;
-	}else{
+	}else if(colorCount < 72){
 		ret[0] = hsl[colorCount % 24]
 		ret[1] = 70;
 		ret[2] = 50;
+	}else{
+		return getRandomColor()
 	}
 	colorCount++;
 	var color = hslToHex(ret[0], ret[1], ret[2]);
