@@ -69,7 +69,7 @@ export function colorPanelInit(name, initColor, id){
         console.log('Event: "show"', color, instance);
     }).on('save', (color, instance) => {
         console.log(color.toHEXA().toString());
-        // console.log('Event: "save"', color, instance);
+        console.log('Event: "save"', color, instance);
         lineColorChanger(name, color.toHEXA().toString(), id);
         pickr.hide();
     }).on('change', (color, source, instance) => {

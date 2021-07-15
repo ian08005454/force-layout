@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>API.js - Documentation</title>
+    <title>searchSuggest - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,52 +29,303 @@
 
 <div id="main">
     
-    <h1 class="page-title">API.js</h1>
+    <h1 class="page-title">searchSuggest</h1>
     
 
     
 
 
 
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @module API
- * @description 運用ajax取得資料的方法
- * @author Wei-Jie Li
- * @createDate 2021-03-21
- */
-import $ from 'jquery/dist/jquery';
-/**
- * 運用ajax來取得url傳回來的資料並存入jdata
- * @param {string} url  資料的網址
- */
-export function GetJSON(url) {
-    $.ajax({
-        url: url,
-        method: "GET",
-        async: false,
-        dataType: "JSON",
-    })
 
-        .done( function (response) {
-            console.log(jdata);
-            var cpdata = Object.assign(jdata, response); //合併之前資料
-            console.log(cpdata);
-            jdata = response;
-        })
-        .fail( function (xhr, status, error) {
-            console.log( '出現錯誤，無法完成!' )
-            console.log( 'Error: ' + error )
-            console.log( 'Status: ' + status )
-            console.dir("xhr:" +  xhr )
-            // console.log("xhr:" + xhr + '\n' + "status:" + status + '\n' + "error:" + error);
-        })
-}
-</code></pre>
-        </article>
-    </section>
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>搜尋建議模組</p></div>
+        
+
+        
+            
+<div class="section-method">
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Wei-Jie Li</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="searchSuggest.js.html">searchSuggest.js</a>, <a href="searchSuggest.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>w3schools <a href="https://www.w3schools.com/howto/howto_js_autocomplete.asp">https://www.w3schools.com/howto/howto_js_autocomplete.asp</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id=".autocomplete"><span class="type-signature">(static) </span>autocomplete<span class="signature">(inp, arr0)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="searchSuggest.js.html">searchSuggest.js</a>, <a href="searchSuggest.js.html#line13">line 13</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>object</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>use document.getElementById to select input filed</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>arr0</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>array</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>node and line dataset</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

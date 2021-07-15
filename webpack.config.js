@@ -6,7 +6,7 @@ module.exports = {
   mode: 'development',
   // mode: 'production',
   entry: './js/mainSetting.js',
-  watch: true,
+  // watch: true,
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: "main.bundle.js",

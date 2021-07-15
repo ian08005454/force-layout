@@ -176,15 +176,9 @@ label{
 	opacity: 1;
 	width: 100%;
 }
-.switch-left-right .switch-input:checked ~ .switch-label:before {
-	opacity: 1;
-	left: 100px;
-}
+
 .switch-left-right .switch-input:checked ~ .switch-label:after {
 	left: 0;
-}
-.switch-left-right .switch-input:checked ~ .switch-label {
-	background: inherit;
 }
 /* common switch */
 .switch {
@@ -247,16 +241,6 @@ label{
 	text-shadow: 0 1px rgba(0, 0, 0, 0.2);
 	opacity: 0;
 }
-.switch-input:checked ~ .switch-label {
-	background: #E1B42B;
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 0 3px rgba(0, 0, 0, 0.2);
-}
-.switch-input:checked ~ .switch-label:before {
-	opacity: 0;
-}
-.switch-input:checked ~ .switch-label:after {
-	opacity: 1;
-}
 .switch-handle {
 	position: absolute;
 	top: 4px;
@@ -268,19 +252,7 @@ label{
 	border-radius: 100%;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 }
-.switch-handle:before {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin: -6px 0 0 -6px;
-	width: 12px;
-	height: 12px;
-	background: linear-gradient(to bottom, #eeeeee, #FFFFFF);
-	background-image: -webkit-linear-gradient(top, #eeeeee, #FFFFFF);
-	border-radius: 6px;
-	box-shadow: inset 0 1px rgba(0, 0, 0, 0.02);
-}
+
 .switch-input:checked ~ .switch-handle {
 	left: 74px;
 	box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
@@ -294,14 +266,46 @@ label{
 	-moz-transition: All 0.3s ease;
 	-o-transition: All 0.3s ease;
 }
-[role="button"] {
+.color-lump[role="button"] {
 	width: 30px;
     height: 18px;
-    padding: 0,0,0,5px;
     border: 2px solid #ffffff;
 }
 
 button[aria-pressed="true"],
 [role="button"][aria-pressed="true"] {
     border: 4px solid #000;
+}
+.autocomplete {
+position: relative;
+display: inline-block;
+}
+.autocomplete-items {
+position: absolute;
+border: 1px solid #d4d4d4;
+border-bottom: none;
+border-top: none;
+z-index: 99;
+/*position the autocomplete items to be the same width as the container:*/
+top: 100%;
+left: 0;
+right: 0;
+}
+
+.autocomplete-items div {
+padding: 10px;
+cursor: pointer;
+background-color: #fff; 
+border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+background-color: DodgerBlue !important; 
+color: #ffffff; 
 }
