@@ -132,6 +132,7 @@ function keyword_search(e) {
 					throw alert(`Error1 : 找不到關鍵字:${keyword}`);
 				}
 			}
+		start = new Date().getTime();
 		let test = keywordItemAppend(keyword, keywordSearchType, keywordModel);
 		if (test === 0) keywordFliter();
 	}
@@ -172,6 +173,8 @@ function viewDataChange() {
 	option.series[0].links = viewResult.links;
 	option.series[0].nodes = viewResult.nodes;
 	event_setOption_function();
+	var End1 = new Date().getTime();
+	console.log(End1 - start + 'ms');
 }
 // Chart.on('legendselectchanged', (category_select) => {
 //圖例的觸發事件

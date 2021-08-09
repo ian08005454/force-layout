@@ -65,7 +65,8 @@
                         <div class="slider_item">
                             <label class="slider_describe" for="node_distance">點的群聚度 : </label>
                             <input type="text" value="" id="node_distance">
-                            <div class="slider_slider" id="node_distance"></div>
+                            <div class="slider_slider" id="node_distance">
+                            </div>
                         </div>
                         <div class="slider_item">
                             <label class="slider_describe" for="node_size">點的背景大小 : </label>
@@ -120,13 +121,17 @@
                     <option value="and" selected>and</option>
                     <option value="or">or</option>
                     <option value="not">not</option>
-                   </select>
+                </select>
                 <select class="keywordModel" id = "kModel">
                     <option value="node" selected>點</option>
                     <option value="line">線</option>
-                   </select>
-                <input type="text" placeholder="" id="keyword_search_field" style="width:100px;">
-                <button id="keyword_search_button" type="submit">搜尋</button>
+                </select>
+                <form action="" method="">
+                    <div class="autocomplete" style="width:300px;">
+                        <input type="text" placeholder="請輸入關鍵字" id="keyword_search_field" style="width:100px;">
+                </form>
+                    <button type="button" id="keyword_search_button">搜尋</button>
+                </div>
                 <!-- <input type="text" placeholder="搜尋節點2" id="keyword_search_field2">
                 <button id="keyword_search_button2" type="submit">搜尋</button> -->
                 <div class="keyword">
@@ -140,17 +145,12 @@
         </div>
         <div class="lineSelect">
         <p class="current_relation">顯示的線 : </p>
-        
         <div class="lineSelected">
         </div>
     </div>
-        
-            <!-- <div id="choose_color"></div> -->
         </div>
-        <div id="road"></div>
         <div id="main"  style="width:95%;height:900px;"></div>
-        </div>
-
+</div>
     <script>
         var bookName = '紅樓夢' //書籍名稱，將會顯示在右下角
         var bookId = '39267';  //中研院的書籍ID 可以忽視
@@ -165,15 +165,14 @@
     <!-- <script src="./source/清史錄-宣統政紀-師生朋友親屬關係.js"></script> -->
     <!-- <script src="./source/清史稿-人物關係.js"></script> -->
     <!-- <script src="./source/清史稿-人.js"></script> -->
-    <!-- <script src="./source/2-paragraph.js"></script> -->
+    <script src="./source/2-paragraph.js"></script>
     <!-- <script src="./source/台灣文獻叢刊_人對人.js"></script> -->
     <!-- <script src="./source/台灣文獻叢刊_人對地.js"></script> -->
     <!-- <script src="./source/p_test.js"></script> -->
     <!-- <script src="./source/example.js"></script> -->
     <!-- <script  src="./source/p_test1.js"></script> -->
     <!-- <script  src="./source/test2.js"></script> -->
-    <script src="./source/紅樓夢-二字詞人.js"></script>
-    
+    <!-- <script src="./source/紅樓夢-二字詞人.js"></script> -->
 </body>
 
 </html>

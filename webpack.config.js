@@ -1,12 +1,9 @@
-//const webpack = require('webpack'); //to access built-in plugins
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 module.exports = {
-  mode: 'development',
-  // mode: 'production',
   entry: './js/mainSetting.js',
-  // watch: true,
+  watch: false,
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: "main.bundle.js",
@@ -33,8 +30,8 @@ module.exports = {
   plugins: [
     new BundleAnalyzerPlugin(),
     new HtmlWebpackPlugin({
-      template:'./base.html'
+      template:'./base.html',
+      minify: false,
     })
-    // new config.optimization.minimize()
   ]
 };
