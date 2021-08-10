@@ -9,6 +9,7 @@
   "dependencies": {
     "@simonwep/pickr": "^1.8.0",
     "echarts": "^5.0.2",
+    "glob-parent": "^5.1.2",
     "graphology": "^0.19.3",
     "graphology-layout-forceatlas2": "^0.6.0",
     "graphology-layout-noverlap": "^0.3.0",
@@ -17,7 +18,8 @@
     "jquery-ui": "^1.12.1",
     "jquery-ui-dist": "^1.12.1",
     "ngraph.forcelayout": "^3.0.0",
-    "ngraph.graph": "^19.1.0"
+    "ngraph.graph": "^19.1.0",
+    "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

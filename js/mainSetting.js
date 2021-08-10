@@ -33,6 +33,7 @@ import { silderInit, sliderBar } from './sliderbarSetting.js';
 import { data, option } from './chartSetting';
 import { listGenerator } from './listGenerator';
 import {autocomplete} from './searchSuggest';
+// import dps from 'dbpedia-sparql-client';
 // import { layoutCalculator } from "./graphologyLayoutSystem.js";
 $('.sidebar').hide(); //在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
@@ -299,6 +300,7 @@ Chart.on('click', (e) => {
 		if (e.data.source == undefined && e.data.target == undefined) searchBookUnit(bookId, e.data.name);
 		else searchBookAssociation(bookId, e.data.source, e.data.target, e.data.name);
 	}
+	
 
 	function searchBookAssociation(bid, key1, key2, relation) {
 		var associationQuery = '"' + key1 + '" AND "' + key2 + '"';
@@ -346,6 +348,27 @@ Chart.on('click', (e) => {
 			}
 		);
 	}
+});
+/**
+ * 雙擊圖表上的元素會去dbpidia取得相關的資料
+ */
+ Chart.on('dblclick', (e) => {
+	// console.log(e.data.name);
+	var url = "http://dbpedia.org/sparql";
+	const query = `SELECT DISTINCT ?Concept WHERE {[] a ?Concept} LIMIT 10`;
+	var queryUrl = encodeURI( url+"?query="+query+"&format=json" );
+    $.ajax({
+        dataType: "json",  
+        url: queryUrl,
+        success: function( _data ) {
+			console.log(_data)
+            console.log(_data.results.bindings);
+            // for ( var i in results ) {
+            //     var res = results[i].abstract.value;
+            //     alert(res);
+            // }
+        }
+    });
 });
 /**
  * 點兩下標題可以修改圖表標題
