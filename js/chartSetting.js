@@ -3,10 +3,19 @@
  * @description 圖表的設定內容
  * @author Wei-Jie Li
  * @createDate 2021-03-21
+ * <h4>Change Log</h4>
+ * <ul>
+ *     <li> 增加 URL Variable 判斷</li>
+ * </ul>
  */
-import { dataFormat, allValues, allIdf } from './dataFormater.js';
-import { GetJSON } from "./API";
-GetJSON(url);
+
+import {allIdf, allValues, dataFormat} from './dataFormater.js';
+import {GetJSON} from "./API";
+// 避免沒有使用 Ajax 時(註解時)還會顯示錯誤，造成 jdata 無法讀取
+if (typeof url !== 'undefined') {
+	GetJSON(url);
+}
+
 console.log(jdata);
 /**
  * @type {object}
