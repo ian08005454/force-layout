@@ -39,9 +39,9 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "dev": "webpack --mode development",
+    "test": "webpack --mode development",
     "docs": "./node_modules/.bin/jsdoc --configure ./jsdoc.json --verbose",
-    "test": "webpack serve --mode development"
+    "dev": "webpack serve --mode development"
   },
   "repository": {
     "type": "git",

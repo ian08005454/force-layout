@@ -259,7 +259,7 @@ export function event_setOption_function(render = true) {
 export function lineColorChanger(name, color, id) {
 	document.cookie = `${name}=${color}; max-age=2592000; path=/`;
 	if (id === 'node') {
-		var gp = parseInt(name);
+		var gp = groupName.indexOf(name);
 		userColors[gp] = color;
 		data.nodes.forEach((node) => {
 			if (node.gp === gp) {
@@ -291,9 +291,9 @@ export function lineColorChanger(name, color, id) {
 	event_setOption_function(false);
 }
 /**
- * 點擊圖表上的元素會開啟新視窗顯示文本中的相關資訊
+ * 雙擊圖表上的元素會開啟新視窗顯示文本中的相關資訊
  */
-Chart.on('click', (e) => {
+Chart.on('dblclick', (e) => {
 	// console.log(e);
 	if (bookId.indexOf('_') == -1 && e.componentType !== 'title') {
 		console.log(bookId, e.data.source, e.data.target, e.data.name);
@@ -350,9 +350,9 @@ Chart.on('click', (e) => {
 	}
 });
 /**
- * 雙擊圖表上的元素會去dbpidia取得相關的資料
+ * 點擊圖表上的元素會去dbpidia取得相關的資料
  */
- Chart.on('dblclick', (e) => {
+ Chart.on('click', (e) => {
 	// console.log(e.data.name);
 	var url = "http://dbpedia.org/sparql";
 	const query = `SELECT DISTINCT ?Concept WHERE {[] a ?Concept} LIMIT 10`;
