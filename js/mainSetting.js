@@ -32,7 +32,7 @@ import {data, option} from './chartSetting';
 import {listGenerator} from './listGenerator';
 import {autocomplete} from './searchSuggest';
 
-window.jQuery = window.$ = $; //定義jqurey
+window.jQuery = window.$ = $; //定義jquery
 // import { layoutCalculator } from "./graphologyLayoutSystem.js";
 $('.sidebar').hide(); //在圖還沒形成之前要先將左邊的slider隱藏
 const Chart = echarts.init(document.getElementById('main'), null, {
@@ -70,6 +70,7 @@ if (dataType === 1) {
     $('.common_show_value').hide();
     $('.word_strength').hide();
 }
+
 /**
  * 儲存max_level slider的現值
  * @typedef {(number|string)}
@@ -84,7 +85,9 @@ var keywordCollection = [],
 window.onresize = () => {
     Chart.resize();
 };
+
 autocomplete(document.getElementById("keyword_search_field"), [data.all_nodes, allLine]);
+
 // EventListener
 $('#keyword_search_field').keyup((e) => {
     keyword_search(e);
