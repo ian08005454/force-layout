@@ -42,6 +42,7 @@ const Chart = echarts.init(document.getElementById('main'), null, {
     // width: 1700,
     // height: 800 //有置中問題
 });
+
 Chart.showLoading('default'); //轉圈圈~~
 let start = new Date().getTime();
 console.log('data item : ');
