@@ -25,6 +25,15 @@
 1. 透過 Terminal `> npm run test`
 2. 網址修改 port 成 8080，學長預設 run test port 8888，檢視載入的檔案大小。
 
-## 套件
+## 打包 webpack
+
+1. `npm run build`
+2. 在 `force-layout\dist` 資料夾中，會產生 main.bundle.js，即為壓縮後資料
+
+## 需要使用套件
 
 使用 package.json 調整
+
+## 修改 npm run test/build 參數
+
+至 package.json 修改 scripts 欄位
