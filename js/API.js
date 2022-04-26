@@ -31,3 +31,23 @@ export function GetJSON(url) {
             // console.log("xhr:" + xhr + '\n' + "status:" + status + '\n' + "error:" + error);
         })
 }
+export function dbpediaConnect(e){
+    var url = "http://dbpedia.org/sparql";
+	const query = `SELECT DISTINCT ?Concept WHERE {[] a ?Concept} LIMIT 10`;
+	var queryUrl = encodeURI( url+"?query="+query+"&format=json" );
+    $.ajax({
+        dataType: "json",  
+        url: queryUrl,
+        success: function( _data ) {
+			console.log(_data)
+            console.log(_data.results.bindings);
+            // for ( var i in results ) {
+            //     var res = results[i].abstract.value;
+            //     alert(res);
+            // }
+        }
+    });
+}
+function dbpediaDataFilter(){
+
+}

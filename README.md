@@ -3,7 +3,7 @@
 運用ECharts的視覺化套件將鏈結資料以視覺化的方式呈現出來，能以更直觀的方式來了解物件之間的關係和其親密程度。
 未來將連結公開鏈結資料庫(wikidata、 dbpedia)
 ## 載入資料的方法
-可以通過修改html的
+可以通過修改html的要載入的js檔或是填入要取得的json的網址
 ## data format
 ### json
 ### javascript

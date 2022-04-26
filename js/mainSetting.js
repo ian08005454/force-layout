@@ -33,6 +33,7 @@ import { silderInit, sliderBar } from './sliderbarSetting.js';
 import { data, option } from './chartSetting';
 import { listGenerator } from './listGenerator';
 import {autocomplete} from './searchSuggest';
+import { dbpediaConnect } from "./API";
 // import dps from 'dbpedia-sparql-client';
 // import { layoutCalculator } from "./graphologyLayoutSystem.js";
 $('.sidebar').hide(); //在圖還沒形成之前要先將左邊的slider隱藏
@@ -259,7 +260,7 @@ export function event_setOption_function(render = true) {
 export function lineColorChanger(name, color, id) {
 	document.cookie = `${name}=${color}; max-age=2592000; path=/`;
 	if (id === 'node') {
-		var gp = parseInt(name);
+		var gp = groupName.indexOf(name);
 		userColors[gp] = color;
 		data.nodes.forEach((node) => {
 			if (node.gp === gp) {
@@ -291,17 +292,15 @@ export function lineColorChanger(name, color, id) {
 	event_setOption_function(false);
 }
 /**
- * 點擊圖表上的元素會開啟新視窗顯示文本中的相關資訊
+ * 雙擊圖表上的元素會開啟新視窗顯示文本中的相關資訊
  */
-Chart.on('click', (e) => {
+Chart.on('dblclick', (e) => {
 	// console.log(e);
 	if (bookId.indexOf('_') == -1 && e.componentType !== 'title') {
 		console.log(bookId, e.data.source, e.data.target, e.data.name);
 		if (e.data.source == undefined && e.data.target == undefined) searchBookUnit(bookId, e.data.name);
 		else searchBookAssociation(bookId, e.data.source, e.data.target, e.data.name);
 	}
-	
-
 	function searchBookAssociation(bid, key1, key2, relation) {
 		var associationQuery = '"' + key1 + '" AND "' + key2 + '"';
 		// http://dh.ascdc.sinica.edu.tw/member/text/segementRelationDetails.jsp
@@ -350,25 +349,12 @@ Chart.on('click', (e) => {
 	}
 });
 /**
- * 雙擊圖表上的元素會去dbpidia取得相關的資料
+ * 點擊圖表上的元素會去dbpidia取得相關的資料
  */
  Chart.on('dblclick', (e) => {
+	dbpediaConnect(e)
 	// console.log(e.data.name);
-	var url = "http://dbpedia.org/sparql";
-	const query = `SELECT DISTINCT ?Concept WHERE {[] a ?Concept} LIMIT 10`;
-	var queryUrl = encodeURI( url+"?query="+query+"&format=json" );
-    $.ajax({
-        dataType: "json",  
-        url: queryUrl,
-        success: function( _data ) {
-			console.log(_data)
-            console.log(_data.results.bindings);
-            // for ( var i in results ) {
-            //     var res = results[i].abstract.value;
-            //     alert(res);
-            // }
-        }
-    });
+	
 });
 /**
  * 點兩下標題可以修改圖表標題
@@ -394,7 +380,6 @@ function edgeFilter() {
 		}
 	});
 }
-
 // function nodeTypeChange(){
 // 	let target = option.series[0].links.map(function(item, index, array) {
 // 		return item.target;
