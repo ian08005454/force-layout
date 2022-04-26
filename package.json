@@ -1,7 +1,7 @@
 {
   "name": "ascdc-sna",
   "version": "1.1.0",
-  "description": "the socail network analysis for academia sinica center for digital cultures",
+  "description": "The social network analysis for academia sinica center for digital cultures",
   "main": "./js/mainSetting.js",
   "directories": {
     "lib": "lib"
